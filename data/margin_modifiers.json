@@ -1,0 +1,196 @@
+{
+  "skills": {
+    "Heavy Weapons": {
+      "minimal_success": [
+        "The weapon connects with basic effectiveness",
+        "A simple strike finds its mark",
+        "The attack lands, if barely"
+      ],
+      "solid_success": [
+        "The massive weapon strikes true with devastating force",
+        "A powerful overhead swing connects solidly",
+        "The heavy blow lands with crushing impact"
+      ],
+      "critical_success": [
+        "An absolutely perfect strike demolishes all defense",
+        "The weapon becomes an unstoppable force of destruction",
+        "A masterful blow that would fell giants"
+      ],
+      "minimal_failure": [
+        "The weapon swings just wide of the mark",
+        "The attack barely misses its target",
+        "The strike falls short by inches"
+      ],
+      "solid_failure": [
+        "The heavy weapon misses completely",
+        "The attack goes wide of its mark",
+        "The strike fails to connect"
+      ],
+      "critical_failure": [
+        "The weapon's weight works against them catastrophically",
+        "They lose control of the massive weapon entirely",
+        "The attack backfires spectacularly"
+      ]
+    },
+    "Light Weapons": {
+      "minimal_success": [
+        "The blade grazes its target",
+        "A quick strike barely connects",
+        "The attack finds a small opening"
+      ],
+      "solid_success": [
+        "The swift blade finds its mark with precision",
+        "A quick strike slips through their defense",
+        "The agile attack connects cleanly"
+      ],
+      "critical_success": [
+        "The blade moves faster than the eye can follow",
+        "A perfect strike finds the most vulnerable spot",
+        "An impossibly precise attack that cannot be stopped"
+      ],
+      "minimal_failure": [
+        "The blade passes just shy of its target",
+        "The attack nearly finds its mark",
+        "The strike misses by a hair"
+      ],
+      "solid_failure": [
+        "The swift attack fails to connect",
+        "Their defense proves adequate",
+        "The strike misses its mark"
+      ],
+      "critical_failure": [
+        "They lose their grip on the weapon entirely",
+        "The attack leaves them completely exposed",
+        "Their technique falls apart completely"
+      ]
+    },
+    "Stealth": {
+      "minimal_success": [
+        "They remain barely undetected",
+        "Their presence goes just unnoticed",
+        "They maintain concealment by a thread"
+      ],
+      "solid_success": [
+        "They move silently through the shadows",
+        "Their presence goes completely unnoticed",
+        "They slip past without a sound"
+      ],
+      "critical_success": [
+        "They become one with the shadows themselves",
+        "Even their own shadow seems to vanish",
+        "They move with supernatural silence"
+      ],
+      "minimal_failure": [
+        "A small noise nearly gives them away",
+        "They're almost spotted",
+        "Their concealment barely fails"
+      ],
+      "solid_failure": [
+        "Their presence is clearly detected",
+        "The attempt at stealth fails",
+        "They fail to remain hidden"
+      ],
+      "critical_failure": [
+        "They stumble directly into plain sight",
+        "Their attempt at stealth draws immediate attention",
+        "Every step seems to echo loudly"
+      ]
+    },
+    "Investigation": {
+      "minimal_success": [
+        "They notice a small but relevant detail",
+        "Something seems slightly off",
+        "A minor clue catches their attention"
+      ],
+      "solid_success": [
+        "They uncover crucial details others missed",
+        "Their careful analysis reveals the truth",
+        "Key evidence comes to light under their scrutiny"
+      ],
+      "critical_success": [
+        "They piece together the entire puzzle in an instant",
+        "Their deduction borders on precognition",
+        "Every tiny detail tells them a complete story"
+      ],
+      "minimal_failure": [
+        "The evidence remains just out of reach",
+        "Something important eludes their notice",
+        "The clues don't quite add up"
+      ],
+      "solid_failure": [
+        "The investigation yields no results",
+        "They miss important evidence",
+        "The truth remains hidden"
+      ],
+      "critical_failure": [
+        "Their investigation leads them completely astray",
+        "They draw entirely wrong conclusions",
+        "Critical evidence is overlooked or misinterpreted"
+      ]
+    },
+    "Intimidation": {
+      "minimal_success": [
+        "Their target shows slight unease",
+        "A flicker of fear crosses their face",
+        "They manage to seem somewhat threatening"
+      ],
+      "solid_success": [
+        "Their threatening presence breaks their target's resolve",
+        "Fear takes hold as they make their intentions clear",
+        "Their target wilts under their forceful demeanor"
+      ],
+      "critical_success": [
+        "Their mere presence induces primal terror",
+        "The target's will to resist completely shatters",
+        "Fear itself seems to emanate from their being"
+      ],
+      "minimal_failure": [
+        "Their attempt at intimidation falls flat",
+        "The target remains mostly unfazed",
+        "Their threatening presence wavers"
+      ],
+      "solid_failure": [
+        "The attempt at intimidation fails completely",
+        "Their target shows no fear",
+        "They fail to appear threatening"
+      ],
+      "critical_failure": [
+        "Their attempt at intimidation becomes laughable",
+        "The target's confidence only grows stronger",
+        "They appear completely non-threatening"
+      ]
+    }
+  },
+  "generic": {
+    "minimal_success": [
+      "They barely complete the task",
+      "The attempt succeeds by a narrow margin",
+      "They manage just enough skill to succeed"
+    ],
+    "solid_success": [
+      "They complete the task successfully",
+      "Their skill proves sufficient",
+      "The attempt succeeds"
+    ],
+    "critical_success": [
+      "They perform the task with impossible perfection",
+      "Their mastery defies belief",
+      "A display of skill that seems supernatural"
+    ],
+    "minimal_failure": [
+      "They fall just short of success",
+      "The task proves slightly beyond their ability",
+      "They nearly succeed, but not quite"
+    ],
+    "solid_failure": [
+      "They fail to complete the task",
+      "Their attempt falls short",
+      "The task proves beyond their capability"
+    ],
+    "critical_failure": [
+      "They fail spectacularly at the task",
+      "Everything goes wrong",
+      "Their attempt backfires completely"
+    ]
+  }
+}

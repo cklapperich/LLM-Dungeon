@@ -1,0 +1,31 @@
+{
+  "name": "lewddungeon",
+  "version": "1.0.0",
+  "description": "",
+  "main": "actor.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test:skills": "node --experimental-specifier-resolution=node --loader ts-node/esm tests/skillCheckTest.ts",
+    "test:narration": "node --experimental-specifier-resolution=node --loader ts-node/esm tests/llmNarrationTest.ts",
+    "test:actor": "node --experimental-specifier-resolution=node --loader ts-node/esm tests/actorTest.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3",
+    "vite": "^6.1.1"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}

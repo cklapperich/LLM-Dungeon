@@ -1,0 +1,9 @@
+{
+    "might": 8,
+    "grace": 6,
+    "mind": 4,
+    "will": 4,
+    "skills": {
+        "Intimidation": 1
+    }
+}
