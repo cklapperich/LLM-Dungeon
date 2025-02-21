@@ -1,5 +1,7 @@
-import { Attribute, SkillName} from './skilltypes.js';
+import { Attribute, SkillName } from './skilltypes.js';
 import { Trait } from './abilities.js';
+import { abilities } from '../default_abilities.js';
+import { copyTrait } from './abilities.js';
 
 export interface Character {
     traits: Trait[]; // Array of traits/abilities the character has
@@ -17,10 +19,10 @@ export interface Character {
 }
 
 export function calculateMaxVitality(might: number): number {
-    if (might <= 6) return 1;
-    if (might <= 9) return 2;
-    if (might <= 13) return 3;
-    if (might <= 17) return 4;
+    if (might < 6) return 1;
+    if (might < 9) return 2;
+    if (might < 13) return 3;
+    if (might < 17) return 4;
     return 5;
 }
 
@@ -78,5 +80,21 @@ export function saveCharacter(character: Character): string {
  */
 export function loadCharacter(json: string): Character {
     const data = JSON.parse(json);
+    
+    // Convert string traits to actual Trait instances
+    if (data.traits) {
+        data.traits = data.traits.map((trait: string | Trait) => {
+            if (typeof trait === 'string') {
+                // Look up trait in default abilities and create a copy
+                const defaultTrait = (abilities as Record<string, Trait>)[trait.toLowerCase()];
+                if (!defaultTrait) {
+                    throw new Error(`Unknown trait: ${trait}`);
+                }
+                return copyTrait(defaultTrait);
+            }
+            return trait;
+        });
+    }
+    
     return createCharacter(data);
 }

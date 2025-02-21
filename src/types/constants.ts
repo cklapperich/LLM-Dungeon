@@ -11,12 +11,12 @@ export const RarityType = {
 } as const;
 
 export const EffectType = {
-    STAT_CHANGE: 'stat_change',
-    STATUS: 'status',
-    HEAL: 'heal',
-    WOUND: 'wound',
-    GRAPPLE: 'grapple',
-    CORRUPT: 'corrupt'
+    STAT_CHANGE: 'STAT_CHANGE',
+    STATUS: 'STATUS',
+    HEAL: 'HEAL',
+    WOUND: 'WOUND',
+    GRAPPLE: 'GRAPPLE',
+    CORRUPT: 'CORRUPT'
 } as const;
 
 export const LimbType = {

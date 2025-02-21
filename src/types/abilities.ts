@@ -21,7 +21,6 @@ type BodyPartRequirements = {
 }
 
 type Trait = {
-  id: string;
   name: string;
   description: string;
   rarity: Rarity;
@@ -39,10 +38,9 @@ type Trait = {
 }
 
 // Create a new trait with default values
-function createTrait(id: string, defaults: Partial<Trait> = {}): Trait {
+function createTrait(name: string, defaults: Partial<Trait> = {}): Trait {
   return {
-    id,
-    name: defaults.name ?? id,
+    name,
     description: defaults.description ?? "",
     rarity: defaults.rarity ?? RarityType.COMMON,
     skill: defaults.skill ?? Skills.GRAPPLE_MIGHT,
@@ -61,8 +59,7 @@ function copyTrait(trait: Trait): Trait {
 }
 
 // Example trait
-const bite = createTrait('bite', {
-  name: 'Bite',
+const bite = createTrait('Bite', {
   description: 'A sharp bite attack',
   skill: Skills.HEAVY_WEAPONS,
   defenseOptions: [Skills.DODGE_GRACE, Skills.BLOCK_MIGHT], // Defender can use either Dodge or Block

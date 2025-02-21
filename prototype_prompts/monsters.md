@@ -11,10 +11,9 @@ Starting at 120lbs, 12ft
 Abilities: venom bite (Grace, damage + weaken status + arousal status), slam (deal damage, might), coil (dex and might boost, always goes first), Grapple[Might], Breed
 
 ## Blue Slime
-Size 1
 Can move through hidden passages
 
-0bp 
+tiny
 
 Ensures you can always place something. MANY variants and upgrade paths.
 
@@ -26,7 +25,7 @@ Abilities: Stealth[Grace], Slam[Might], Spit[Grace]
 ## Green Slime
 Can move through hidden passages
 
-1bp, 2 vit
+tiny, 2 vit
 Abilities: Stealth[Grace], Slam, Breed, Grapple, Spit
 
 Spit dissolves armor fasteners and clothing and lowers dex
