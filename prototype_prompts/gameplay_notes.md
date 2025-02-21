@@ -1,21 +1,65 @@
-Vitality and Conviction start at 3 for heroines, go down when they take damage.
+## Attributes and Skills
 
-Infamy system. Infamy may increase more/less based on the how you choose to deal with heroines - kill, impregnate, corrupt, release (+3/2/1/-1 points)
+Characters have four attributes:
+- Might
+- Grace
+- Will
+- Wit
 
-killing or releasing are easiest options, reduce Vitality to 3 to do either.
-impregnate is more difficult, takes time, heroine has chance to escape, you're doing non-combat things. Must increase Grapple state to 3.
+From these we derive skills. Each skill is based on an attribute, for example:
+- Grapple[Might]
+- Light Weapons[Grace]
+- Heavy Weapons[Might]
+- Perception[Wit]
 
-corruption is most difficult, reduce Conviction to 3 Not all monsters can corrupt, not all can breed (most can)
+Proficiency in a skill gives +4 modifier.
 
-Boss fight style - only ever 1 heroine / day. may have squires, servants, golems, etc [unbreedable]
+Attribute Score meanings:
+6 or less: Crippling
+7: Poor
+8 or 9: Below average
+10: Average (most humans)
+11 or 12: Above average
+13 or 14: Exceptional
+15 or 16: Amazing
+17 or 18: Legendary
+19 or 20: Mythic
+21+: Superhuman
+
+Initiative is 3d6-grace, lowest wins, rerolled each round.
+
+## Vitality and Conviction
+
+Typical vitality values:
+- Size 1 creatures: 1-2 vitality
+- Size 2 creatures and Heroines: 3 vitality
+- Size 3 creatures: 3-5 vitality
+
+Heroines start with 3 conviction (more for high will ones).
+
+Vitality and Conviction go down when taking damage.
+
+## Infamy System
+
+Infamy may increase more/less based on how you choose to deal with heroines:
+- Kill: +3 points
+- Impregnate: +2 points
+- Corrupt: +1 point
+- Release: -1 points
+
+Killing or releasing are easiest options, reduce Vitality to 3 to do either.
+Impregnate is more difficult, takes time, heroine has chance to escape, you're doing non-combat things. Must increase Grapple state to 3.
+Corruption is most difficult, reduce Conviction to 3. Not all monsters can corrupt, not all can breed (most can).
+
+Higher infamy means better quality heroines.
+
+## Combat Structure
+
+Boss fight style - only ever 1 heroine / day. May have squires, servants, golems, etc [unbreedable]
 
 Which route through the dungeon you guide the hero is always a key decision. You can lure protagonists down a certain path via various methods, some may cost resources.
 
-higher infamy - better quality heroines
-
-Monsters can die but you can always breed more, or possibly repair them. Maybe when a monster dies you can use its genetic material to help build new monsters.
-
-have to breed heroines to earn breeding points plus you get a set number each day.
+Monsters can die but you can always make more through card packs.
 
 BACKSTORIES - GIVE GIRLS BACKSTORIES FOR FUNSIES and to make player more connected to them.
 
@@ -30,7 +74,7 @@ UPGRADE MONSTERS, PLACE TRAPS, PLACE MONSTERS, ADD ON TO TEMPLE
 
 ## COMBAT
 
-combat is always 1v1
+Combat is always 1v1
 
 Monsters can only use abilities in combat. Some grant you a free trap though.
 
@@ -40,21 +84,21 @@ Heroines that are grappled can use resist/struggle + 4 to resist grapple skill c
 
 A failed grapple check from a monster decreases the stage by 1 (only if they're resisting? otherwise a failure means state remains the same? uncertain.)
 Success increases stage by 1
-limited use items and abilities can free from grapple/reduce stage by 1
-heroines can attack or use items while grappled or abilities, instead of resisting.
-many/most grapple skills give a permanent ability debuff till end of battle - to help progress things.
+Limited use items and abilities can free from grapple/reduce stage by 1
+Heroines can attack or use items while grappled or abilities, instead of resisting.
+Many/most grapple skills give a permanent ability debuff till end of battle - to help progress things.
 Need to be careful to avoid 'loop' of gameplay where you just keep going up/down by 1 grapple point. 
 Healing needs to be limited. Things that reduce grapple stage carefully limited. Most grapple abilities need to come with a free +2 or +4 modifier, or a stat reduction (spider web type stuff)
 
 Each grapple level is progressively harder to escape from. Needs a progressive modifier of some type. 1x or 2x the stage as a bonus/penalty.
 
-healing is always limited use (very) and typically adventurers lack this
+Healing is always limited use (very) and typically adventurers lack this
 
 Killing an adventurer is SUPPOSED to be easier, grappling meant to be hard
 
 Some grapple actions have a BIG bonus modifier but cause a wound, giving a tradeoff: dont want to kill
 
-if she struggles when you choose not to grapple, thats a wasted action! Almost like a rock/paper/scissors
+If she struggles when you choose not to grapple, thats a wasted action! Almost like a rock/paper/scissors
 grapple - resist: grapple happens without modifier, failure keeps same state. Heroine gains benefit of the action
 grapple + resist: grapple happens with a modifier helping the Heroine, failure on monsters grapple check reduces grapple state by 1 instead of 0
 no grapple - resist action: wasted action for heroine!
@@ -63,33 +107,32 @@ no grapple - resist action: wasted action for heroine!
 
 Each grapple level automatically restrains 1 limb of your choice. Limbs: leg, leg, arm, arm, mouth.
 
-## breeding
-
-breeding tradeoff - can either breed a 2nd time, or do some action to get another pack pull/draft.
+## Arousal System
 
 Arousal levels for narrative purposes:
  dry - slick - sopping
 maybe add gameplay implications too?
 
-DESIGN PHILOSOPHY:
+## DESIGN PHILOSOPHY:
 
 Killing should be easier than capturing
 Grappling should be hard but have tools to ensure progress
 Avoid loops through permanent debuffs
 Combat should always move toward a conclusion
 
-## dungeons
+## Dungeons
 
 Dungeon layout is fixed for now - limited control over it.
+
 ## Clothing/armor removal
 
 Practical Combat-Based Removal:
 
 Each lost point of vit loses some clothing.
 Can attempt to give a command to remove clothing if its a mind control monster.
-can attempt to tear clothing off a grappled heroine as an action
-some monster attack abilities naturally have a shred factor (claws, dissolving slime_)
-heroines can abandon an article of clothing to lower grapple level by one, if they have 1 free arm.
+Can attempt to tear clothing off a grappled heroine as an action
+Some monster attack abilities naturally have a shred factor (claws, dissolving slime)
+Heroines can abandon an article of clothing to lower grapple level by one, if they have 1 free arm.
 
 Gameplay Balance:
 

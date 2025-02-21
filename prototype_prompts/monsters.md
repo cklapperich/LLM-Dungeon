@@ -79,7 +79,7 @@ Rainbow Flash - Dazed, -1 will, cant use next turn
 Temple Cultist: TBD, inspired by the Stewards from Monster Train
 
 ## Orb Weaver
-2bp
+Size: Medium
 
 Place web Trap once/day in adjacent panel only
 
@@ -88,7 +88,7 @@ Bite [Wound, Venom], Slam [Wound], Cocoon (-1 grace -1 might, Grapple[Grace vs M
 ## Crystal Guardian 
 
 ## Shadow Hound
-2bp
+Size: Medium
 Grace Moderate, Might Moderate
 
 Stealth[Grace], Pounce (Grapple[Might] - Knock Prone), Rend[Might] (+0, wound, remove 1 level of armor, including heavy), Breed, Howl, Bite[Might] (+4, wound), 

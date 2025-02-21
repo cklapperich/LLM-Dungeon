@@ -26,8 +26,9 @@ export interface Trap {
     id: string;
     name: string;
     description: string;
+    modifier: Number;
     artworkUrl?: string;
-    effect: string; // TODO: Define proper effect type
+    effect: Trait;
 }
 
 export interface CombatState {
