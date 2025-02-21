@@ -1,4 +1,6 @@
 
+# Classes
+
 Heroine's come in classes: mage, rogue, fighter
 
 Rogues are lightly armored, high Grace, proficient in perception and disarm trap, 

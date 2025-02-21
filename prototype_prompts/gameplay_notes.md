@@ -2,8 +2,6 @@ Vitality and Conviction start at 3 for heroines, go down when they take damage.
 
 Infamy system. Infamy may increase more/less based on the how you choose to deal with heroines - kill, impregnate, corrupt, release (+3/2/1/-1 points)
 
-+1 bp/day, breeding is +1, intense breeding is another +1
-
 killing or releasing are easiest options, reduce Vitality to 3 to do either.
 impregnate is more difficult, takes time, heroine has chance to escape, you're doing non-combat things. Must increase Grapple state to 3.
 
@@ -23,6 +21,7 @@ BACKSTORIES - GIVE GIRLS BACKSTORIES FOR FUNSIES and to make player more connect
 
 Monsters level up by gaining 'perks', not leveling. Heroines do just scale up statwise mostly. Can purchase perks. 
 
+Built in default abilities: slam/bite, grapple, remove clothing (only grappled target). These are all +0 and built into all monsters.
 
 ## PREPARATION: 
 UPGRADE MONSTERS, PLACE TRAPS, PLACE MONSTERS, ADD ON TO TEMPLE
@@ -62,9 +61,11 @@ no grapple - resist action: wasted action for heroine!
 
 [Yes exactly - if she chooses to struggle but you don't attempt to maintain/increase the grapple, her action is essentially wasted. The grapple level stays at 2 but she lost her turn. This creates interesting tactical choices - sometimes letting them waste energy struggling while you accomplish other goals can be smart!]
 
+Each grapple level automatically restrains 1 limb of your choice. Limbs: leg, leg, arm, arm, mouth.
+
 ## breeding
 
-breeding tradeoff - can either breed a 2nd time, or do some action to increase BP gain by +1. However monster unuseable next day.
+breeding tradeoff - can either breed a 2nd time, or do some action to get another pack pull/draft.
 
 Arousal levels for narrative purposes:
  dry - slick - sopping

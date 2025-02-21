@@ -1,13 +1,6 @@
 import { RollResult, IntensityLevel, SKILL_CONSTANTS, OpposedCheckResult, SkillName} from '../types/skilltypes.js';
-import { marginModifiers, getSkillAttribute, getOpposedSkill } from './dataLoader.js';
+import { marginModifiers, getSkillAttribute } from './dataLoader.js';
 import { Character, getAttributeValue, getSkillBonus } from '../types/actor.js';
-
-// export enum Difficulty {
-//     Easy = 4,
-//     Normal = 0,
-//     Hard = -4,
-//     VeryHard = -8
-// }
 
 // Roll 3d6 and subtract Grace for initiative (rerolled each round)
 // Lower numbers go first
@@ -88,16 +81,51 @@ export function makeSkillCheck(
     };
 }
 
+/**
+ * Find the best defensive skill for a character from a list of options
+ * @param character The defending character
+ * @param defenseOptions Array of possible defensive skills
+ * @returns The skill name that gives the highest total (attribute + bonus)
+ */
+function getBestDefensiveSkill(character: Character, defenseOptions: SkillName[]): SkillName {
+    if (defenseOptions.length === 0) {
+        throw new Error("No defense options provided");
+    }
+
+    let bestSkill = defenseOptions[0];
+    let bestTotal = -Infinity;
+
+    for (const skillName of defenseOptions) {
+        const attribute = getSkillAttribute(skillName);
+        const baseAttribute = getAttributeValue(character, attribute);
+        const skillBonus = getSkillBonus(character, skillName);
+        const total = baseAttribute + skillBonus;
+
+        if (total > bestTotal) {
+            bestTotal = total;
+            bestSkill = skillName;
+        }
+    }
+
+    return bestSkill;
+}
+
 export function makeOpposedCheck(
     attacker: Character,
     attackerSkill: SkillName,
     defender: Character,
-    defenderSkill?: SkillName,
+    defenseOptions?: SkillName | SkillName[],
     attacker_modifier: number = 0,
 ): OpposedCheckResult {
-    const attackerResult = makeSkillCheck(attacker, attackerSkill);
-    const actualDefenderSkill = defenderSkill || getOpposedSkill(attackerSkill);
-    const defenderResult = makeSkillCheck(defender, actualDefenderSkill, attacker_modifier);
+    const attackerResult = makeSkillCheck(attacker, attackerSkill, attacker_modifier);
+    
+    // Convert single skill to array if needed
+    const defenseOptionsArray = defenseOptions 
+        ? (Array.isArray(defenseOptions) ? defenseOptions : [defenseOptions])
+        : [attackerSkill]; // Default to same skill if no options provided
+    
+    const defenderSkill = getBestDefensiveSkill(defender, defenseOptionsArray);
+    const defenderResult = makeSkillCheck(defender, defenderSkill);
     
     // If one succeeds and one fails, success wins
     if (attackerResult.success && !defenderResult.success) {

@@ -11,6 +11,7 @@ Starting at 120lbs, 12ft
 Abilities: venom bite (Grace, damage + weaken status + arousal status), slam (deal damage, might), coil (dex and might boost, always goes first), Grapple[Might], Breed
 
 ## Blue Slime
+Size 1
 Can move through hidden passages
 
 0bp 
@@ -38,7 +39,7 @@ can dissolve into water to hide very well.
 
 weak in combat, low in all stats.
 
-CHEAP - only 1bp to produce.
+Size 1
 Low Grace. 
 Low Might
 Decent Vitality
@@ -47,7 +48,7 @@ Low Conviction
 can breed w/o removing clothing or armor
 
 ## MINOTAUR
-3bp
+size 3
 Abilities: Grapple[Might] - restrains both arms, Disarm, Charge[Might] - Damage, breed(throat) - can be done regardless of armor, breed(vaginal) - requires naked heroine, Intimidate
 Trip[Might] - Knocks Prone, Tear Armor[Might] - Only when grappling, remove any armor from the target   
 
@@ -61,7 +62,7 @@ Throatfuck requires no armor removal, but earns only 1bp instead of 2
 intimidating, can encourage adventurers to take other passages instead
 
 ## Crystal Guardian
-3bp
+size 3
 
 99 Conviction
 5 vitality

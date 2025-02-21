@@ -1,0 +1,54 @@
+{
+  "name": "The Profaned Temple",
+  "description": "A once-sacred temple now twisted by dark forces. Holy symbols lie corrupted, and what was once a place of salvation now serves as a beacon of corruption. The very walls seem to pulse with malevolent energy.",
+  "templates": [
+    {
+      "templateId": "dark_corridor",
+      "name": "Dark Corridor",
+      "description": "A narrow passage lined with corrupted symbols",
+      "type": "corridor",
+      "capacity": "SMALL",
+      "canBeTrapped": true
+    },
+    {
+      "templateId": "desecrated_entrance",
+      "name": "Desecrated Temple Gates",
+      "description": "Once-holy gates now twisted by dark energies, their sacred symbols corrupted",
+      "type": "chamber",
+      "capacity": "SMALL",
+      "canBeTrapped": false,
+      "isEntrance": true
+    },
+    {
+      "templateId": "corrupted_chapel",
+      "name": "Corrupted Chapel",
+      "description": "A chapel where holy symbols have been perverted into symbols of darkness",
+      "type": "chamber",
+      "capacity": "LARGE",
+      "canBeTrapped": true
+    },
+    {
+      "templateId": "defiled_confessional",
+      "name": "Defiled Confessional",
+      "description": "A small chamber where sins are celebrated rather than absolved",
+      "type": "chamber",
+      "capacity": "SMALL",
+      "canBeTrapped": true
+    },
+    {
+      "templateId": "dark_altar",
+      "name": "Dark Altar Chamber",
+      "description": "The temple's main altar, now a focal point of corruption",
+      "type": "chamber",
+      "capacity": "LARGE",
+      "canBeTrapped": true
+    }
+  ],
+  "grid": [
+    [0, 1, 0, 1, 0],
+    [1, 2, 1, 3, 1],
+    [0, 1, 0, 1, 0],
+    [1, 4, 1, 5, 1],
+    [0, 1, 0, 1, 0]
+  ]
+}

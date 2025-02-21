@@ -1,6 +1,8 @@
 import { Attribute, SkillName} from './skilltypes.js';
+import { Trait } from './abilities.js';
 
 export interface Character {
+    traits: Trait[]; // Array of traits/abilities the character has
     might: number;
     grace: number;
     mind: number;
@@ -40,6 +42,7 @@ export function createCharacter(attributes: Partial<Character> = {}): Character 
     const mind = attributes.mind??10;
 
     return {
+        traits: attributes.traits ?? [],
         might,
         grace,
         mind,

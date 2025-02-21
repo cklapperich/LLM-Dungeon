@@ -73,42 +73,6 @@ keeps track of which limbs are restrained.
 mouth can be restrained too. 
 
 everything is data-driven, hardcode as little as possible, stored as json
-
-## status conditions
-
-Horny (minus will, minus grapple checks)
-
-Weakened (minus strength)
-
-Dazed (more vulnerable to grapple or attack or another mind control action)
-
-## traps
-
-Can't be in same room as a monster
-
-## Grappling
-
-progressively harder to escape as grappling continues, odds should go down
-Enemies can ambush you, getting a free grapple.
-
-Happens in stages. At final stage the heroine is fully bound and can be bred.
-
-Every action requires certain limbs free. Attacking rquires at least 1 arm free.
-
-Each sucessful grapple opossed check raises a grapple state by 1. 
-
-Failure either removes the grapple state to 0 or reduces it by 1 level.
-
-Full grapple can go into breed or kill.
-
-
-## Mind Control
-
-Happens in stages, inflicts damage to Will instead of HP.
-
-Monster can attempt to disarm, partially disrobe an Heroine, or daze a heroine to decrease her resistance to grapples during the next  round. Either can pickup weapon as an action.
-
-
 ## LLM Narrative Framework
 
 Flash/4o-mini/deepseek v3 narrates everything until EXPLICIT scenes which Sonnet narrates

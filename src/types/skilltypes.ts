@@ -1,7 +1,7 @@
 /**
  * Attributes as defined in skillsystem.md
  */
-export type Attribute = 'Might' | 'Grace' | 'Mind' | 'Will';
+export type Attribute = 'Might' | 'Grace' | 'Will' | 'Wit';
 
 /**
  * Base skill interface representing a skill definition
@@ -15,9 +15,6 @@ export interface Skill {
     
     /** The attribute this skill is based on */
     attribute: Attribute;
-    
-    /** Name of the skill that opposes this one in contested checks, if any */
-    opposed_by?: string;
 }
 
 /**
@@ -100,31 +97,21 @@ export function isSkillProficient(skillLevels: SkillLevels, skillName: string): 
 }
 
 export const Skills = {
-    // Attributes
-    MIGHT: "Might",
-    GRACE: "Grace",
-    MIND: "Mind",
-    WILL: "Will",
-
     // Combat
-    LIGHT_WEAPONS: "Light Weapons",
-    HEAVY_WEAPONS: "Heavy Weapons",
+    GRAPPLE_MIGHT: "Grapple[Might]",
+    GRAPPLE_GRACE: "Grapple[Grace]",
+    LIGHT_WEAPONS: "Light Weapons[Grace]",
+    HEAVY_WEAPONS: "Heavy Weapons[Might]",
+    BREAK_FREE_MIGHT: "Break Free[Might]",
+    SLIP_FREE_GRACE: "Slip Free[Grace]",
+    BLOCK_MIGHT: "Block[Might]",
+    DODGE_GRACE: "Dodge[Grace]",
+    PARRY_GRACE: "Parry[Grace]",
 
-    // Stealth
-    STEALTH: "Stealth",
-    TRAP_DISARMING: "Trap Disarming",
-    TRAP_DETECTION: "Trap Detection",
-
-    // Knowledge
-    ARCANE_KNOWLEDGE: "Arcane Knowledge",
-    INVESTIGATION: "Investigation",
-
-    // Social
-    INTIMIDATION: "Intimidation",
-    COMMAND: "Command",
-
-    // Magic
-    RESIST_MAGIC: "Resist Magic"
+    // Stealth & Detection
+    STEALTH: "Stealth[Grace]",
+    PERCEPTION: "Perception[Wit]",
+    DISARM_TRAP: "Disarm Trap[Grace]"
 } as const;
 
 export type SkillName = typeof Skills[keyof typeof Skills];

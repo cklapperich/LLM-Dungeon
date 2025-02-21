@@ -1,88 +1,59 @@
 {
     "skills": [
         {
-            "name": "Might",
+            "name": "Grapple[Might]",
             "attribute": "Might",
-            "description": "Raw physical power and strength",
-            "opposed_by": "Might"
+            "description": "Wrestling and physical control using raw strength"
         },
         {
-            "name": "Grace",
+            "name": "Grapple[Grace]",
+            "attribute": "Grace", 
+            "description": "Wrestling and physical control using agility and technique"
+        },
+        {
+            "name": "Light Weapons[Grace]",
             "attribute": "Grace",
-            "description": "Physical agility and coordination",
-            "opposed_by": "Grace"
+            "description": "Skill with quick, precise weapons that rely on agility"
         },
         {
-            "name": "Mind",
-            "attribute": "Mind",
-            "description": "Mental acuity and intelligence",
-            "opposed_by": "Mind"
-        },
-        {
-            "name": "Will",
-            "attribute": "Will",
-            "description": "Mental fortitude and force of personality",
-            "opposed_by": "Will"
-        },
-        {
-            "name": "Heavy Weapons",
+            "name": "Heavy Weapons[Might]",
             "attribute": "Might",
-            "description": "Proficiency with large, powerful weapons that require significant strength",
-            "opposed_by": null
+            "description": "Proficiency with large, powerful weapons that require strength"
         },
         {
-            "name": "Light Weapons",
+            "name": "Slip Free[Grace]",
             "attribute": "Grace",
-            "description": "Skill with quick, precise weapons that rely on agility",
-            "opposed_by": null
+            "description": "Using agility to escape holds and bindings"
         },
         {
-            "name": "Stealth",
+            "name": "Block[Might]",
+            "attribute": "Might",
+            "description": "Using strength to physically block attacks"
+        },
+        {
+            "name": "Dodge[Grace]",
             "attribute": "Grace",
-            "description": "Ability to move silently and avoid detection",
-            "opposed_by": null
+            "description": "Using agility to avoid attacks"
         },
         {
-            "name": "Trap Disarming",
+            "name": "Parry[Grace]",
             "attribute": "Grace",
-            "description": "Skill at safely disabling mechanical traps and devices",
-            "opposed_by": null
+            "description": "Using precise movements to deflect attacks"
         },
         {
-            "name": "Trap Detection",
-            "attribute": "Mind",
-            "description": "Ability to spot and identify traps and hazards",
-            "opposed_by": null
+            "name": "Disarm Trap[Grace]",
+            "attribute": "Grace",
+            "description": "Skill at safely disabling mechanical traps and devices"
         },
         {
-            "name": "Arcane Knowledge",
-            "attribute": "Mind",
-            "description": "Understanding of magical theory and supernatural phenomena",
-            "opposed_by": null
+            "name": "Stealth[Grace]",
+            "attribute": "Grace",
+            "description": "Ability to move silently and avoid detection"
         },
         {
-            "name": "Investigation",
-            "attribute": "Mind",
-            "description": "Ability to gather information and solve mysteries",
-            "opposed_by": null
-        },
-        {
-            "name": "Intimidation",
-            "attribute": "Will",
-            "description": "Skill at frightening or coercing others",
-            "opposed_by": "Will"
-        },
-        {
-            "name": "Resist Magic",
-            "attribute": "Will",
-            "description": "Mental fortitude against magical effects",
-            "opposed_by": "Will"
-        },
-        {
-            "name": "Command",
-            "attribute": "Will",
-            "description": "Ability to lead and direct others",
-            "opposed_by": "Will"
+            "name": "Perception[Wit]",
+            "attribute": "Wit",
+            "description": "Ability to notice details and spot hidden things"
         }
     ]
 }

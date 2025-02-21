@@ -48,22 +48,6 @@ const skillAttributeMap = new Map(
     skillsData.skills.map(skill => [skill.name, skill.attribute])
 );
 
-const skillOppositionMap = new Map(
-    skillsData.skills.map(skill => [skill.name, skill.opposed_by || skill.name])
-);
-
-/**
- * Get the opposing skill for a given skill
- * If no opposition is defined, returns the same skill
- */
-export function getOpposedSkill(skillName: SkillName): SkillName {
-    const opposedSkill = skillOppositionMap.get(skillName);
-    if (!opposedSkill) {
-        throw new Error(`Unknown skill: ${skillName}`);
-    }
-    return opposedSkill as SkillName;
-}
-
 /**
  * Get the attribute associated with a skill
  */

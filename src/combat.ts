@@ -1,5 +1,5 @@
 import { Character } from './types/actor.js';
-import { abilities } from './abilities.js';
+import { abilities } from './default_abilities.js';
 import { makeSkillCheck, makeOpposedCheck, rollInitiative} from './utils/skillCheck.js';
 import { RollResult, SkillName } from './types/skilltypes.js';
 

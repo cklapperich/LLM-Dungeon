@@ -132,3 +132,5 @@ Base Monsters can be pulled from card packs.
 
 You get X card packs per day, +Y for breeding +Z for an intense capture. Each pack is 3 cards, choose 1. 
 Probably 2/day, +1 uncommon pick if capture, +1 rare pick if intense capture
+
+Abilities all have cooldowns.
