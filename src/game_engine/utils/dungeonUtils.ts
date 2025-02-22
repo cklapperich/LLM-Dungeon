@@ -1,5 +1,5 @@
-import { DungeonLayout, Room } from '../types/dungeon.js';
-import { RoomType } from '../types/constants.js';
+import { DungeonLayout, Room } from '../../types/dungeon.ts';
+import { RoomType } from '../../types/constants.ts';
 
 export function getAdjacentRooms(layout: DungeonLayout, roomId: number): number[] {
     const rooms: number[] = [];
@@ -59,13 +59,17 @@ export function loadDungeonFromJson(json: string): DungeonLayout {
     data.grid.forEach((row, y) => {
         row.forEach((value, x) => {
             if (value !== RoomType.EMPTY && !rooms[value]) {
-                const template = data.templates[value - 1]; // -1 because grid uses 1-based indexing
+                const template = data.templates.find(t => t.id === value);
+                if (!template) {
+                    throw new Error(`No template found for room ID ${value}`);
+                }
                 rooms[value] = {
-                    ...template, // Copy all template properties
+                    ...template,
                     id: value,
                     actors: [],
                     monster: null,
-                    trap: null
+                    trap: null,
+                    flags: {},
                 };
             }
         });

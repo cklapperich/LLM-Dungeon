@@ -1,9 +1,8 @@
 import { TaskType, PROMPTS } from './prompts.js';
 
-export type Message = {
-    role: 'system' | 'user' | 'assistant';
-    content: string;
-}
+import { GameLogMessage} from '../types/gamestate.ts';
+
+export type Message = GameLogMessage;
 
 export async function callLLM(
     taskType: TaskType,
@@ -16,9 +15,9 @@ export async function callLLM(
 
     // Construct the full message array with system prompt and task
     const fullMessages: Message[] = [
-        { role: 'system', content: system },
+        { sender: 'system', content: system, timestamp: Date.now() },
         ...messages,
-        { role: 'user', content: task }
+        { sender: 'user', content: task, timestamp: Date.now() }
     ];
 
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -30,7 +29,10 @@ export async function callLLM(
         },
         body: JSON.stringify({
             model,
-            messages: fullMessages
+            messages: fullMessages.map(msg => ({
+                role: msg.sender,
+                content: msg.content
+            }))
         })
     });
 

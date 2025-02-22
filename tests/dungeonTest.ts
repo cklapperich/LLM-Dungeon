@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { describe, test, expect } from 'vitest';
-import { loadDungeonFromJson, getAdjacentRooms } from '../src/utils/dungeonUtils.js';
-import { formatDungeonLayout, formatRoomInfo } from '../src/utils/textUI.js';
+import { loadDungeonFromJson, getAdjacentRooms } from '../src/game_engine/utils/dungeonUtils.ts';
+import { formatDungeonLayout, formatRoomInfo } from '../src/game_engine/utils/textUI.ts';
 import { RoomType } from '../src/types/constants.js';
 
 describe('Profaned Temple Dungeon', () => {

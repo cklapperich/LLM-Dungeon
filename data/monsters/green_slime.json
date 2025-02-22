@@ -1,7 +1,8 @@
 {
-    "might": 6,
-    "grace": 6,
-    "mind": 4,
+    "name": "Green Slime",
+    "might": 7,
+    "grace": 7,
+    "wit": 4,
     "will": 4,
     "skills": {
         "Stealth[Grace]": 2,
@@ -9,46 +10,23 @@
     },
     "description": "A small, gelatinous creature that can dissolve into water and slip through tight spaces",
     "size": 1,
-    "minTraitSlots": 2,
-    "maxTraitSlots": 4,
     "traits": [
         "slam",
-        "grapple",
         {
-            "name": "Dissolve",
-            "description": "Dissolve into water to become nearly invisible",
+            "name": "Bludgeon",
+            "description": "A more skillful attack, reaching out with a tentacle to strike.",
             "rarity": "common",
-            "skill": "Stealth[Grace]",
-            "defenseOptions": ["Perception[Wit]"],
-            "modifier": 0,
-            "target": "self",
-            "priority": false,
-            "effects": [
-                {
-                    "type": "STAT_CHANGE",
-                    "value": 2,
-                    "skill": "Stealth[Grace]"
-                }
-            ]
-        },
-        {
-            "name": "Spit",
-            "description": "Spits acid that dissolves armor fasteners and clothing",
-            "rarity": "common",
-            "skill": "Light Weapons[Grace]",
+            "skill": "Grace",
             "defenseOptions": ["Dodge[Grace]", "Block[Might]"],
-            "modifier": 0,
+            "modifier": 2,
             "target": "opponent",
             "priority": false,
             "effects": [
                 {
-                    "type": "CORRUPT",
-                    "value": 1
-                },
-                {
-                    "type": "STAT_CHANGE",
-                    "value": -2,
-                    "skill": "Dodge[Grace]"
+                    "type": "WOUND",
+                    "params":{
+                        "value": 1
+                    }
                 }
             ]
         }

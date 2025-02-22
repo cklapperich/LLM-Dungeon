@@ -8,6 +8,7 @@ export type GridValue = typeof RoomType.EMPTY | number;
 export interface Room {
     id: number;
     templateId: string;
+    templateName: string;
     name: string;
     description: string;
     type: RoomTypeValue;
@@ -17,6 +18,7 @@ export interface Room {
     monster?: BaseMonster | null;
     trap?: Trap | null;
     actors: Character[];
+    flags: Record<string, number>;
 }
 
 export interface DungeonLayout {

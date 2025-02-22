@@ -1,15 +1,13 @@
-import { RollResult, IntensityLevel, SKILL_CONSTANTS, OpposedCheckResult, SkillName} from '../types/skilltypes.js';
-import { marginModifiers, getSkillAttribute } from './dataLoader.js';
-import { Character, getAttributeValue, getSkillBonus } from '../types/actor.js';
+import { RollResult, IntensityLevel, SKILL_CONSTANTS, OpposedCheckResult, SkillName} from '../../types/skilltypes.ts';
+import { marginModifiers, getSkillAttribute } from './dataLoader.ts';
+import { Character, getAttributeValue, getSkillBonus } from '../../types/actor.ts';
 
 // Roll 3d6 and subtract Grace for initiative (rerolled each round)
 // Lower numbers go first
 // Example: Grace 13, roll 15 = initiative 2 (15-13)
 //         Grace 13, roll 8 = initiative -5 (8-13)
 export function rollInitiative(character: Character): number {
-    const roll = Math.floor(Math.random() * 6) + 1 + 
-                Math.floor(Math.random() * 6) + 1 + 
-                Math.floor(Math.random() * 6) + 1;
+    const roll = roll2d10();
     return roll - character.grace;
 }
 
@@ -36,15 +34,16 @@ function getSkillDescription(skillName: string | undefined, intensity: Intensity
     return prompts[Math.floor(Math.random() * prompts.length)];
 }
 
-/**
- * Roll 3d6
- */
+
 function roll3d6(): number {
     return Math.floor(Math.random() * 6) + 1 +
            Math.floor(Math.random() * 6) + 1 +
            Math.floor(Math.random() * 6) + 1;
 }
-
+function roll2d10(): number {
+    return Math.floor(Math.random() * 10) + 1 +
+           Math.floor(Math.random() * 10) + 1
+}
 /**
  * Make a skill check
  * @param character The character making the check
@@ -61,12 +60,12 @@ export function makeSkillCheck(
     const baseAttribute = getAttributeValue(character, attribute);
     const skillBonus = getSkillBonus(character, skillName);
     
-    const roll = roll3d6();
+    const roll = roll2d10();
     const modifiedAttribute = baseAttribute + skillBonus + modifier;
     const margin = modifiedAttribute - roll;
     const intensity = getIntensityLevel(margin);
-    const isCriticalSuccess = roll <= 4;
-    const isCriticalFailure = roll >= 17;
+    const isCriticalSuccess = roll <= 3;
+    const isCriticalFailure = roll >= 19;
     const success = isCriticalSuccess || (roll <= modifiedAttribute && !isCriticalFailure);
 
     return {

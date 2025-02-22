@@ -1,4 +1,4 @@
-import { makeSkillCheck, makeOpposedCheck } from '../src/utils/skillCheck.js';
+import { makeSkillCheck, makeOpposedCheck } from '../src/game_engine/utils/skillCheck.ts';
 import { Skills } from '../src/types/skilltypes.js';
 import { createCharacter } from '../src/types/actor.js';
 import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';

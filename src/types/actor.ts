@@ -1,13 +1,15 @@
 import { Attribute, SkillName } from './skilltypes.js';
 import { Trait } from './abilities.js';
-import { abilities } from '../default_abilities.js';
+import { abilities } from '../game_engine/default_abilities.ts';
 import { copyTrait } from './abilities.js';
+import { MonsterSize } from './constants.js';
 
 export interface Character {
-    traits: Trait[]; // Array of traits/abilities the character has
+    name: string;
+    traits: Trait[];
     might: number;
     grace: number;
-    mind: number;
+    wit: number;
     will: number;
     skills: Record<string, number>;
     maxVitality: number;
@@ -15,22 +17,25 @@ export interface Character {
     maxConviction: number;
     conviction: number;
     grappleState: number;
-    description:string;
+    description: string;
+    flags: Record<string, number>;
+    size?: MonsterSize; // Optional size field for monsters
+    initiative?: number; // Track initiative in combat
 }
 
 export function calculateMaxVitality(might: number): number {
-    if (might < 6) return 1;
-    if (might < 9) return 2;
+    if (might < 6) return 2;
+    if (might < 9) return 3;
     if (might < 13) return 3;
-    if (might < 17) return 4;
+    if (might < 16) return 4;
     return 5;
 }
 
 export function calculateMaxConviction(will: number): number {
-    if (will <= 6) return 1;
-    if (will <= 9) return 2;
+    if (will <= 6) return 2;
+    if (will <= 9) return 3;
     if (will <= 13) return 3;
-    if (will <= 17) return 4;
+    if (will <= 16) return 4;
     return 5;
 }
 
@@ -41,13 +46,14 @@ export function createCharacter(attributes: Partial<Character> = {}): Character 
     const might = attributes.might ?? 10;
     const will = attributes.will ?? 10;
     const grace = attributes.grace??10;
-    const mind = attributes.mind??10;
+    const wit = attributes.wit??10;
 
     return {
+        name: attributes.name ?? 'New Character',
         traits: attributes.traits ?? [],
         might,
         grace,
-        mind,
+        wit,
         will,
         skills: attributes.skills ?? {},
         maxVitality: calculateMaxVitality(might),
@@ -56,11 +62,12 @@ export function createCharacter(attributes: Partial<Character> = {}): Character 
         conviction: calculateMaxConviction(will),
         grappleState: 0,
         description:attributes.description??"",
+        flags: attributes.flags ?? {},
     };
 }
 
 export function getAttributeValue(character: Character, attribute: Attribute): number {
-    return character[attribute.toLowerCase() as keyof Pick<Character, 'might' | 'grace' | 'mind' | 'will'>];
+    return character[attribute.toLowerCase() as keyof Pick<Character, 'might' | 'grace' | 'wit' | 'will'>];
 }
 
 export function getSkillBonus(character: Character, skillName: SkillName): number {

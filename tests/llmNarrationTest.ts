@@ -1,5 +1,5 @@
 import { config } from 'dotenv';
-import { callLLM, Message } from '../src/llm.js';
+import { callLLM, Message } from '../src/game_engine/llm.ts';
 import { describe, test, expect, vi, beforeAll, afterEach } from 'vitest';
 
 // Load environment variables

@@ -11,7 +11,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 describe('Create Actor Tests', () => {
     test('creating a slime with a Slam ability', () => {
-        const slimeJson = readFileSync(join(__dirname, '..', 'data', 'monsters', 'slime.json'), 'utf-8');
+        const slimeJson = readFileSync(join(__dirname, '..', 'data', 'monsters', 'green_slime.json'), 'utf-8');
         const slime = loadCharacter(slimeJson);
 
         // Create Slam ability
@@ -35,7 +35,7 @@ describe('Create Actor Tests', () => {
 
         // Test ability was added correctly
         expect(slime.traits.length).toBe(1);
-        expect(slime.traits[0].name).toBe('Slam');
+        expect(slime.traits[0].name).toBe('slam');
         expect(slime.traits[0].skill).toBe(Skills.GRAPPLE_MIGHT);
         expect(slime.traits[0].modifier).toBe(4);
         expect(slime.traits[0].defenseOptions).toEqual([]);

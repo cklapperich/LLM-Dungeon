@@ -1,0 +1,30 @@
+{
+    "name": "Clara",
+    "might": 8,
+    "grace": 14,
+    "wit": 12,
+    "will": 6,
+    "skills": {
+        "Stealth[Grace]": 2
+    },
+    "description": "",
+    "size": 1,
+    "traits": [
+        {
+            "name": "Stab",
+            "description": "A skillfull rapier thrust",
+            "rarity": "common",
+            "skill": "Light Weapons[Grace]",
+            "defenseOptions": ["Dodge[Grace]","Block[Might]"],
+            "modifier": 2,
+            "target": "self",
+            "priority": false,
+            "effects": [
+                {
+                    "type": "WOUND",
+                    "value": 1
+                }
+            ]
+        }
+    ]
+}

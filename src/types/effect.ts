@@ -1,10 +1,7 @@
 import { EffectType } from './constants.js';
 import { Character } from './actor.js';
-
-export interface GameState {
-    characters: Record<string, Character>;
-    // Add other game state as needed
-}
+import { applyWound } from '../game_engine/gameActions.ts';
+import { GameState } from './gamestate.js';
 
 export interface Effect {
     type: typeof EffectType[keyof typeof EffectType];
@@ -20,10 +17,13 @@ export const effectHandlers: Record<typeof EffectType[keyof typeof EffectType], 
             throw new Error('Wound effect requires a numeric value parameter');
         }
         
-        target.vitality = Math.max(0, target.vitality - effect.params.value);
-    },
-    [EffectType.STAT_CHANGE]: (effect, source, target, gameState) => {
-        throw new Error('STAT_CHANGE effect not implemented');
+        const result = applyWound(gameState, source, target, {
+            amount: effect.params.value
+        });
+        
+        if (!result.success) {
+            throw new Error(`Failed to apply wound: ${result.message}`);
+        }
     },
     [EffectType.STATUS]: (effect, source, target, gameState) => {
         throw new Error('STATUS effect not implemented');

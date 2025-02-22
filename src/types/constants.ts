@@ -11,7 +11,6 @@ export const RarityType = {
 } as const;
 
 export const EffectType = {
-    STAT_CHANGE: 'STAT_CHANGE',
     STATUS: 'STATUS',
     HEAL: 'HEAL',
     WOUND: 'WOUND',

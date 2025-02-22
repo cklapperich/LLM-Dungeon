@@ -1,7 +1,7 @@
 /**
  * Attributes as defined in skillsystem.md
  */
-export type Attribute = 'Might' | 'Grace' | 'Mind' | 'Will';
+export type Attribute = 'Might' | 'Grace' | 'Wit' | 'Will';
 
 /**
  * Base skill interface representing a skill definition

@@ -40,23 +40,36 @@ describe('Actor Tests', () => {
 
     describe('character loading', () => {
         test('loads monsters with traits', () => {
-            // Test green slime loads with both string-based and custom traits
+            // Test clara loads correctly
+            const claraJson = readFileSync(join(__dirname, '..', 'data', 'monsters', 'clara.json'), 'utf-8');
+            const clara = loadCharacter(claraJson);
+            
+            // Basic stats load as provided in JSON
+            expect(clara.might).toBe(8);
+            expect(clara.grace).toBe(14);
+            expect(clara.mind).toBe(12);
+            expect(clara.will).toBe(6);
+            expect(clara.skills['Stealth[Grace]']).toBe(2);
+            expect(clara.traits[0].name).toBe('Stab');
+            expect(clara.traits[0].effects[0].type).toBe('WOUND');
+
+            // Test green slime loads correctly
             const greenSlimeJson = readFileSync(join(__dirname, '..', 'data', 'monsters', 'green_slime.json'), 'utf-8');
             const greenSlime = loadCharacter(greenSlimeJson);
             
             // Basic stats load as provided in JSON
             expect(greenSlime.might).toBe(6);
-            expect(greenSlime.vitality).toBe(greenSlime.maxVitality);
+            expect(greenSlime.grace).toBe(6);
+            expect(greenSlime.mind).toBe(4);
+            expect(greenSlime.will).toBe(4);
+            expect(greenSlime.skills['Stealth[Grace]']).toBe(2);
+            expect(greenSlime.skills['Grapple[Might]']).toBe(2);
+            expect(greenSlime.description).toBe('A small, gelatinous creature that can dissolve into water and slip through tight spaces');
             
-            // String-based traits are converted to instances
-            const slamTrait = greenSlime.traits.find(t => t.name === 'Slam');
-            expect(slamTrait).toBeDefined();
-            expect(slamTrait?.effects[0].type).toBe('WOUND');
-            
-            // Custom traits are preserved
-            const dissolveTrait = greenSlime.traits.find(t => t.name === 'Dissolve');
-            expect(dissolveTrait).toBeDefined();
-            expect(dissolveTrait?.effects[0].type).toBe('STAT_CHANGE');
+            // Test traits
+            expect(greenSlime.traits).toHaveLength(2);
+            expect(greenSlime.traits[1].name).toBe('Bludgeon');
+            expect(greenSlime.traits[1].effects[0].type).toBe('WOUND');
         });
     });
 });

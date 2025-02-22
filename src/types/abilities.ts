@@ -58,6 +58,7 @@ function copyTrait(trait: Trait): Trait {
   return JSON.parse(JSON.stringify(trait));
 }
 
+const defaultDefenseOptions=["Dodge[Grace]","Block[Might"];
 // Example trait
 const bite = createTrait('Bite', {
   description: 'A sharp bite attack',
@@ -83,5 +84,6 @@ export type {
 
 export {
   createTrait,
-  copyTrait
+  copyTrait,
+  defaultDefenseOptions
 };
