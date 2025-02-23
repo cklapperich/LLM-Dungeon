@@ -54,6 +54,26 @@
             "name": "Perception[Wit]",
             "attribute": "Wit",
             "description": "Ability to notice details and spot hidden things"
+        },
+        {
+            "name":"Grace",
+            "attribute": "Grace",
+            "description": "Agility and coordination"
+        },
+        {
+            "name": "Might",
+            "attribute": "Might",
+            "description": "Physical strength and power"
+        },
+        {
+            "name": "Wit",
+            "attribute": "Wit",
+            "description": "Intelligence and mental acuity"
+        },
+        {
+            "name": "Will",
+            "attribute": "Will",
+            "description": "Determination and resolve"
         }
     ]
 }

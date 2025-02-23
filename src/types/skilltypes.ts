@@ -1,3 +1,5 @@
+import { IntensityType, IntensityTypes } from "./constants";
+
 /**
  * Attributes as defined in skillsystem.md
  */
@@ -35,17 +37,6 @@ export interface SkillProficiency {
 export type SkillLevels = Record<string, number>;
 
 /**
- * Possible intensity levels for skill check results
- */
-export type IntensityLevel = 
-    | 'critical_success'
-    | 'solid_success'
-    | 'minimal_success'
-    | 'minimal_failure'
-    | 'solid_failure'
-    | 'critical_failure';
-
-/**
  * Result of a skill check roll
  */
 export interface RollResult {
@@ -56,7 +47,7 @@ export interface RollResult {
     isCriticalSuccess: boolean;
     isCriticalFailure: boolean;
     description?: string;
-    intensity?: IntensityLevel;
+    intensity?: IntensityTypes;
 }
 
 /**
@@ -107,11 +98,15 @@ export const Skills = {
     BLOCK_MIGHT: "Block[Might]",
     DODGE_GRACE: "Dodge[Grace]",
     PARRY_GRACE: "Parry[Grace]",
-
     // Stealth & Detection
     STEALTH: "Stealth[Grace]",
     PERCEPTION: "Perception[Wit]",
-    DISARM_TRAP: "Disarm Trap[Grace]"
+    DISARM_TRAP: "Disarm Trap[Grace]",
+    // Attribute-based skills: the skill is literally just the attribute
+    MIGHT: "Might",
+    GRACE: "Grace",
+    WIT: "Wit",
+    WILL: "Will",
 } as const;
 
 export type SkillName = typeof Skills[keyof typeof Skills];

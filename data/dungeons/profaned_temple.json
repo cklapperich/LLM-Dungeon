@@ -3,8 +3,7 @@
   "description": "A once-sacred temple now twisted by dark forces. Holy symbols lie corrupted, and what was once a place of salvation now serves as a beacon of corruption. The very walls seem to pulse with malevolent energy.",
   "templates": [
     {
-      "id": 1,
-      "templateId": "dark_corridor",
+      "templateId": 1,
       "templateName": "Dark Corridor",
       "name": "Dark Corridor",
       "description": "A narrow passage lined with corrupted symbols",
@@ -13,8 +12,7 @@
       "canBeTrapped": true
     },
     {
-      "id": 2,
-      "templateId": "desecrated_entrance",
+      "templateId": 2,
       "templateName": "Desecrated Temple Gates",
       "name": "Desecrated Temple Gates",
       "description": "Once-holy gates now twisted by dark energies, their sacred symbols corrupted",
@@ -24,8 +22,7 @@
       "isEntrance": true
     },
     {
-      "id": 3,
-      "templateId": "corrupted_chapel",
+      "templateId": 3,
       "templateName": "Corrupted Chapel",
       "name": "Corrupted Chapel",
       "description": "A chapel where holy symbols have been perverted into symbols of darkness",
@@ -34,8 +31,7 @@
       "canBeTrapped": true
     },
     {
-      "id": 4,
-      "templateId": "defiled_confessional",
+      "templateId": 4,
       "templateName": "Defiled Confessional",
       "name": "Defiled Confessional",
       "description": "A small chamber where sins are celebrated rather than absolved",
@@ -44,8 +40,7 @@
       "canBeTrapped": true
     },
     {
-      "id": 5,
-      "templateId": "dark_altar",
+      "templateId": 5,
       "templateName": "Dark Altar Chamber",
       "name": "Dark Altar Chamber",
       "description": "The temple's main altar, now a focal point of corruption",

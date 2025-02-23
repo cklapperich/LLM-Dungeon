@@ -1,72 +1,117 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Book } from 'lucide-react';
-import { GameLogMessage } from '../../../types/gamestate';
-import { UIAction, BaseUIAction } from '../../types/uiTypes';
+import { CombatState, getAllLogsWithRounds } from '../../../game_engine/combatState';
+import { UIAction } from '../../types/uiTypes';
+import { useLoading } from '../../context/LoadingContext';
+import { Character } from '../../../types/actor';
 
 interface ActionPanelProps {
-    messageLog: GameLogMessage[];
-    legalActions: UIAction[];
-    onAction: (action: UIAction) => void;
+    combatState?: CombatState;
+    allCharacters: Record<string, Character>;
+    onAction: (action: UIAction) => Promise<void>;
 }
 
 export const ActionPanel: React.FC<ActionPanelProps> = ({ 
-    messageLog = [],
-    legalActions = [],
+    combatState,
+    allCharacters,
     onAction 
 }) => {
-    const [showLog, setShowLog] = React.useState(false);
+    const { isLoading } = useLoading();
+    
+    // Log combat state and actions whenever they change
+    React.useEffect(() => {
+        console.log('ActionPanel received combatState:', combatState);
+        console.log('Available actions:', combatState?.playerActions);
+    }, [combatState]);
+    const [logType, setLogType] = React.useState<'combat' | 'narration'>('narration');
+    const logContainerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const scrollToBottom = () => {
+            if (logContainerRef.current) {
+                const element = logContainerRef.current;
+                setTimeout(() => {
+                    element.scrollTop = element.scrollHeight;
+                }, 100);
+            }
+        };
+        scrollToBottom();
+    }, [logType, combatState && getAllLogsWithRounds(combatState)]);
 
     return (
-        <div className="w-1/3 bg-slate-200 p-6 flex flex-col">
+        <div className="w-1/3 bg-slate-200 p-6 flex flex-col h-full">
             {/* Available Actions */}
-            <div className="mb-4">
-                <h3 className="font-bold mb-2">Available Actions</h3>
-                <div className="space-y-2">
-                    {legalActions.map((action, i) => (
+            <div className="h-[25%] flex flex-col min-h-0 mb-4">
+                <h3 className="font-bold mb-2 flex-none">Available Actions</h3>
+                <div className="grid grid-cols-2 auto-rows-fr gap-2 overflow-y-auto pr-2 flex-1">
+                    {(combatState?.playerActions || []).map((action, i) => (
                         <button
                             key={i}
-                            onClick={() => onAction(action)}
-                            disabled={action.disabled}
-                            className={`w-full p-2 rounded flex items-center justify-between
-                                ${action.disabled 
-                                    ? 'bg-slate-300 text-slate-500' 
+                            onClick={async () => await onAction(action)}
+                            disabled={action.disabled || isLoading}
+                            className={`w-full h-full p-2 rounded flex flex-col items-center justify-center text-center
+                                ${action.disabled || isLoading
+                                    ? 'bg-slate-300 text-slate-500 cursor-not-allowed' 
                                     : 'bg-blue-500 text-white hover:bg-blue-600'}`}
                         >
-                            <span>{action.label}</span>
-                            {action.disabled && action.tooltip && (
-                                <span className="text-sm">{action.tooltip}</span>
-                            )}
+                            <div className="w-full overflow-hidden">
+                                <div className="truncate">{action.label}</div>
+                                {action.disabled && action.tooltip && (
+                                    <div className="text-sm truncate">{action.tooltip}</div>
+                                )}
+                            </div>
                         </button>
-                    ))}
+                     ))}
                 </div>
             </div>
 
-            {/* Message Log Toggle */}
+            {/* Log Type Toggle */}
             <button 
-                className="mb-4 flex items-center gap-2 px-4 py-2 rounded bg-slate-300 hover:bg-slate-400"
-                onClick={() => setShowLog(!showLog)}
+                className={`mb-4 flex items-center justify-center gap-2 px-4 py-2 rounded w-full ${
+                    isLoading 
+                        ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                        : 'bg-slate-300 hover:bg-slate-400'
+                }`}
+                disabled={isLoading}
+                onClick={() => setLogType(logType === 'combat' ? 'narration' : 'combat')}
             >
                 <Book size={16} />
-                Message Log
+                {logType === 'combat' ? 'Show Narration' : 'Show Combat'}
             </button>
 
-            {/* Message Log Panel */}
-            <div className="flex-1 bg-white rounded-lg p-4 overflow-y-auto">
-                {showLog ? (
-                    messageLog.map((message, i) => (
-                        <div key={i} className="mb-2 text-sm">
-                            <span className="font-medium">{message.sender}: </span>
-                            {message.content}
-                        </div>
-                    ))
-                ) : (
-                    <>
-                        <h3 className="font-bold mb-2">Combat Status</h3>
-                        <div className="text-sm text-gray-600">
-                            Waiting for next action...
-                        </div>
-                    </>
-                )}
+            {/* Log Panel */}
+            <div ref={logContainerRef} className="flex-1 bg-white rounded-lg p-4 overflow-y-auto min-h-0">
+                <div className="space-y-4">
+                    {combatState && (() => {
+                        const logs = getAllLogsWithRounds(combatState)
+                            .filter(entry => entry.type === logType);
+                        
+                        // Group logs by round
+                        const logsByRound: { [round: number]: typeof logs } = {};
+                        logs.forEach(log => {
+                            if (!logsByRound[log.round]) {
+                                logsByRound[log.round] = [];
+                            }
+                            logsByRound[log.round].push(log);
+                        });
+
+                        return Object.entries(logsByRound).map(([round, entries]) => (
+                            <div key={round} className="mb-4">
+                                <div className="text-xs text-gray-500 mb-2">Round {round}</div>
+                                <div className="space-y-2">
+                                    {entries.map((entry, i) => (
+                                        <div 
+                                            key={`${entry.type}-${round}-${i}`}
+                                            className={`text-sm ${logType === 'narration' ? 'italic' : ''}`}
+                                        >
+                                            {entry.text}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ));
+                    })()}
+                </div>
             </div>
         </div>
     );

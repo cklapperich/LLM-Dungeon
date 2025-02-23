@@ -1,53 +1,66 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import claraJson from '../data/monsters/clara.json'
-import greenSlimeJson from '../data/monsters/green_slime.json'
 import GameInterface from './react_ui/GameInterface'
-import { createTestGameState, GamePhase } from './types/gamestate'
-import { MonsterSize, RarityType, TargetType } from './types/constants'
-import { loadMonster } from './game_engine/utils/dataLoader'
-import { getLegalActions } from './game_engine/combat'
-import { Skills } from './types/skilltypes'
+import { createTestCombatScenario, createDefaultTestCharacters, createTestGameState } from './testing/stateGenerators'
+import { executeAction } from './game_engine/gameActions'
+import { UIAction } from './react_ui/types/uiTypes'
+import { LoadingProvider, useLoading } from './react_ui/context/LoadingContext'
 import './index.css'
 
-// Create characters from data
-const hero = loadMonster(claraJson);
-const monster = loadMonster(greenSlimeJson);
+const GameApp = () => {
+  // Initialize test game state
+  const [gameState, setGameState] = React.useState(() => {
+    // Return empty initial state
+    return createTestGameState();
+  });
 
-// Create a test game state
-const testGameState = createTestGameState({
-  turnCounter: 1,
-  dayCounter: 1,
-  infamy: 100,
-  messageLog: [
-    { sender: 'system', content: 'Combat initialized...', timestamp: Date.now() },
-    { sender: 'assistant', content: 'Monster appears!', timestamp: Date.now() }
-  ],
-  activeCombat: {
-    roomId: 'test-room',
-    characters: [hero, monster],
-    round: 1,
-    isComplete: false,
-    activeCharacterIndex: 0,
-    current_turn: 'player',
-    legalActions: [], // Will be populated by getLegalActions
-    actionResults: []
-  },
-  currentPhase: 'combat' as GamePhase
-});
+  // Load combat state asynchronously
+  React.useEffect(() => {
+    async function initGame() {
+      const { player, monster } = createDefaultTestCharacters();
+      // Use the Corrupted Chapel room for testing
+      const initialState = await createTestCombatScenario(player, monster, "Corrupted Chapel_3_1");  // Room ID for Corrupted Chapel at grid position [1,3]
+      setGameState(initialState);
+    }
 
-// Populate legal actions for combat state
-if (testGameState.activeCombat) {
-  const actions = getLegalActions(testGameState.activeCombat.characters[0], testGameState.activeCombat);
-  testGameState.activeCombat.legalActions = actions;
-}
+    initGame();
+  }, []); // Empty dependency array means this runs once on mount
+
+  const { setIsLoading } = useLoading();
+
+  const handleAction = async (action: UIAction) => {
+    setIsLoading(true);
+    try {
+      const result = await executeAction(gameState, action);
+      if (result.success) {
+        setGameState(result.newState);
+      } else {
+        console.error(result.message);
+      }
+    } catch (error) {
+      console.error('Error executing action:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <GameInterface 
+      gameState={gameState}
+      onAction={handleAction}
+      onNavigate={(view) => console.log('Navigate to:', view)}
+    />
+  );
+};
+
+const App = () => (
+  <LoadingProvider>
+    <GameApp />
+  </LoadingProvider>
+);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <GameInterface 
-      gameState={testGameState}
-      onAction={(action) => console.log('Action:', action)}
-      onNavigate={(view) => console.log('Navigate to:', view)}
-    />
+    <App />
   </React.StrictMode>
-)
+);

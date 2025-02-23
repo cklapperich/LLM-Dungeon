@@ -1,5 +1,6 @@
 {
     "name": "Clara",
+    "type": "hero",
     "might": 8,
     "grace": 14,
     "wit": 12,
@@ -22,7 +23,7 @@
             "effects": [
                 {
                     "type": "WOUND",
-                    "value": 1
+                    "params": { "value": 1 }
                 }
             ]
         }

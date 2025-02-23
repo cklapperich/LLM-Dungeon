@@ -1,37 +1,49 @@
 import { Character } from '../types/actor.ts';
-import { makeSkillCheck, makeOpposedCheck, rollInitiative} from './utils/skillCheck.js';
-import { RollResult, SkillName } from '../types/skilltypes.ts';
+import { makeSkillCheck, makeOpposedCheck} from './utils/skillCheck.js';
+import { SkillName } from '../types/skilltypes.ts';
 import { Trait } from '../types/abilities';
-import { TargetType } from '../types/constants';
+import { TargetType, CharacterType } from '../types/constants';
 import { UIAction, TraitUIAction, BaseUIAction } from '../react_ui/types/uiTypes';
-import { CombatState, ActionResult } from '../types/gamestate';
+import { GameState, getCharactersFromIdList } from '../types/gamestate';
+import { CombatState, initializeCombatState, startNewRound } from './combatState';
+import { applyEffect } from '../types/effect.js';
+import { generateInitialNarration, generateRoundNarration } from './combatNarration.js';
+import { processStateBasedActions } from './stateBasedActions';
 
-// Initialize combat state with given characters
-export function initializeCombat(characters: Character[]): CombatState {
-    // Set initial initiative for each character
-    characters.forEach(char => {
-        char.initiative = rollInitiative(char);
-    });
+// Initialize combat state with given game state
+export async function initializeCombat(gameState: GameState, room_id: string, narrate: boolean = true): Promise<CombatState> {
+    const characterIds = Object.keys(gameState.characters);
+    if (characterIds.length !== 2) {
+        throw new Error('Combat must be initialized with exactly 2 characters');
+    }
 
-    // Sort characters by initiative (lower goes first)
-    const sortedCharacters = [...characters].sort(
-        (a, b) => (a.initiative ?? 0) - (b.initiative ?? 0)
-    );
+    // Get the characters and initialize combat state
+    const characters = characterIds.map(id => gameState.characters[id]) as [Character, Character];
+    console.log('Characters in combat:', characters.map(c => ({ name: c.name, type: c.type })));
+    
+    const state = initializeCombatState(characterIds, characters, room_id);
 
-    return {
-        roomId: 'combat-room',
-        characters: sortedCharacters,
-        round: 1,
-        isComplete: false,
-        activeCharacterIndex: 0,
-        current_turn: 'player',
-        legalActions: [],
-        actionResults: []
-    };
+    // Find the monster and set its actions
+    const monster = getCharactersFromIdList(state.characterIds, gameState).find(c => c.type === CharacterType.MONSTER);
+    console.log('Found monster for player:', monster?.name);
+    if (!monster) {
+        throw new Error('No monster character found in combat');
+    }
+    
+    const actions = getLegalActions(monster, state, gameState);
+    console.log('Initial legal actions:', actions.map(a => a.type));
+    state.playerActions = actions;
+
+    // Generate initial narration after state is set up
+    if (narrate) {
+        state.combatLog[0].narrations.push(await generateInitialNarration(state, gameState));
+    }
+
+    return state;
 }
 
 // Check if a trait is legal for the current actor
-export function isLegalAction(trait: Trait, state: CombatState): boolean {
+export function isLegalAction(trait: Trait, state: CombatState, gameState: GameState): boolean {
     // For now, all traits are legal unless explicitly disabled
     return true;
 }
@@ -53,15 +65,27 @@ const systemActions: BaseUIAction[] = [
     }
 ];
 
-// Get all legal actions for the current actor and store them in combat state
-export function getLegalActions(actor: Character, state: CombatState): UIAction[] {
+// Get all legal actions for a given actor
+export function getLegalActions(actor: Character, state: CombatState, gameState: GameState): UIAction[] {
+    console.log('Getting legal actions for:', actor.name);
+    console.log('Actor traits:', actor.traits);
+    
     const actions: UIAction[] = [];
 
     // Add system actions first
     actions.push(...systemActions);
+    console.log('Added system actions:', systemActions.map(a => a.type));
 
     // Add all traits from the actor
     actor.traits.forEach(trait => {
+        console.log('Processing trait:', trait.name);
+        
+        // Skip if ability is on cooldown
+        if (trait.cooldown?.current > 0) {
+            console.log('Trait on cooldown:', trait.name);
+            return;
+        }
+
         const action: TraitUIAction = {
             type: trait.name,
             label: trait.name,
@@ -72,35 +96,48 @@ export function getLegalActions(actor: Character, state: CombatState): UIAction[
         // Add target for abilities that need one
         if (trait.target === TargetType.OPPONENT) {
             // Find the target character (the one that's not the actor)
-            const target = state.characters.find(char => char !== actor);
-            if (target) {
+            const actorId = state.characterIds.find(id => gameState.characters[id] === actor);
+            const targetId = state.characterIds.find(id => id !== actorId);
+            console.log('Target check:', { actorId, targetId });
+            if (targetId && gameState.characters[targetId]) {
                 actions.push(action);
+                console.log('Added opponent-targeted action:', action.type);
             }
         } else {
             actions.push(action);
+            console.log('Added non-targeted action:', action.type);
         }
     });
 
-    // Store filtered actions in combat state
+    console.log('Final legal actions:', actions.map(a => a.type));
     return actions;
 }
 
-// Process state-based actions (like ongoing effects, vitality loss, etc)
-export function processStateBasedActions(state: CombatState): CombatState {
-    // Check each character for state-based effects
-    state.characters.forEach(char => {
-        // Check for defeat conditions
-        if (char.vitality <= 0 || char.conviction <= 0) {
-            state.isComplete = true;
-        }
-    });
-
-    return state;
+// Get actions for current actor (used by combat/AI logic)
+export function getCurrentActorActions(state: CombatState, gameState: GameState): UIAction[] {
+    const actor = getCharactersFromIdList(state.characterIds, gameState)[state.activeCharacterIndex];
+    return getLegalActions(actor, state, gameState);
 }
 
+// Get monster's actions (used to update playerActions)
+export function getMonsterActions(state: CombatState, gameState: GameState): UIAction[] {
+    const monster = getCharactersFromIdList(state.characterIds, gameState).find(c => c.type === CharacterType.MONSTER);
+    console.log('Getting monster actions for:', monster?.name);
+    const actions = monster ? getLegalActions(monster, state, gameState) : [];
+    console.log('Monster actions:', actions.map(a => a.type));
+    return actions;
+}
+
+
 // Execute a trait
-export function executeTrait(trait: Trait, actor: Character, target: Character | undefined, state: CombatState): CombatState {
-    if (!isLegalAction(trait, state)) {
+export async function executeTrait(
+    trait: Trait, 
+    actor: Character, 
+    target: Character | undefined, 
+    state: CombatState,
+    gameState: GameState
+): Promise<CombatState> {
+    if (!isLegalAction(trait, state, gameState)) {
         throw new Error('Illegal trait attempted');
     }
     
@@ -123,42 +160,77 @@ export function executeTrait(trait: Trait, actor: Character, target: Character |
         );
     }
     
-    // Create action result
-    const result: ActionResult = {
-        trait,
-        actor,
-        target,
-        success: skillCheck.success,
-        message: `${actor.name} used ${trait.name}`,
-        margin: skillCheck.margin
-    };
+    // Get or create the current round's log
+    let currentRoundLog = state.combatLog.find(log => log.round === state.round);
+    if (!currentRoundLog) {
+        currentRoundLog = {
+            combatLogs: [],
+            round: state.round,
+            narrations: []
+        };
+        state.combatLog.push(currentRoundLog);
+    }
+
+    // Log the initial action
+    currentRoundLog.combatLogs.push(
+        `${actor.name} used ${trait.name}${target ? ` on ${target.name}` : ''}`
+    );
+
+    // For opposed checks, we need to access the attacker's result
+    const result = target ? skillCheck.attacker : skillCheck;
     
-    // Record the result
-    state.actionResults.push(result);
+    // Log skill check result with description
+    currentRoundLog.combatLogs.push(
+        `${actor.name} rolled ${result.roll} vs target ${result.attribute} (${result.success ? 'Success' : 'Failure'} by ${Math.abs(result.margin)})`
+    );
+    currentRoundLog.combatLogs.push(result.description);
+
     
-    // Apply each effect in the trait
-    trait.effects.forEach(effect => {
-        // TODO: Apply effect based on type
-        // For now, just log it
-        console.log(`Applying effect: ${effect.type} with value ${effect.value}`);
-    });
+    // Only apply effects if the skill check succeeded
+    if (result.success) {
+        // Apply each effect in the trait
+        trait.effects.forEach(effect => {
+            try {
+                // Pass the full game state to apply effect
+                const updatedGameState = {
+                    ...gameState,
+                    activeCombat: state
+                };
+                applyEffect(effect, actor, target ?? actor, updatedGameState);
+                // Only log successful effects to combat log
+                currentRoundLog.combatLogs.push(
+                    `Applied ${effect.type} effect${effect.params.value ? ` with value ${effect.params.value}` : ''}`
+                );
+            } catch (error) {
+                // Log technical errors to console only
+                console.error(`Error applying ${effect.type} effect:`, error);
+                // Add a generic failure message to combat log
+                currentRoundLog.combatLogs.push(
+                    `${actor.name}'s ${effect.type} effect failed`
+                );
+            }
+        });
+    }
 
     // Move to next character
-    state.activeCharacterIndex = (state.activeCharacterIndex + 1) % state.characters.length;
+    state.activeCharacterIndex = (state.activeCharacterIndex + 1) % state.characterIds.length;
 
-    // If we've wrapped around to the start, advance to next round
+    // If we've wrapped around to the start, narrate and start new round
     if (state.activeCharacterIndex === 0) {
-        state.round += 1;
-        // Roll new initiative for each character
-        state.characters.forEach(char => {
-            char.initiative = rollInitiative(char);
-        });
-        // Sort characters by new initiative values
-        state.characters.sort(
-            (a, b) => (a.initiative ?? 0) - (b.initiative ?? 0)
-        );
+        state.combatLog[state.round - 1].narrations.push(await generateRoundNarration(state, gameState));
+        const characters = state.characterIds.map(id => gameState.characters[id]) as [Character, Character];
+        await startNewRound(state, characters);
+    }
+
+    // Update player actions
+    const monster = getCharactersFromIdList(state.characterIds, gameState).find(c => c.type === CharacterType.MONSTER);
+    console.log('Updating player actions for monster:', monster?.name);
+    if (monster) {
+        const actions = getLegalActions(monster, state, gameState);
+        console.log('Updated player actions:', actions.map(a => a.type));
+        state.playerActions = actions;
     }
 
     // Check state-based actions after the action resolves
-    return processStateBasedActions(state);
+    return processStateBasedActions(state, gameState);
 }

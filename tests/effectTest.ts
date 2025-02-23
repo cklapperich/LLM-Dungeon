@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import { createCharacter } from '../src/types/actor.js';
-import { createWoundEffect, applyEffect } from '../src/types/effect.js';
-import { EffectType } from '../src/types/constants.js';
+import { createWoundEffect, createGrappleEffect, applyEffect } from '../src/types/effect.js';
+import { EffectType, CombatFlags, GrappleType } from '../src/types/constants.js';
 import { createTestGameState } from '../src/types/gamestate.js';
 
 describe('Effect Tests', () => {
@@ -37,6 +37,42 @@ describe('Effect Tests', () => {
         applyEffect(wound, source, target, gameState);
         
         expect(target.vitality).toBe(0);
+    });
+
+    test('grapple effect with GRAB type sets grappled flag', () => {
+        const source = createCharacter();
+        const target = createCharacter();
+        const gameState = createTestGameState({
+            characters: { 
+                'source': source,
+                'target': target 
+            }
+        });
+        
+        expect(target.flags[CombatFlags.GRAPPLED]).toBeUndefined();
+        
+        const grapple = createGrappleEffect();  // Defaults to GRAB type
+        applyEffect(grapple, source, target, gameState);
+        
+        expect(target.flags[CombatFlags.GRAPPLED]).toBe(1);
+    });
+
+    test('grapple effect with PENETRATE type sets penetrated flag', () => {
+        const source = createCharacter();
+        const target = createCharacter();
+        const gameState = createTestGameState({
+            characters: { 
+                'source': source,
+                'target': target 
+            }
+        });
+        
+        expect(target.flags[CombatFlags.PENETRATED]).toBeUndefined();
+        
+        const penetrate = createGrappleEffect(GrappleType.PENETRATE);
+        applyEffect(penetrate, source, target, gameState);
+        
+        expect(target.flags[CombatFlags.PENETRATED]).toBe(1);
     });
 
     test('wound effect requires numeric value', () => {

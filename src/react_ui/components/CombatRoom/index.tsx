@@ -8,7 +8,7 @@ import ActionPanel from './ActionPanel';
 
 interface CombatRoomProps {
     gameState: BackendGameState;
-    onAction: (action: UIAction) => void;
+    onAction: (action: UIAction) => Promise<void>;
     onNavigate: (view: string) => void;
 }
 
@@ -32,14 +32,17 @@ export const CombatRoom: React.FC<CombatRoomProps> = ({
                 />
 
                 {/* Main Game Area */}
-                <div className="flex-1 flex">
+                <div className="flex-1 flex overflow-hidden">
                     {/* Combat View */}
-                    <CombatArea combatState={gameState.activeCombat} />
+                    <CombatArea 
+                        combatState={gameState.activeCombat} 
+                        allCharacters={gameState.characters}
+                    />
 
                     {/* Right Side Panel */}
                     <ActionPanel 
-                        messageLog={gameState.messageLog}
-                        legalActions={gameState.activeCombat?.legalActions ?? []}
+                        combatState={gameState.activeCombat ?? undefined}
+                        allCharacters={gameState.characters}
                         onAction={onAction}
                     />
                 </div>

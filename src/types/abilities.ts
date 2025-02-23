@@ -10,14 +10,15 @@ import {
 
 type Effect = {
   type: EffectTypes;
-  value: number; // Defaults to 1
-  skill?: string | null; // Defaults to null
+  params: Record<string, any>;  // Different params for different effect types
 }
 
-type BodyPartRequirements = {
-  arms?: number;
-  legs?: number;
-  mouth?: number;
+type Requirements = {
+  limbs?: {
+    arms?: number;
+    legs?: number;
+    mouth?: number;
+  }
 }
 
 type Trait = {
@@ -31,10 +32,16 @@ type Trait = {
   modifier: number;
   target: Target;
   priority: boolean;
-  bodyParts?: BodyPartRequirements;
+  requirements?: Requirements;
   
   // What happens on hit
   effects: Effect[];
+
+  // Cooldown tracking
+  cooldown?: {
+    duration: number;  // How many rounds the cooldown lasts
+    current: number;   // Current rounds remaining on cooldown
+  }
 }
 
 // Create a new trait with default values
@@ -49,7 +56,8 @@ function createTrait(name: string, defaults: Partial<Trait> = {}): Trait {
     target: defaults.target ?? TargetType.OPPONENT,
     priority: defaults.priority ?? false,
     effects: defaults.effects ?? [],
-    ...(defaults.bodyParts && { bodyParts: defaults.bodyParts })
+    ...(defaults.requirements && { requirements: defaults.requirements }),
+    ...(defaults.cooldown && { cooldown: { ...defaults.cooldown, current: 0 } })
   };
 }
 
@@ -65,20 +73,22 @@ const bite = createTrait('Bite', {
   skill: Skills.HEAVY_WEAPONS,
   defenseOptions: [Skills.DODGE_GRACE, Skills.BLOCK_MIGHT], // Defender can use either Dodge or Block
   modifier: 2,
-  bodyParts: {
-    mouth: 1
-  },
-  effects: [
-    {
-      type: EffectType.WOUND,
-      value: 1
+  requirements: {
+    limbs: {
+      mouth: 1
     }
-  ]
+  },
+    effects: [
+      {
+        type: EffectType.WOUND,
+        params: { value: 1 }
+      }
+    ]
 });
 
 export type {
   Effect,
-  BodyPartRequirements,
+  Requirements,
   Trait
 };
 

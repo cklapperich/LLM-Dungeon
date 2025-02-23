@@ -9,7 +9,7 @@ export const Card: React.FC<CardProps> = ({ data }) => {
     const { type, emoji, backgroundColor, overlayColor, borderRadius, stats } = data;
     
     return (
-        <div className={`relative w-64 h-80 ${backgroundColor} ${borderRadius} flex flex-col items-center justify-center shadow-lg`}>
+        <div className={`relative w-full aspect-[4/5] ${backgroundColor} ${borderRadius} flex flex-col items-center justify-center shadow-lg`}>
             <div className="absolute top-2 right-2 flex flex-col gap-1">
                 {stats.topStats.map((stat, index) => (
                     <div key={`${type}-top-${index}`} 

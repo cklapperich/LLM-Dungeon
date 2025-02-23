@@ -2,10 +2,12 @@ import { Attribute, SkillName } from './skilltypes.js';
 import { Trait } from './abilities.js';
 import { abilities } from '../game_engine/default_abilities.ts';
 import { copyTrait } from './abilities.js';
-import { MonsterSize } from './constants.js';
+import { MonsterSize, CharacterType, CharacterTypeValue, Limb, LimbType } from './constants.js';
 
 export interface Character {
+    id: string;
     name: string;
+    type: CharacterTypeValue;
     traits: Trait[];
     might: number;
     grace: number;
@@ -16,11 +18,11 @@ export interface Character {
     vitality: number;
     maxConviction: number;
     conviction: number;
-    grappleState: number;
     description: string;
     flags: Record<string, number>;
     size?: MonsterSize; // Optional size field for monsters
     initiative?: number; // Track initiative in combat
+    limbs: Record<Limb, boolean>; // Track which limbs the character has
 }
 
 export function calculateMaxVitality(might: number): number {
@@ -49,7 +51,9 @@ export function createCharacter(attributes: Partial<Character> = {}): Character 
     const wit = attributes.wit??10;
 
     return {
+        id: attributes.id ?? crypto.randomUUID(),
         name: attributes.name ?? 'New Character',
+        type: attributes.type ?? CharacterType.MONSTER,  // Default to monster type
         traits: attributes.traits ?? [],
         might,
         grace,
@@ -60,9 +64,15 @@ export function createCharacter(attributes: Partial<Character> = {}): Character 
         vitality: calculateMaxVitality(might),
         maxConviction: calculateMaxConviction(will),
         conviction: calculateMaxConviction(will),
-        grappleState: 0,
-        description:attributes.description??"",
+        description: attributes.description ?? "",
         flags: attributes.flags ?? {},
+        limbs: attributes.limbs ?? {
+            [LimbType.LEFT_ARM]: true,
+            [LimbType.RIGHT_ARM]: true,
+            [LimbType.LEFT_LEG]: true,
+            [LimbType.RIGHT_LEG]: true,
+            [LimbType.MOUTH]: true
+        }
     };
 }
 
@@ -72,6 +82,31 @@ export function getAttributeValue(character: Character, attribute: Attribute): n
 
 export function getSkillBonus(character: Character, skillName: SkillName): number {
     return character.skills[skillName] || 0;
+}
+
+/**
+ * Check if a character has the required limbs for a trait
+ */
+export function hasRequiredLimbs(character: Character, trait: Trait): boolean {
+    if (!trait.requirements?.limbs) return true;
+
+    const requiredArms = trait.requirements.limbs.arms ?? 0;
+    const requiredLegs = trait.requirements.limbs.legs ?? 0;
+    const requiredMouth = trait.requirements.limbs.mouth ?? 0;
+
+    let availableArms = 0;
+    if (character.limbs[LimbType.LEFT_ARM]) availableArms++;
+    if (character.limbs[LimbType.RIGHT_ARM]) availableArms++;
+
+    let availableLegs = 0;
+    if (character.limbs[LimbType.LEFT_LEG]) availableLegs++;
+    if (character.limbs[LimbType.RIGHT_LEG]) availableLegs++;
+
+    const hasMouth = character.limbs[LimbType.MOUTH];
+
+    return availableArms >= requiredArms && 
+           availableLegs >= requiredLegs && 
+           (requiredMouth === 0 || hasMouth);
 }
 
 /**

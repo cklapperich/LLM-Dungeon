@@ -6,6 +6,7 @@ import skillsJson from '../../../data/skills.json';
 interface MarginModifiers {
     skills: Record<string, Record<string, string[]>>;
     generic: Record<string, string[]>;
+    initiative: Record<string, string[]>;
 }
 
 import { Skill } from '../../types/skilltypes';

@@ -5,7 +5,7 @@ import CombatRoom from './components/CombatRoom';
 
 interface UIPrototypeProps {
     gameState: GameState;
-    onAction: (action: UIAction) => void;
+    onAction: (action: UIAction) => Promise<void>;
     onNavigate: (view: string) => void;
 }
 

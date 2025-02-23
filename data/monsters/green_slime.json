@@ -1,5 +1,6 @@
 {
     "name": "Green Slime",
+    "type": "monster",
     "might": 7,
     "grace": 7,
     "wit": 4,
@@ -12,6 +13,7 @@
     "size": 1,
     "traits": [
         "slam",
+        "grab",
         {
             "name": "Bludgeon",
             "description": "A more skillful attack, reaching out with a tentacle to strike.",

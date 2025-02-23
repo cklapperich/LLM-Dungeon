@@ -88,50 +88,11 @@ Can be upgraded over time.
 
 ### Breeding
 
-Clothing has a level (0-5) armor adds to your level.
-By default a heroine has a clothing level of 1 with no armor.
-Breeding requires a clothing level of 0, some active or passive traits may allow breeding at 1 or even higher clothing.
-
-Prone - some breeding attempts require knocked prone so monster can mount them.
-some like the spider thematically require the heroine is fully cocooned or at the last stage of the grapple. 
-
-grapple + breeding is the same thing. its all one action.
-Some grapples require a certain # of limbs restrained. both arms, both legs, 1 of each etc.
-Each breeding attempt has a number of stages. 
-Each stage has a description for the LLM. 
-Stages is an int. Lower stages is advantageous/a better ability.
-Final stage - adventurer is bred. This allows her to still struggle even while being penetrated and fucked.
-Until the monsters orgasm its not over. unless she's fully restrained.
-A grapple trait requires as description of the 'intense' stage.
-There can be some reasonable defaults: 3 stages, restrain, penetrate, 'finish', and 'intense' - 'use a different hole this time', with generic descriptions for each.
-of course a spider may require a 3 stage cocooning, then penetrate, then breed, etc.
-Each grapple stage restrains a limb automatically / for free? 
-monster can restrain another limb an an action while grappling without raising stage?
-
-Wolf: needs knock prone, and clothing 0. 3 stages as is standard.
-Spider: needs all limbs restrained, 4 stages: cocoon 1, cocoon 2, penetrate, impregnate. requires all 5 limbs restrained (arm, arm, mouth, leg, leg)
-Slime: 2 stages only? 1 clothing or lower. Low stats still make breeding a challenge. 
-Crystal golem: doesnt breed by grappling. breeds via Conviction reaching 0 which is weird. how does that all work together?
-
-Heroines that are grappled can use resist/struggle + 4 to resist grapple skill checks.
-
-Success on monster grapple increases stage by 1
-Failure on grapple increases stage by 0
-Failure on grapple check reduces stage by 1 if heroine chose 'resist'
-
-Limited use items and abilities can reduce stage by 1 or reduce back to 0.
-Heroines can use abilities or items while grappled or abilities, instead of resisting.
-Healing needs to be limited. Things that reduce grapple stage carefully limited. Most grapple abilities need to come with a free +2 or +4 modifier, or a stat reduction (spider web type stuff)
-
-Each grapple level is progressively harder to escape from. Needs a progressive modifier of some type. 1x or 2x the stage as a bonus/penalty.
-
-Some grapple actions have a BIG bonus modifier but cause a wound, giving a tradeoff: dont want to kill
-
-If she struggles when you choose not to grapple, thats a wasted action! Almost like a rock/paper/scissors
+See grappling.md
 
 ## Arousal System
 
-Arousal levels:
+heat/arousal levels:
 0 1 2 3
 dry - slick - sopping - in heat
 -0/-1/-2/-3 to grapple/breed checks.

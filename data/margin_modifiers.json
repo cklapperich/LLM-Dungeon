@@ -1,6 +1,6 @@
 {
   "skills": {
-    "Heavy Weapons": {
+    "Heavy Weapons[Might]": {
       "minimal_success": [
         "The weapon connects with basic effectiveness",
         "A simple strike finds its mark",
@@ -32,7 +32,7 @@
         "The attack backfires spectacularly"
       ]
     },
-    "Light Weapons": {
+    "Light Weapons[Grace]": {
       "minimal_success": [
         "The blade grazes its target",
         "A quick strike barely connects",
@@ -64,7 +64,199 @@
         "Their technique falls apart completely"
       ]
     },
-    "Stealth": {
+    "Grapple[Might]": {
+      "minimal_success": [
+        "They barely manage to grab hold",
+        "A tenuous grip is established",
+        "They secure a weak hold on their target"
+      ],
+      "solid_success": [
+        "They lock their opponent in a firm hold",
+        "Their grappling technique proves effective",
+        "They successfully restrain their target"
+      ],
+      "critical_success": [
+        "Their grip becomes absolutely unbreakable",
+        "They control their opponent with masterful technique",
+        "The grapple is executed with perfect precision"
+      ],
+      "minimal_failure": [
+        "Their grip slips at the last moment",
+        "The attempt to grapple nearly succeeds",
+        "They fail to secure a proper hold"
+      ],
+      "solid_failure": [
+        "The grappling attempt fails completely",
+        "Their opponent evades the grab",
+        "They fail to establish any hold"
+      ],
+      "critical_failure": [
+        "They lose their balance entirely",
+        "The failed grapple leaves them vulnerable",
+        "Their technique backfires completely"
+      ]
+    },
+    "Break Free[Might]": {
+      "minimal_success": [
+        "They barely manage to break the hold",
+        "They struggle free with great effort",
+        "They escape by the smallest margin"
+      ],
+      "solid_success": [
+        "They break free with decisive force",
+        "Their strength overcomes the restraint",
+        "They power their way to freedom"
+      ],
+      "critical_success": [
+        "They shatter the hold with overwhelming force",
+        "Their escape is explosive and absolute",
+        "They break free as if the restraint was nothing"
+      ],
+      "minimal_failure": [
+        "They almost break free but remain caught",
+        "The hold proves just too strong",
+        "Their attempt at freedom falls just short"
+      ],
+      "solid_failure": [
+        "They remain firmly trapped",
+        "Their struggle for freedom fails",
+        "The hold maintains its grip"
+      ],
+      "critical_failure": [
+        "Their struggle only tightens the hold",
+        "They exhaust themselves fighting the restraint",
+        "Their attempt at freedom makes things worse"
+      ]
+    },
+    "Slip Free[Grace]": {
+      "minimal_success": [
+        "They barely squirm out of the hold",
+        "A slight twist gains them freedom",
+        "They find just enough space to escape"
+      ],
+      "solid_success": [
+        "They smoothly slip from the grasp",
+        "Their nimble escape proves effective",
+        "They deftly twist free of restraint"
+      ],
+      "critical_success": [
+        "They escape with impossible fluidity",
+        "Their freedom seems to defy physics",
+        "They slip free like smoke through fingers"
+      ],
+      "minimal_failure": [
+        "They almost slip away but get caught",
+        "Freedom remains just out of reach",
+        "Their escape falls just short"
+      ],
+      "solid_failure": [
+        "They remain firmly trapped",
+        "Their attempt to slip free fails",
+        "The hold proves too tight to escape"
+      ],
+      "critical_failure": [
+        "Their struggle only worsens their position",
+        "They become even more entangled",
+        "Their attempted escape backfires completely"
+      ]
+    },
+    "Block[Might]": {
+      "minimal_success": [
+        "They barely deflect the attack",
+        "Their defense holds by a thread",
+        "They manage to interrupt the strike"
+      ],
+      "solid_success": [
+        "They stand firm against the attack",
+        "Their defense proves substantial",
+        "The block redirects the force effectively"
+      ],
+      "critical_success": [
+        "Their defense is absolutely impenetrable",
+        "They turn aside the attack with perfect form",
+        "Their block seems to deny physics itself"
+      ],
+      "minimal_failure": [
+        "The attack barely breaks through",
+        "Their defense falters slightly",
+        "The block nearly succeeds"
+      ],
+      "solid_failure": [
+        "Their defense fails to stop the attack",
+        "The block proves inadequate",
+        "They fail to protect themselves"
+      ],
+      "critical_failure": [
+        "Their attempted block leaves them exposed",
+        "The defense crumbles catastrophically",
+        "They fail to defend in the worst way possible"
+      ]
+    },
+    "Dodge[Grace]": {
+      "minimal_success": [
+        "They barely avoid the attack",
+        "A slight movement saves them",
+        "They evade by the smallest margin"
+      ],
+      "solid_success": [
+        "They deftly avoid the attack",
+        "Their evasion proves effective",
+        "They move smoothly out of harm's way"
+      ],
+      "critical_success": [
+        "They move with impossible grace",
+        "Their evasion seems to bend reality",
+        "They make the impossible dodge look easy"
+      ],
+      "minimal_failure": [
+        "The attack catches them by a hair",
+        "Their dodge falls just short",
+        "They almost evade in time"
+      ],
+      "solid_failure": [
+        "They fail to avoid the attack",
+        "Their attempt to dodge fails",
+        "The evasion proves inadequate"
+      ],
+      "critical_failure": [
+        "Their dodge leaves them completely exposed",
+        "They stumble badly trying to evade",
+        "Their attempted evasion goes horribly wrong"
+      ]
+    },
+    "Parry[Grace]": {
+      "minimal_success": [
+        "They barely deflect the attack",
+        "Their blade catches the strike at the last moment",
+        "They manage a weak deflection"
+      ],
+      "solid_success": [
+        "They skillfully turn aside the attack",
+        "Their parry redirects the force cleanly",
+        "The defensive technique proves effective"
+      ],
+      "critical_success": [
+        "Their parry flows with impossible perfection",
+        "They turn defense into opportunity",
+        "Their technique seems to defy reality"
+      ],
+      "minimal_failure": [
+        "Their parry falls just short",
+        "The attack barely breaks through",
+        "They almost deflect the strike"
+      ],
+      "solid_failure": [
+        "They fail to parry the attack",
+        "Their defense proves inadequate",
+        "The parry misses its mark"
+      ],
+      "critical_failure": [
+        "Their failed parry leaves them exposed",
+        "They lose their weapon trying to defend",
+        "The attempt at defense backfires completely"
+      ]
+    },
+    "Stealth[Grace]": {
       "minimal_success": [
         "They remain barely undetected",
         "Their presence goes just unnoticed",
@@ -96,70 +288,230 @@
         "Every step seems to echo loudly"
       ]
     },
-    "Investigation": {
+    "Perception[Wit]": {
       "minimal_success": [
-        "They notice a small but relevant detail",
-        "Something seems slightly off",
-        "A minor clue catches their attention"
+        "They notice something slightly unusual",
+        "A faint detail catches their attention",
+        "They barely detect something amiss"
       ],
       "solid_success": [
-        "They uncover crucial details others missed",
-        "Their careful analysis reveals the truth",
-        "Key evidence comes to light under their scrutiny"
+        "Their keen senses reveal the truth",
+        "They spot crucial details others missed",
+        "Their awareness proves sharp and true"
       ],
       "critical_success": [
-        "They piece together the entire puzzle in an instant",
-        "Their deduction borders on precognition",
-        "Every tiny detail tells them a complete story"
+        "Nothing escapes their notice",
+        "Their senses seem supernaturally sharp",
+        "They perceive everything with perfect clarity"
       ],
       "minimal_failure": [
-        "The evidence remains just out of reach",
-        "Something important eludes their notice",
-        "The clues don't quite add up"
+        "Something important almost catches their eye",
+        "They nearly notice what matters",
+        "A crucial detail escapes their notice"
       ],
       "solid_failure": [
-        "The investigation yields no results",
-        "They miss important evidence",
-        "The truth remains hidden"
+        "They fail to notice anything unusual",
+        "Important details go unnoticed",
+        "Their awareness proves inadequate"
       ],
       "critical_failure": [
-        "Their investigation leads them completely astray",
-        "They draw entirely wrong conclusions",
-        "Critical evidence is overlooked or misinterpreted"
+        "They completely misread the situation",
+        "Their senses lead them astray",
+        "They focus on all the wrong details"
       ]
     },
-    "Intimidation": {
+    "Disarm Trap[Grace]": {
       "minimal_success": [
-        "Their target shows slight unease",
-        "A flicker of fear crosses their face",
-        "They manage to seem somewhat threatening"
+        "They barely manage to disable the mechanism",
+        "The trap is neutralized by the smallest margin",
+        "They just manage to prevent disaster"
       ],
       "solid_success": [
-        "Their threatening presence breaks their target's resolve",
-        "Fear takes hold as they make their intentions clear",
-        "Their target wilts under their forceful demeanor"
+        "They skillfully disarm the trap",
+        "The mechanism is safely disabled",
+        "Their technique proves effective"
       ],
       "critical_success": [
-        "Their mere presence induces primal terror",
-        "The target's will to resist completely shatters",
-        "Fear itself seems to emanate from their being"
+        "They disable the trap with perfect precision",
+        "Their expertise makes the impossible look easy",
+        "The trap is completely neutralized"
       ],
       "minimal_failure": [
-        "Their attempt at intimidation falls flat",
-        "The target remains mostly unfazed",
-        "Their threatening presence wavers"
+        "They almost disable the mechanism",
+        "The trap remains barely active",
+        "Their attempt falls just short"
       ],
       "solid_failure": [
-        "The attempt at intimidation fails completely",
-        "Their target shows no fear",
-        "They fail to appear threatening"
+        "They fail to disarm the trap",
+        "The mechanism remains armed",
+        "Their attempt proves ineffective"
       ],
       "critical_failure": [
-        "Their attempt at intimidation becomes laughable",
-        "The target's confidence only grows stronger",
-        "They appear completely non-threatening"
+        "They trigger the trap spectacularly",
+        "Their attempt makes things much worse",
+        "The mechanism backfires catastrophically"
+      ]
+    },
+    "Might": {
+      "minimal_success": [
+        "They barely succeed through raw strength",
+        "Their power proves just sufficient",
+        "They manage through sheer force"
+      ],
+      "solid_success": [
+        "Their strength proves more than adequate",
+        "Raw power carries them through",
+        "Their might overcomes the challenge"
+      ],
+      "critical_success": [
+        "Their strength seems to defy physics",
+        "Raw power makes the impossible possible",
+        "Their might knows no bounds"
+      ],
+      "minimal_failure": [
+        "Their strength falls just short",
+        "The task proves slightly too demanding",
+        "They nearly succeed through force alone"
+      ],
+      "solid_failure": [
+        "Their strength proves inadequate",
+        "Raw power isn't enough",
+        "The task exceeds their might"
+      ],
+      "critical_failure": [
+        "Their strength works against them",
+        "Raw power backfires completely",
+        "They exhaust themselves catastrophically"
+      ]
+    },
+    "Grace": {
+      "minimal_success": [
+        "They barely maintain their balance",
+        "Their agility proves just sufficient",
+        "They manage with minimal coordination"
+      ],
+      "solid_success": [
+        "They move with fluid precision",
+        "Their grace carries them through",
+        "Their agility proves more than adequate"
+      ],
+      "critical_success": [
+        "They move with impossible perfection",
+        "Their grace defies natural limits",
+        "Their agility seems supernatural"
+      ],
+      "minimal_failure": [
+        "Their coordination falls just short",
+        "They almost maintain their grace",
+        "Their agility proves barely insufficient"
+      ],
+      "solid_failure": [
+        "Their grace fails them",
+        "They lose their coordination",
+        "Their agility proves inadequate"
+      ],
+      "critical_failure": [
+        "They lose all semblance of grace",
+        "Their coordination fails spectacularly",
+        "They stumble catastrophically"
+      ]
+    },
+    "Wit": {
+      "minimal_success": [
+        "They barely puzzle it out",
+        "Their mind grasps the basics",
+        "They understand just enough"
+      ],
+      "solid_success": [
+        "Their sharp mind finds the answer",
+        "Their wit proves more than adequate",
+        "They comprehend the situation clearly"
+      ],
+      "critical_success": [
+        "Their insight seems supernatural",
+        "Their mind grasps impossible connections",
+        "Their understanding transcends normal limits"
+      ],
+      "minimal_failure": [
+        "Understanding remains just out of reach",
+        "They almost grasp the concept",
+        "Their wit falls slightly short"
+      ],
+      "solid_failure": [
+        "Their mind fails to understand",
+        "The concept eludes them",
+        "Their wit proves inadequate"
+      ],
+      "critical_failure": [
+        "They completely misunderstand everything",
+        "Their reasoning leads them astray",
+        "Their conclusions couldn't be more wrong"
+      ]
+    },
+    "Will": {
+      "minimal_success": [
+        "Their resolve barely holds",
+        "Their will proves just strong enough",
+        "They maintain control by a thread"
+      ],
+      "solid_success": [
+        "Their iron will prevails",
+        "Their determination proves unshakeable",
+        "Their resolve carries them through"
+      ],
+      "critical_success": [
+        "Their will becomes absolutely unbreakable",
+        "Their determination transcends normal limits",
+        "Their resolve seems supernatural"
+      ],
+      "minimal_failure": [
+        "Their will almost holds firm",
+        "Their resolve cracks slightly",
+        "Their determination falls just short"
+      ],
+      "solid_failure": [
+        "Their will fails them",
+        "Their resolve breaks",
+        "Their determination proves inadequate"
+      ],
+      "critical_failure": [
+        "Their will shatters completely",
+        "Their resolve crumbles catastrophically",
+        "Their determination backfires entirely"
       ]
     }
+  },
+  "initiative": {
+    "minimal_success": [
+      "They react just a fraction faster",
+      "Their timing is barely superior",
+      "They seize the initiative by the slimmest margin"
+    ],
+    "solid_success": [
+      "Their superior speed is clear",
+      "They move with decisive quickness",
+      "Their reflexes prove clearly superior"
+    ],
+    "critical_success": [
+      "They move with blinding speed",
+      "Their reaction time seems supernatural",
+      "They strike like lightning"
+    ],
+    "minimal_failure": [
+      "They react just a moment too slow",
+      "Their timing falls slightly behind",
+      "They hesitate for just a fraction too long"
+    ],
+    "solid_failure": [
+      "Their reactions prove clearly slower",
+      "They fall notably behind in speed",
+      "Their timing is distinctly inferior"
+    ],
+    "critical_failure": [
+      "They react with glacial slowness",
+      "Their hesitation costs them dearly",
+      "They might as well be moving in slow motion"
+    ]
   },
   "generic": {
     "minimal_success": [

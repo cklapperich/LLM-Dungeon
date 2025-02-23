@@ -15,7 +15,8 @@ export const EffectType = {
     HEAL: 'HEAL',
     WOUND: 'WOUND',
     GRAPPLE: 'GRAPPLE',
-    CORRUPT: 'CORRUPT'
+    CORRUPT: 'CORRUPT',
+    COOLDOWN: 'COOLDOWN'
 } as const;
 
 export const LimbType = {
@@ -42,6 +43,17 @@ export enum MonsterSize {
 export type Target = typeof TargetType[keyof typeof TargetType];
 export type Rarity = typeof RarityType[keyof typeof RarityType];
 export type EffectTypes = typeof EffectType[keyof typeof EffectType];
+
+export const IntensityType = {
+    CRITICAL_SUCCESS: 'critical_success',
+    SOLID_SUCCESS: 'solid_success',
+    MINIMAL_SUCCESS: 'minimal_success',
+    MINIMAL_FAILURE: 'minimal_failure',
+    SOLID_FAILURE: 'solid_failure',
+    CRITICAL_FAILURE: 'critical_failure'
+} as const;
+
+export type IntensityTypes = typeof IntensityType[keyof typeof IntensityType];
 export type Limb = typeof LimbType[keyof typeof LimbType];
 
 export const RoomType = {
@@ -50,4 +62,24 @@ export const RoomType = {
     CHAMBER: 'chamber'
 } as const;
 
+export const CharacterType = {
+    HERO: 'hero',
+    MONSTER: 'monster'
+} as const;
+
 export type RoomTypeValue = typeof RoomType[keyof typeof RoomType];
+export type CharacterTypeValue = typeof CharacterType[keyof typeof CharacterType];
+
+// Combat state flags
+export const CombatFlags = {
+    GRAPPLED: 'grappled',
+    PENETRATED: 'penetrated'
+} as const;
+
+export const GrappleType = {
+    GRAB: 'grab',
+    PENETRATE: 'penetrate'
+} as const;
+
+export type CombatFlagTypes = typeof CombatFlags[keyof typeof CombatFlags];
+export type GrappleTypes = typeof GrappleType[keyof typeof GrappleType];

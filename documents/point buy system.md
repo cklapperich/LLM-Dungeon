@@ -25,7 +25,7 @@ Monsters heal 1 wound between *waves.* All status clears between waves.
 Small monster point buy: 12/10/8/6. 2 vitality.  
 Medium Monster: 14/10/8/6 3 vitality  
 Big Monster: 16/12/10/8 \- 4 vitality  
-Small hero attributes: 14/10/8/6 \- 8 must be in a defensive stat. 3 vitality.  
+Small hero attributes: 14/10/8/6 \- 3 vitality.  
 Big hero attributes: 16/12/10/8 3 vitality  
 Epic Hero attributes: 17/13/12/10 4 vitality
 
@@ -73,7 +73,7 @@ Lasts till end of battle
 - Weaken: \-1 Might  
 - Daze: \-1 Wit  
 - Charm: \-1 Will  
-- Heat: \-1 Will, \-1 grapple  
+- Heat: \-1 will, \-1 grapple
 - Prone: \-1 Grace, \-1 Might, \-1 grapple, max 1 stack, lasts 1 turn
 
 3 points:
@@ -92,7 +92,7 @@ Lasts till end of battle
 - Hide (0 base points, only self target effects allowed)  
 - Grapple (0 base points)
 
-## Drawbacks Effects (Cost Reduction)
+## Drawback Effects (Cost Reduction)
 
 - Cooldown: \-1 point per turn (1/2/3 turns max)  
 - Self-wound: \-2 points per wound (0/1/2 self-wounds max)  
@@ -110,9 +110,9 @@ Lasts till end of battle
 
 ## Monster-Specific Rules
 
-- ##### **Monster Wound1 \+ status/grapple Discount: \-2 points**
+- ##### **Monster Wound1 \+ heat/prone/grapple Discount: \-2 points**
 
-  When combining wound 1 WITH Prone OR grapple, \-2 points instead of \+2	\!  
+  When combining wound 1 with Prone, Heat OR grapple, \-2 points instead of \+2	\!  
 - Does not apply to 2-wound abilities (always cost 4 points)  
 - Justified because players want to grapple and capture\! Killing prevents that
 

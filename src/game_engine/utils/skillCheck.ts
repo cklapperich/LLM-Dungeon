@@ -1,8 +1,36 @@
-import { RollResult, IntensityLevel, SKILL_CONSTANTS, OpposedCheckResult, SkillName} from '../../types/skilltypes.ts';
+import { RollResult, SKILL_CONSTANTS, OpposedCheckResult, SkillName} from '../../types/skilltypes.ts';
 import { marginModifiers, getSkillAttribute } from './dataLoader.ts';
 import { Character, getAttributeValue, getSkillBonus } from '../../types/actor.ts';
+import { IntensityType, IntensityTypes } from '../../types/constants';
 
-// Roll 3d6 and subtract Grace for initiative (rerolled each round)
+interface InitiativeResult {
+    firstActor: Character;
+    margin: number;
+    description: string;
+}
+
+export function processInitiative(char1: Character, char2: Character): InitiativeResult {
+    // Roll initiative for both characters
+    const roll1 = roll2d10();
+    const roll2 = roll2d10();
+    const init1 = roll1 - char1.grace;
+    const init2 = roll2 - char2.grace;
+
+    // Calculate margin and determine who goes first (lower initiative goes first)
+    const margin = Math.abs(init1 - init2);
+    const firstActor = init1 <= init2 ? char1 : char2;
+    const intensity = getIntensityLevel(null, margin); // Using a fresh roll for intensity
+
+    // Get description from initiative category
+    const description = getSkillDescription('initiative', intensity);
+
+    return {
+        firstActor,
+        margin,
+        description
+    };
+}
+
 // Lower numbers go first
 // Example: Grace 13, roll 15 = initiative 2 (15-13)
 //         Grace 13, roll 8 = initiative -5 (8-13)
@@ -14,21 +42,34 @@ export function rollInitiative(character: Character): number {
 /**
  * Get the intensity level based on margin of success/failure
  */
-function getIntensityLevel(margin: number): IntensityLevel {
-    const { MARGIN_THRESHOLDS } = SKILL_CONSTANTS;
-    if (margin >= MARGIN_THRESHOLDS.SOLID_SUCCESS) return 'solid_success';
-    if (margin >= MARGIN_THRESHOLDS.MINIMAL_SUCCESS) return 'minimal_success';
-    if (margin > MARGIN_THRESHOLDS.SOLID_FAILURE) return 'solid_failure';
-    return 'minimal_failure';
+function getIntensityLevel(roll: number | undefined | null, margin: number): IntensityTypes {
+    const { MARGIN_THRESHOLDS, CRITICAL_SUCCESS_ROLL, CRITICAL_FAILURE_ROLL } = SKILL_CONSTANTS;
+    
+    if (!roll){
+        // Check for critical success/failure first based on roll
+        if (roll <= CRITICAL_SUCCESS_ROLL) return IntensityType.CRITICAL_SUCCESS;
+        if (roll >= CRITICAL_FAILURE_ROLL) return IntensityType.CRITICAL_FAILURE;
+    }
+
+    // Then check margins for regular success/failure
+    if (margin >= MARGIN_THRESHOLDS.SOLID_SUCCESS) return IntensityType.SOLID_SUCCESS;
+    if (margin >= MARGIN_THRESHOLDS.MINIMAL_SUCCESS) return IntensityType.MINIMAL_SUCCESS;
+    if (margin > MARGIN_THRESHOLDS.SOLID_FAILURE) return IntensityType.SOLID_FAILURE;
+
+    return IntensityType.MINIMAL_FAILURE;
 }
 
 /**
  * Get a random description for a skill check result
  */
-function getSkillDescription(skillName: string | undefined, intensity: IntensityLevel): string {
-    // Get the appropriate prompts array
-    const prompts = skillName && marginModifiers.skills[skillName]?.[intensity] || 
-                   marginModifiers.generic[intensity];
+function getSkillDescription(skillName: string | undefined, intensity: IntensityTypes): string {
+    let prompts = null;
+    if (!skillName)
+        prompts = marginModifiers.generic[intensity];
+    else if (skillName=='initiative')
+        prompts = marginModifiers.initiative[intensity];
+    else
+       prompts = marginModifiers.skills[skillName][intensity];
     
     // Return a random prompt
     return prompts[Math.floor(Math.random() * prompts.length)];
@@ -63,7 +104,7 @@ export function makeSkillCheck(
     const roll = roll2d10();
     const modifiedAttribute = baseAttribute + skillBonus + modifier;
     const margin = modifiedAttribute - roll;
-    const intensity = getIntensityLevel(margin);
+    const intensity = getIntensityLevel(roll, margin);
     const isCriticalSuccess = roll <= 3;
     const isCriticalFailure = roll >= 19;
     const success = isCriticalSuccess || (roll <= modifiedAttribute && !isCriticalFailure);
