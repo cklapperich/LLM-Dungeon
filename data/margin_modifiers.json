@@ -511,39 +511,39 @@
         "Their resolve crumbles catastrophically",
         "Their determination backfires entirely"
       ]
+    },
+    "Initiative[Grace]": {
+      "minimal_success": [
+        "They react just a fraction faster",
+        "Their timing is barely superior",
+        "They seize the initiative by the slimmest margin"
+      ],
+      "solid_success": [
+        "Their superior speed is clear",
+        "They move with decisive quickness",
+        "Their reflexes prove clearly superior"
+      ],
+      "critical_success": [
+        "They move with blinding speed",
+        "Their reaction time seems supernatural",
+        "They strike like lightning"
+      ],
+      "minimal_failure": [
+        "They react just a moment too slow",
+        "Their timing falls slightly behind",
+        "They hesitate for just a fraction too long"
+      ],
+      "solid_failure": [
+        "Their reactions prove clearly slower",
+        "They fall notably behind in speed",
+        "Their timing is distinctly inferior"
+      ],
+      "critical_failure": [
+        "They react with glacial slowness",
+        "Their hesitation costs them dearly",
+        "They might as well be moving in slow motion"
+      ]
     }
-  },
-  "initiative": {
-    "minimal_success": [
-      "They react just a fraction faster",
-      "Their timing is barely superior",
-      "They seize the initiative by the slimmest margin"
-    ],
-    "solid_success": [
-      "Their superior speed is clear",
-      "They move with decisive quickness",
-      "Their reflexes prove clearly superior"
-    ],
-    "critical_success": [
-      "They move with blinding speed",
-      "Their reaction time seems supernatural",
-      "They strike like lightning"
-    ],
-    "minimal_failure": [
-      "They react just a moment too slow",
-      "Their timing falls slightly behind",
-      "They hesitate for just a fraction too long"
-    ],
-    "solid_failure": [
-      "Their reactions prove clearly slower",
-      "They fall notably behind in speed",
-      "Their timing is distinctly inferior"
-    ],
-    "critical_failure": [
-      "They react with glacial slowness",
-      "Their hesitation costs them dearly",
-      "They might as well be moving in slow motion"
-    ]
   },
   "generic": {
     "minimal_success": [

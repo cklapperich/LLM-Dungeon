@@ -1,5 +1,4 @@
 import React from 'react';
-import { GameState as BackendGameState } from '../../../types/gamestate';
 
 interface TopBarProps {
     turnCounter?: number;
@@ -21,7 +20,7 @@ export const TopBar: React.FC<TopBarProps> = ({
     onToggleDebug
 }) => {
     return (
-        <div className="bg-slate-800 text-white p-4 flex justify-between items-center">
+        <div className="bg-slate-800 text-white p-4 flex justify-between items-center shadow-lg shadow-black/25">
             <div className="flex items-center gap-4">
                 <span>Turn {turnCounter} - Day {dayCounter}</span>
             </div>
@@ -29,17 +28,21 @@ export const TopBar: React.FC<TopBarProps> = ({
                 <div className="flex gap-2">
                     <button 
                         onClick={onToggleNarration}
-                        className={`px-3 py-1 rounded ${narrationEnabled ? 'bg-green-600' : 'bg-red-600'}`}
+                        className={`px-3 py-1 rounded shadow-lg shadow-black/25 relative
+                            border-[3px] border-white/50
+                            bg-slate-800 hover:bg-slate-700 active:bg-slate-900`}
                     >
                         Narration: {narrationEnabled ? 'On' : 'Off'}
                     </button>
                     <button 
                         onClick={onToggleDebug}
-                        className={`px-3 py-1 rounded ${debugEnabled ? 'bg-green-600' : 'bg-red-600'}`}
+                        className={`px-3 py-1 rounded shadow-lg shadow-black/25 relative
+                            border-[3px] border-white/50
+                            bg-slate-800 hover:bg-slate-700 active:bg-slate-900`}
                     >
                         Debug: {debugEnabled ? 'On' : 'Off'}
                     </button>
-                    <span>Infamy: {infamy}</span>
+                    <span className="px-3 py-1 bg-slate-800 rounded shadow-lg shadow-black/25 border-[3px] border-white/50">Infamy: {infamy}</span>
                 </div>
             </div>
         </div>

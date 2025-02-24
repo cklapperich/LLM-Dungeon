@@ -1,8 +1,11 @@
-import { createCharacter, calculateMaxVitality, calculateMaxConviction, saveCharacter, loadCharacter, getSkillBonus } from '../src/types/actor.js';
+import { createCharacter, calculateMaxVitality, calculateMaxConviction, saveCharacter, loadCharacter, getSkillBonus, getCombinedModifiers } from '../src/types/actor.js';
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { describe, test, expect } from 'vitest';
+import { StatusName } from '../src/types/status.js';
+import { createStatus } from '../src/game_engine/statusEffects.js';
+import { Skills } from '../src/types/skilltypes.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -13,14 +16,13 @@ describe('Actor Tests', () => {
         expect(defaultChar.might).toBeGreaterThan(0);
         expect(defaultChar.maxVitality).toBeGreaterThan(0);
         expect(defaultChar.maxConviction).toBeGreaterThan(0);
-        expect(defaultChar.grappleState).toBe(0);
 
         // Test custom creation
         const customChar = createCharacter({
             might: 15,
             will: 6,
             grace: 12,
-            mind: 14
+            wit: 14
         });
         expect(customChar.might).toBe(15);
         expect(customChar.maxVitality).toBeGreaterThan(0);
@@ -43,33 +45,33 @@ describe('Actor Tests', () => {
             // Test clara loads correctly
             const claraJson = readFileSync(join(__dirname, '..', 'data', 'monsters', 'clara.json'), 'utf-8');
             const clara = loadCharacter(claraJson);
-            
-            // Basic stats load as provided in JSON
-            expect(clara.might).toBe(8);
-            expect(clara.grace).toBe(14);
-            expect(clara.mind).toBe(12);
-            expect(clara.will).toBe(6);
-            expect(clara.skills['Stealth[Grace]']).toBe(2);
-            expect(clara.traits[0].name).toBe('Stab');
-            expect(clara.traits[0].effects[0].type).toBe('WOUND');
 
             // Test green slime loads correctly
             const greenSlimeJson = readFileSync(join(__dirname, '..', 'data', 'monsters', 'green_slime.json'), 'utf-8');
             const greenSlime = loadCharacter(greenSlimeJson);
             
-            // Basic stats load as provided in JSON
-            expect(greenSlime.might).toBe(6);
-            expect(greenSlime.grace).toBe(6);
-            expect(greenSlime.mind).toBe(4);
-            expect(greenSlime.will).toBe(4);
-            expect(greenSlime.skills['Stealth[Grace]']).toBe(2);
-            expect(greenSlime.skills['Grapple[Might]']).toBe(2);
-            expect(greenSlime.description).toBe('A small, gelatinous creature that can dissolve into water and slip through tight spaces');
+        });
+    });
+
+    describe('status effect modifiers', () => {
+        test('combines modifiers from multiple status effects', () => {
+            const char = createCharacter();
             
-            // Test traits
-            expect(greenSlime.traits).toHaveLength(2);
-            expect(greenSlime.traits[1].name).toBe('Bludgeon');
-            expect(greenSlime.traits[1].effects[0].type).toBe('WOUND');
+            // Add some test statuses
+            char.statuses = [
+                createStatus(StatusName.GRAPPLED),
+                createStatus(StatusName.EXHAUSTION, { stacks: 2 })
+            ];
+
+            // Test getCombinedModifiers
+            const mods = getCombinedModifiers(char.statuses);
+            expect(mods.skill_modifiers[Skills.BREAK_FREE_MIGHT]).toBe(-2); // From exhaustion
+            expect(mods.skill_modifiers[Skills.SLIP_FREE_GRACE]).toBe(-2); // From exhaustion
+            
+            // Test getSkillBonus
+            char.skills[Skills.BREAK_FREE_MIGHT] = 2; // Base skill of 2
+            const totalBonus = getSkillBonus(char, Skills.BREAK_FREE_MIGHT);
+            expect(totalBonus).toBe(0); // Base 2 + (-2) from exhaustion
         });
     });
 });

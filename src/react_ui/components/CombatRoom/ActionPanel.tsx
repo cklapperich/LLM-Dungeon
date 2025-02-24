@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { Book } from 'lucide-react';
-import { CombatState, getAllLogsWithRounds } from '../../../types/combatState';
+import { CombatState, getAllLogsWithRounds, getMonsterCharacterId } from '../../../types/combatState';
 import { UIAction } from '../../types/uiTypes';
 import { useLoading } from '../../context/LoadingContext';
 import { Character } from '../../../types/actor';
@@ -17,12 +17,6 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
     onAction 
 }) => {
     const { isLoading } = useLoading();
-    
-    // Log combat state and actions whenever they change
-    React.useEffect(() => {
-        console.log('ActionPanel received combatState:', combatState);
-        console.log('Available actions:', combatState?.playerActions);
-    }, [combatState]);
     const [logType, setLogType] = React.useState<'combat' | 'narration'>('narration');
     const logContainerRef = useRef<HTMLDivElement>(null);
 
@@ -39,25 +33,32 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
     }, [logType, combatState && getAllLogsWithRounds(combatState)]);
 
     return (
-        <div className="w-1/3 bg-slate-200 p-6 flex flex-col h-full">
+        <div className="w-1/3 bg-black p-6 flex flex-col h-full text-white border-2 border-white/40 rounded-lg">
             {/* Available Actions */}
             <div className="h-[25%] flex flex-col min-h-0 mb-4">
-                <h3 className="font-bold mb-2 flex-none">Available Actions</h3>
-                <div className="grid grid-cols-2 auto-rows-fr gap-2 overflow-y-auto pr-2 flex-1">
+                <h3 className="font-bold mb-2 flex-none">
+                    {combatState && allCharacters ? 
+                        `What will ${allCharacters[getMonsterCharacterId(combatState, allCharacters)]?.name} do?` 
+                        : 'Available Actions'
+                    }
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 overflow-y-auto pr-2 flex-1">
                     {(combatState?.playerActions || []).map((action, i) => (
                         <button
                             key={i}
                             onClick={async () => await onAction(action)}
                             disabled={action.disabled || isLoading}
-                            className={`w-full h-full p-2 rounded flex flex-col items-center justify-center text-center
+                            className={`w-full px-4 py-3 rounded flex flex-col items-center justify-center text-center
+                                border-[3px] border-white/50 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_2px_4px_rgba(0,0,0,0.2)]
+                                bg-slate-800
                                 ${action.disabled || isLoading
-                                    ? 'bg-slate-300 text-slate-500 cursor-not-allowed' 
-                                    : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+                                    ? 'opacity-50 text-slate-400 cursor-not-allowed' 
+                                    : 'text-white hover:bg-slate-700 active:bg-slate-900'}`}
                         >
-                            <div className="w-full overflow-hidden">
-                                <div className="truncate">{action.label}</div>
+                            <div className="w-full">
+                                <div className="font-medium">{action.label}</div>
                                 {action.disabled && action.tooltip && (
-                                    <div className="text-sm truncate">{action.tooltip}</div>
+                                    <div className="text-sm mt-1 text-slate-300">{action.tooltip}</div>
                                 )}
                             </div>
                         </button>
@@ -67,10 +68,12 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
 
             {/* Log Type Toggle */}
             <button 
-                className={`mb-4 flex items-center justify-center gap-2 px-4 py-2 rounded w-full ${
+                className={`mb-4 flex items-center justify-center gap-2 px-4 py-2 rounded
+                    border-[3px] border-white/50 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_2px_4px_rgba(0,0,0,0.2)]
+                    bg-slate-800 ${
                     isLoading 
-                        ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
-                        : 'bg-slate-300 hover:bg-slate-400'
+                        ? 'opacity-50 text-slate-400 cursor-not-allowed'
+                        : 'text-white hover:bg-slate-700 active:bg-slate-900'
                 }`}
                 disabled={isLoading}
                 onClick={() => setLogType(logType === 'combat' ? 'narration' : 'combat')}
@@ -80,7 +83,7 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
             </button>
 
             {/* Log Panel */}
-            <div ref={logContainerRef} className="flex-1 bg-white rounded-lg p-4 overflow-y-auto min-h-0">
+            <div ref={logContainerRef} className="flex-1 bg-black rounded-lg p-4 overflow-y-auto min-h-0 shadow-lg shadow-black/25 border-2 border-white/40">
                 <div className="space-y-4">
                     {combatState && (() => {
                         const logs = getAllLogsWithRounds(combatState)
@@ -97,7 +100,7 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
 
                         return Object.entries(logsByRound).map(([round, entries]) => (
                             <div key={round} className="mb-4">
-                                <div className="text-xs text-gray-500 mb-2">Round {round}</div>
+                                <div className="text-xs text-slate-400 mb-2">Round {round}</div>
                                 <div className="space-y-2">
                                     {entries.map((entry, i) => (
                                         <div 

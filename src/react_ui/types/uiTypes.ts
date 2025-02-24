@@ -11,13 +11,12 @@ import {
     Library,
     LayoutGrid,
     Binary,
-    Menu,
     Swords,
     Sparkles,
     Brain,
     Heart,
     Flame,
-    Cross
+    Wind
 } from 'lucide-react';
 
 // UI-specific types that transform backend data for display
@@ -41,6 +40,7 @@ export interface UICharacterCard {
     overlayColor: string;
     borderRadius: string;
     stats: UICardStats;
+    artworkUrl?: string;
 }
 
 // Unified interface for all combat actions
@@ -71,14 +71,14 @@ export interface UIActionResult {
 // Theme configurations
 export const CharacterThemes = {
     hero: {
-        backgroundColor: 'bg-blue-500',
-        overlayColor: 'bg-blue-600',
+        backgroundColor: 'bg-slate-900',
+        overlayColor: 'bg-blue-900',
         borderRadius: 'rounded-l-xl',
         emoji: '🦹‍♂️'
     },
     monster: {
-        backgroundColor: 'bg-red-500',
-        overlayColor: 'bg-red-600',
+        backgroundColor: 'bg-slate-900',
+        overlayColor: 'bg-red-900',
         borderRadius: 'rounded-r-xl',
         emoji: '👾'
     }
@@ -97,16 +97,17 @@ export function characterToUICard(
         backgroundColor: theme.backgroundColor,
         overlayColor: theme.overlayColor,
         borderRadius: theme.borderRadius,
+        artworkUrl: character.artworkUrl,
         stats: {
             topStats: [
-                { icon: Flame, value: character.vitality, label: 'Vitality' },
-                { icon: Cross, value: character.conviction, label: 'Conviction' }
+                { icon: Heart, value: character.vitality, label: 'Vitality' },
+                { icon: Flame, value: character.conviction, label: 'Conviction' }
             ],
             bottomStats: [
-                { icon: Swords, value: character.might, label: 'Might' },
-                { icon: Sparkles, value: character.grace, label: 'Grace' },
+                { icon: Sword, value: character.might, label: 'Might' },
+                { icon: Wind, value: character.grace, label: 'Grace' },
                 { icon: Brain, value: character.wit, label: 'Wit' },
-                { icon: Heart, value: character.will, label: 'Will' }
+                { icon: Sparkles, value: character.will, label: 'Will' }
             ]
         }
     };

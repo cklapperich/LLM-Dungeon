@@ -1,6 +1,6 @@
-import { RollResult, SKILL_CONSTANTS, OpposedCheckResult, SkillName} from '../../types/skilltypes.ts';
+import { RollResult, SKILL_CONSTANTS, OpposedCheckResult, SkillName, Skills} from '../../types/skilltypes.ts';
 import { marginModifiers, getSkillAttribute } from './dataLoader.ts';
-import { Character, getAttributeValue, getSkillModifier } from '../../types/actor.ts';
+import { Character, getAttributeValue, getSkillModifier, getAttributeBonus, getSkillBonus } from '../../types/actor.ts';
 import { IntensityType, IntensityTypes } from '../../types/constants';
 interface InitiativeResult {
     initiatives: [number, number];
@@ -8,20 +8,20 @@ interface InitiativeResult {
     description: string;
 }
 
-export function processInitiative(char1: Character, char2: Character): InitiativeResult {
-    // Roll initiative for both characters
-    const init1 = roll2d10() - char1.grace;
-    const init2 = roll2d10() - char2.grace;
+export function processInitiative(char1: Character, char2: Character, gameState: any = {}): InitiativeResult {
+    // Make initiative checks for both characters
+    const check1 = makeSkillCheck(char1, Skills.INITIATIVE, 0, gameState);
+    const check2 = makeSkillCheck(char2, Skills.INITIATIVE, 0, gameState);
 
-    // Calculate margin between initiatives (lower is better)
-    const margin = Math.abs(init1 - init2);
+    // Calculate margin between initiatives
+    const margin = Math.abs(check1.margin - check2.margin);
     const intensity = getIntensityLevel(null, margin);
 
     // Get description from initiative category
-    const description = getSkillDescription('initiative', intensity);
+    const description = getSkillDescription(Skills.INITIATIVE, intensity);
 
     return {
-        initiatives: [init1, init2],
+        initiatives: [check1.roll, check2.roll],
         margin,
         description
     };
@@ -52,17 +52,16 @@ function getIntensityLevel(roll: number | undefined | null, margin: number): Int
  */
 function getSkillDescription(skillName: string | undefined, intensity: IntensityTypes): string {
     let prompts = null;
-    if (!skillName)
+    if (!skillName) {
         prompts = marginModifiers.generic[intensity];
-    else if (skillName=='initiative')
-        prompts = marginModifiers.initiative[intensity];
-    else
-       try{
-           prompts = marginModifiers.skills[skillName][intensity];
-       } catch {
-           console.warn(`No skill description found for ${skillName}`);
-           prompts = marginModifiers.generic[intensity];
-       }
+    } else {
+        try {
+            prompts = marginModifiers.skills[skillName][intensity];
+        } catch {
+            console.warn(`No skill description found for ${skillName}`);
+            prompts = marginModifiers.generic[intensity];
+        }
+    }
     // Return a random prompt
     return prompts[Math.floor(Math.random() * prompts.length)];
 }
@@ -91,10 +90,11 @@ export function makeSkillCheck(
     character: Character,
     skillName: SkillName,
     modifier: number = 0,
+    gameState: any = {}
 ): RollResult {
     const attribute = getSkillAttribute(skillName);
-    const baseAttribute = getAttributeValue(character, attribute);
-    const skillBonus = getSkillModifier(character, skillName);
+    const baseAttribute = getAttributeBonus(character, attribute, gameState);
+    const skillBonus = getSkillBonus(character, skillName, gameState);
     
     const roll = roll2d10();
     const modifiedAttribute = baseAttribute + skillBonus + modifier;
@@ -122,7 +122,7 @@ export function makeSkillCheck(
  * @param defenseOptions Array of possible defensive skills
  * @returns The skill name that gives the highest total (attribute + bonus)
  */
-function getBestDefensiveSkill(character: Character, defenseOptions: SkillName[]): SkillName {
+function getBestDefensiveSkill(character: Character, defenseOptions: SkillName[], gameState: any = {}): SkillName {
     if (defenseOptions.length === 0) {
         throw new Error("No defense options provided");
     }
@@ -132,8 +132,8 @@ function getBestDefensiveSkill(character: Character, defenseOptions: SkillName[]
 
     for (const skillName of defenseOptions) {
         const attribute = getSkillAttribute(skillName);
-        const baseAttribute = getAttributeValue(character, attribute);
-        const skillBonus = getSkillModifier(character, skillName);
+        const baseAttribute = getAttributeBonus(character, attribute, gameState);
+        const skillBonus = getSkillBonus(character, skillName, gameState);
         const total = baseAttribute + skillBonus;
 
         if (total > bestTotal) {
@@ -151,16 +151,17 @@ export function makeOpposedCheck(
     defender: Character,
     defenseOptions?: SkillName | SkillName[],
     attacker_modifier: number = 0,
+    gameState: any = {}
 ): OpposedCheckResult {
-    const attackerResult = makeSkillCheck(attacker, attackerSkill, attacker_modifier);
+    const attackerResult = makeSkillCheck(attacker, attackerSkill, attacker_modifier, gameState);
     
     // Convert single skill to array if needed
     const defenseOptionsArray = defenseOptions 
         ? (Array.isArray(defenseOptions) ? defenseOptions : [defenseOptions])
         : [attackerSkill]; // Default to same skill if no options provided
     
-    const defenderSkill = getBestDefensiveSkill(defender, defenseOptionsArray);
-    const defenderResult = makeSkillCheck(defender, defenderSkill);
+    const defenderSkill = getBestDefensiveSkill(defender, defenseOptionsArray, gameState);
+    const defenderResult = makeSkillCheck(defender, defenderSkill, 0, gameState);
     
     // If one succeeds and one fails, success wins
     if (attackerResult.success && !defenderResult.success) {
@@ -171,8 +172,11 @@ export function makeOpposedCheck(
     }
     
     // If both succeed or both fail, compare margins
-    // Ties go to defender
-    const attackerWins = attackerResult.margin > defenderResult.margin;
+    // For success ties, attacker wins (they met the target number)
+    // For failure ties, defender wins
+    const attackerWins = attackerResult.success ? 
+        attackerResult.margin >= defenderResult.margin : // Success ties go to attacker
+        attackerResult.margin > defenderResult.margin;   // Failure ties go to defender
     
     return {
         attacker: attackerResult,

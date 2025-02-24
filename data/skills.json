@@ -1,5 +1,10 @@
 {
-    "skills": [
+  "skills": [
+    {
+      "name": "Initiative[Grace]",
+      "description": "Determines who acts first in combat",
+      "attribute": "Grace"
+    },
         {
             "name": "Grapple[Might]",
             "attribute": "Might",
@@ -19,6 +24,11 @@
             "name": "Heavy Weapons[Might]",
             "attribute": "Might",
             "description": "Proficiency with large, powerful weapons that require strength"
+        },
+        {
+            "name": "Break Free[Might]",
+            "attribute": "Might",
+            "description": "Using raw strength to break free from holds and bindings"
         },
         {
             "name": "Slip Free[Grace]",

@@ -54,10 +54,11 @@ export function convertToUIActions(actionData: { actions: Trait[], reasons: Reco
 
 export function setupInitialTurnOrder(
     state: CombatState,
-    characters: [Character, Character]
+    characters: [Character, Character],
+    gameState: GameState
 ): void {
     // Roll initial initiative
-    const initiativeResult = processInitiative(characters[0], characters[1]);
+    const initiativeResult = processInitiative(characters[0], characters[1], gameState);
     const [init1, init2] = initiativeResult.initiatives;
     
     // Store actual initiative values
@@ -85,6 +86,9 @@ export async function initializeCombat(gameState: GameState, roomId: string): Pr
     
     // Create basic state
     const state = createCombatState(characterIds, roomId);
+
+    // Set up initial turn order
+    setupInitialTurnOrder(state, characters, gameState);
 
     // Get monster's actions
     const monster = getCharactersFromIdList(state.characterIds, gameState)
@@ -157,14 +161,16 @@ export async function executeTrait(
             trait.skill as SkillName,
             target,
             undefined, // Let the system determine the opposing skill
-            modifier
+            modifier,
+            gameState
         );
     } else {
         // Perform regular skill check
         skillCheck = makeSkillCheck(
             actor, 
             trait.skill as SkillName,
-            modifier
+            modifier,
+            gameState
         );
     }
 
@@ -218,11 +224,18 @@ export async function executeCombatRound(state: CombatState, gameState: GameStat
     // Get characters for this round
     const characters = getCharactersFromIdList(state.characterIds, gameState) as [Character, Character];
     
-    // Start new round - this handles initiative rolls and logging
-    await startNewRound(state, characters);
+    // Get actors in initiative order for the upcoming round
+    const initiativeResult = processInitiative(characters[0], characters[1], gameState);
+    const [init1, init2] = initiativeResult.initiatives;
     
-    // Get actors in initiative order
-    const firstActor = characters[state.activeCharacterIndex];
+    // Store actual initiative values
+    const [char1, char2] = characters;
+    char1.initiative = init1;
+    char2.initiative = init2;
+    
+    // Lower initiative goes first
+    const firstActor = init1 <= init2 ? char1 : char2;
+    state.activeCharacterIndex = characters.indexOf(firstActor);
     const secondActor = characters[1 - state.activeCharacterIndex];
     
     // First actor's turn
@@ -250,19 +263,13 @@ export async function executeCombatRound(state: CombatState, gameState: GameStat
     // Process round-based effects (like cooldowns)
     processBetweenRounds(state, gameState);
     
-    // Generate narration for this round if enabled
+    // Generate narration for the current round if enabled
     if (gameState.narrationEnabled) {
         const narration = await generateRoundNarration(state, gameState);
-        state.combatLog[state.round - 1].narrations.push(narration);
+        state.combatLog[state.round].narrations.push(narration);
     }
     
-    return state;
-}
-
-export async function startNewRound(
-    state: CombatState,
-    characters: [Character, Character]
-): Promise<void> {
+    // Increment round counter and create new round log
     state.round += 1;
     state.combatLog.push({
         combatLogs: [],
@@ -270,23 +277,12 @@ export async function startNewRound(
         narrations: []
     });
     
-    // Process new round initiative
-    const initiativeResult = processInitiative(characters[0], characters[1]);
-    const [init1, init2] = initiativeResult.initiatives;
-    
-    // Store actual initiative values
-    const [char1, char2] = characters;
-    char1.initiative = init1;
-    char2.initiative = init2;
-    
-    // Lower initiative goes first
-    const firstActor = init1 <= init2 ? char1 : char2;
-    state.activeCharacterIndex = characters.indexOf(firstActor);
-    
-    // Log initiative with actual values
-    state.combatLog[state.round - 1].combatLogs.push(
+    // Log initiative for next round
+    state.combatLog[state.round].combatLogs.push(
         `${firstActor.name} moves first! ${initiativeResult.description}`
     );
+    
+    return state;
 }
 
 export async function executeActionFromUI(gameState: GameState, action: CombatUIAction): Promise<UIActionResult> {

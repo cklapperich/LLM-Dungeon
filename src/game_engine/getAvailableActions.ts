@@ -31,14 +31,6 @@ export function getAvailableActions(actor: Character, state: CombatState, gameSt
     actions: Trait[];  // ALL possible actions, including disabled ones
     reasons: Record<string, string>;  // Map of action name to reason why it's disabled
 } {
-    console.log('Actor state in getLegalActions:', {
-        name: actor.name,
-        type: actor.type,
-        traits: actor.traits.map(t => t.name),
-        vitality: actor.vitality,
-        conviction: actor.conviction
-    });
-    
     const actions: Trait[] = [];
     const reasons: Record<string, string> = {};
 
@@ -50,7 +42,7 @@ export function getAvailableActions(actor: Character, state: CombatState, gameSt
         
         // Disable all other system actions
         Object.values(system_actions).forEach((action: Trait) => {
-            if (action.name !== 'Pass') {
+            if (action.name !== system_actions.pass.name) {
                 reasons[action.name] = 'Combat is over';
             }
         });
@@ -64,29 +56,8 @@ export function getAvailableActions(actor: Character, state: CombatState, gameSt
         return { actions, reasons };
     }
 
-    // Add system actions (only if combat is not complete)
-    Object.values(system_actions).forEach((action: Trait) => {
-        // Check if action is break free related
-        if (action.name === 'Break Free' || action.name === 'Slip Free') {
-            // Only add if character is grappled
-            const isGrappled = actor.statuses?.some(status => status.name === StatusName.GRAPPLED);
-            if (!isGrappled) {
-                reasons[action.name] = 'Can only be used while grappled';
-                return;
-            }
-        }
-        
-        if (action.name === 'Retreat') {
-            reasons[action.name] = 'Cannot retreat during combat';
-        }
-        
-        actions.push(action);
-    });
-
-    // Add all traits from the actor
+    // Add all traits from the actor first
     actor.traits.forEach(trait => {
-        console.log('Processing trait:', trait.name);
-        
         // Check if ability is on cooldown
         const cooldownStatus = actor.statuses?.find(s => 
             s.name === StatusName.ABILITY_COOLDOWN && 
@@ -94,7 +65,6 @@ export function getAvailableActions(actor: Character, state: CombatState, gameSt
         );
         
         if (cooldownStatus) {
-            console.log('Trait on cooldown:', trait.name);
             reasons[trait.name] = `On cooldown (${cooldownStatus.duration} turns remaining)`;
         }
 
@@ -165,8 +135,22 @@ export function getAvailableActions(actor: Character, state: CombatState, gameSt
         actions.push(trait);
     });
 
-    console.log('Final actions:', actions.map(a => a.name));
-    console.log('Reasons:', reasons);
+    // Add system actions at the end (only if combat is not complete)
+    Object.values(system_actions).forEach((action: Trait) => {
+        // Always add the action to the list first
+        actions.push(action);
+
+        // Then check if it should be disabled
+        if (action.name === system_actions.breakFree.name || action.name === system_actions.slipFree.name) {
+            const isGrappled = actor.statuses?.some(status => status.name === StatusName.GRAPPLED);
+            if (!isGrappled) {
+                reasons[action.name] = 'Can only be used while grappled';
+            }
+        } else if (action.name === system_actions.retreat.name) {
+            reasons[action.name] = 'Cannot retreat during combat';
+        }
+    });
+
     return { actions, reasons };
 }
 
@@ -179,6 +163,5 @@ export function getCurrentActorActions(state: CombatState, gameState: GameState)
 // Get monster's actions (used to update playerActions)
 export function getMonsterActions(state: CombatState, gameState: GameState) {
     const monster = getCharactersFromIdList(state.characterIds, gameState).find(c => c.type === CharacterType.MONSTER);
-    console.log('Getting monster actions for:', monster?.name);
     return monster ? getAvailableActions(monster, state, gameState) : { actions: [], reasons: {} };
 }

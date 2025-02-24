@@ -90,6 +90,7 @@ export function isSkillProficient(skillLevels: SkillLevels, skillName: string): 
 export const Skills = {
     // System
     NONE: "None",
+    INITIATIVE: "Initiative[Grace]",
     // Combat
     GRAPPLE_MIGHT: "Grapple[Might]",
     GRAPPLE_GRACE: "Grapple[Grace]",

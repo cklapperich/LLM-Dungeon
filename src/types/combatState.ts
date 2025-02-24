@@ -1,4 +1,5 @@
 import { Character } from './actor';
+import { CharacterType } from './constants';
 import { UIAction } from '../react_ui/types/uiTypes';
 
 // Types moved from gamestate.ts
@@ -47,6 +48,15 @@ export function getAllCombatLogs(combatState: CombatState): string[] {
     return combatState.combatLog.reduce((allLogs: string[], roundLog: CombatRoundLog) => {
         return [...allLogs, ...roundLog.combatLogs];
     }, []);
+}
+
+// Helper functions to get character IDs based on their type
+export function getMonsterCharacterId(combatState: CombatState, characters: Record<string, Character>): string {
+    return combatState.characterIds.find(id => characters[id].type === CharacterType.MONSTER) || '';
+}
+
+export function getHeroCharacterId(combatState: CombatState, characters: Record<string, Character>): string {
+    return combatState.characterIds.find(id => characters[id].type === CharacterType.HERO) || '';
 }
 
 export function getAllLogsWithRounds(combatState: CombatState): Array<{

@@ -45,7 +45,7 @@ export function applyGrapple(
         if (!canBindLimb(target, limbType)) {
             return {
                 success: false,
-                message: `Cannot bind ${target.name}'s ${limbType}, already bound`
+                message: `Cannot bind ${target.name}'s ${limbType}, already bound. `
             };
         }
 
@@ -65,7 +65,7 @@ export function applyGrapple(
 
     return {
         success: true,
-        message: `${source.name} ${type === GrappleType.PENETRATE ? 'penetrated' : 'grappled'} ${target.name}`
+        message: `${source.name} ${type === GrappleType.PENETRATE ? 'penetrated' : 'grappled'} ${target.name}. `
     };
 }
 
@@ -87,12 +87,31 @@ export function applyStatus(
         };
     }
 
+    // Check if status already exists
+    const existingStatus = getStatus(target.statuses, params.type);
+    if (existingStatus) {
+        // Check if we can stack more
+        if (existingStatus.stacks >= existingStatus.max_stacks) {
+            return {
+                success: false,
+                message: `${target.name} already has maximum amount (${existingStatus.max_stacks}) of ${params.type}. `
+            };
+        }
+        // Increment stacks
+        existingStatus.stacks++;
+        return {
+            success: true,
+            message: `Increased intensity of ${params.type} to ${existingStatus.stacks} on ${target.name}. `
+        };
+    }
+
+    // Create and apply new status
     const status = createStatus(params.type, params);
     target.statuses.push(status);
 
     return {
         success: true,
-        message: `Applied ${params.type} status to ${target.name}`
+        message: `Applied ${params.type} status to ${target.name}.`
     };
 }
 
@@ -116,7 +135,7 @@ export function updateStatusDurations(
 
     return {
         success: true,
-        message: `Updated status durations for ${character.name}`
+        message: `Updated status durations for ${character.name}. `
     };
 }
 
@@ -135,7 +154,7 @@ export function modifyClothing(
 
     return {
         success: true,
-        message: `${source.name} modified ${target.name}'s clothing by ${amount}`
+        message: `${source.name} modified ${target.name}'s clothing by ${amount}. `
     };
 }
 
@@ -153,6 +172,6 @@ export function applyWound(
 
     return {
         success: true,
-        message: `${source.name} wounded ${target.name} for ${amount} damage`
+        message: `${source.name} wounded ${target.name} for ${amount} damage. `
     };
 }

@@ -1,8 +1,10 @@
-import { TaskType, PROMPTS } from './prompts.js';
 import { Character } from '../types/actor.js';
 import { CombatState } from '../types/combatState.js';
 import { formatCharactersForLLM } from './narrativeFormatter';
-import descriptions from '../../data/descriptions.json';
+import promptsData from '../../data/prompts.json';
+
+export type TaskType = 'narrate';
+const PROMPTS = promptsData.prompts;
 
 interface ChatMessage {
     role: 'system' | 'user' | 'assistant';
@@ -12,7 +14,7 @@ interface ChatMessage {
 
 // Determine narration settings based on combat state and action type
 function getNarrationSettings(state: CombatState, isInitialNarration: boolean = false): { spiceLevel: string, length: string } {
-    const { NONE, SUGGESTIVE, EXPLICIT } = descriptions.spiceLevels;
+    const { NONE, SUGGESTIVE, EXPLICIT } = promptsData.spiceLevels;
     // Initial narration is always SUGGESTIVE/MEDIUM
     if (isInitialNarration) {
         return { spiceLevel: 'SUGGESTIVE', length: '4 sentences, a short paragraph.' };
