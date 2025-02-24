@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { Book } from 'lucide-react';
-import { CombatState, getAllLogsWithRounds } from '../../../game_engine/combatState';
+import { CombatState, getAllLogsWithRounds } from '../../../types/combatState';
 import { UIAction } from '../../types/uiTypes';
 import { useLoading } from '../../context/LoadingContext';
 import { Character } from '../../../types/actor';

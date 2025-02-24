@@ -88,16 +88,18 @@ export function isSkillProficient(skillLevels: SkillLevels, skillName: string): 
 }
 
 export const Skills = {
+    // System
+    NONE: "None",
     // Combat
     GRAPPLE_MIGHT: "Grapple[Might]",
     GRAPPLE_GRACE: "Grapple[Grace]",
     LIGHT_WEAPONS: "Light Weapons[Grace]",
     HEAVY_WEAPONS: "Heavy Weapons[Might]",
-    BREAK_FREE_MIGHT: "Break Free[Might]",
-    SLIP_FREE_GRACE: "Slip Free[Grace]",
     BLOCK_MIGHT: "Block[Might]",
     DODGE_GRACE: "Dodge[Grace]",
     PARRY_GRACE: "Parry[Grace]",
+    BREAK_FREE_MIGHT: "Break Free[Might]",
+    SLIP_FREE_GRACE: "Slip Free[Grace]",
     // Stealth & Detection
     STEALTH: "Stealth[Grace]",
     PERCEPTION: "Perception[Wit]",

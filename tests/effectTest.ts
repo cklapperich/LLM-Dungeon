@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { createCharacter } from '../src/types/actor.js';
-import { createWoundEffect, createGrappleEffect, applyEffect } from '../src/types/effect.js';
+import { createWoundEffect, createGrappleEffect, applyEffect } from '../src/game_engine/effect.js';
 import { EffectType, CombatFlags, GrappleType } from '../src/types/constants.js';
 import { createTestGameState } from '../src/types/gamestate.js';
 

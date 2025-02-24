@@ -16,15 +16,32 @@ export const EffectType = {
     WOUND: 'WOUND',
     GRAPPLE: 'GRAPPLE',
     CORRUPT: 'CORRUPT',
-    COOLDOWN: 'COOLDOWN'
+    BREAK_FREE: 'BREAK_FREE',
+    ADVANCE_TURN: 'ADVANCE_TURN',
+    END_COMBAT: 'END_COMBAT',
+    MODIFY_CLOTHING: 'MODIFY_CLOTHING'
 } as const;
 
-export const LimbType = {
-    LEFT_ARM: 'leftArm',
-    RIGHT_ARM: 'rightArm',
-    LEFT_LEG: 'leftLeg',
-    RIGHT_LEG: 'rightLeg',
-    MOUTH: 'mouth'
+export const BodyPartType = {
+    ARM: 'arm',
+    LEG: 'leg',
+    MOUTH: 'mouth',
+    TONGUE: 'tongue',
+    TAIL: 'tail',
+    TENTACLE: 'tentacle',
+    HOOF: 'hoof',
+    HORN: 'horn',
+    CLAW: 'claw',
+    VENOM_INJECTOR: 'venom_injector',  // stingers/fangs/quills
+    BRAIN: 'brain',
+    WEBSPINNER: 'webspinner',
+    WING: 'wing',
+    GILL: 'gill',
+    ROOT: 'root',
+    REACTOR_CORE: 'reactor_core',
+    POUCH: 'pouch',
+    SPORE: 'spore',
+    OVIPOSITOR: 'ovipositor'
 } as const;
 
 export enum RoomCapacity {
@@ -54,7 +71,7 @@ export const IntensityType = {
 } as const;
 
 export type IntensityTypes = typeof IntensityType[keyof typeof IntensityType];
-export type Limb = typeof LimbType[keyof typeof LimbType];
+export type BodyPart = typeof BodyPartType[keyof typeof BodyPartType];
 
 export const RoomType = {
     EMPTY: 0,

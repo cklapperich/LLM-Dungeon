@@ -1,8 +1,15 @@
 import { Character } from '../types/actor';
 import { GameState, getCharactersFromIdList } from '../types/gamestate';
-import { CombatState } from './combatState';
+import { CombatState } from '../types/combatState';
 import { callLLM, narrationHelpers } from './llm';
-import { PROMPTS, TASKS } from './prompts';
+
+// Import JSON data
+import promptsData from '../../data/prompts.json';
+
+export type SpiceLevel = 'NONE' | 'SUGGESTIVE' | 'EXPLICIT';
+
+const TASKS = promptsData.tasks;
+const PROMPTS = promptsData.prompts;
 
 export async function generateInitialNarration(
     state: CombatState,
@@ -41,9 +48,9 @@ export async function generateRoundNarration(
 ): Promise<string> {
     try {
         const characters = getCharactersFromIdList(state.characterIds, gameState);
-        const currentRoundLog = state.combatLog[state.round - 1];
+        const currentRoundLog = state.combatLog[state.round];
         const previousNarrations = state.combatLog
-            .slice(0, state.round - 1)
+            .slice(0, state.round)
             .flatMap(log => log.narrations);
         
         const { spiceLevel, length } = narrationHelpers.getNarrationSettings(state, false);
@@ -64,5 +71,36 @@ export async function generateRoundNarration(
     } catch (error) {
         console.error('Failed to generate round narration:', error);
         return `Round ${state.round} combat actions completed.`;
+    }
+}
+
+export async function generateAfterMathNarration(
+    state: CombatState,
+    gameState: GameState
+): Promise<string> {
+    try {
+        const characters = getCharactersFromIdList(state.characterIds, gameState);
+        const currentRoundLog = state.combatLog[state.round - 1];
+        const previousNarrations = state.combatLog
+            .flatMap(log => log.narrations);
+        
+        const { spiceLevel, length } = narrationHelpers.getNarrationSettings(state, false);
+        
+        const systemPrompt = narrationHelpers.formatSystemPrompt(
+            PROMPTS.narrate.system,
+            characters[0],
+            characters[1],
+            spiceLevel,
+            length,
+            currentRoundLog.combatLogs,
+            previousNarrations,
+            TASKS.COMBAT_AFTERMATH,
+            null
+        );
+
+        return await callLLM('narrate', [systemPrompt]);
+    } catch (error) {
+        console.error('Failed to generate aftermath narration:', error);
+        return `The combat has ended.`;
     }
 }

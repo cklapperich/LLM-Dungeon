@@ -18,14 +18,20 @@
             "skill": "Light Weapons[Grace]",
             "defenseOptions": ["Dodge[Grace]","Block[Might]"],
             "modifier": 2,
-            "target": "self",
             "priority": false,
             "effects": [
                 {
                     "type": "WOUND",
-                    "params": { "value": 1 }
+                    "params": { "value": 1 },
+                    "target": "other"
                 }
             ]
         }
-    ]
+    ],
+    "grappleInfo": {
+        "isGrappled": false,
+        "isPenetrated": false,
+        "boundLimbs": [],
+        "boundDuringGrapple": []
+    }
 }

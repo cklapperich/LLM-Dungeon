@@ -1,19 +1,21 @@
 {
     "name": "Green Slime",
     "type": "monster",
-    "might": 7,
-    "grace": 7,
-    "wit": 4,
-    "will": 4,
+    "might": 16,
+    "grace": 16,
+    "wit": 16,
+    "will": 16,
     "skills": {
         "Stealth[Grace]": 2,
         "Grapple[Might]": 2
     },
-    "description": "A small, gelatinous creature that can dissolve into water and slip through tight spaces",
+    "description": "A small, gelatinous creature that can dissolve into water and slip through tight spaces. Remarkably adaptable, it can learn any ability. It's stats are typically low - but this one seems unbelievably strong! Slimes reproduce via mitosis: it partially invades a victim's womb, then splits in two - one half says in the womb, the other half. stays outside where it was.",
     "size": 1,
     "traits": [
         "slam",
         "grab",
+        "penetrate",
+        "shred",
         {
             "name": "Bludgeon",
             "description": "A more skillful attack, reaching out with a tentacle to strike.",
@@ -21,14 +23,14 @@
             "skill": "Grace",
             "defenseOptions": ["Dodge[Grace]", "Block[Might]"],
             "modifier": 2,
-            "target": "opponent",
             "priority": false,
             "effects": [
                 {
                     "type": "WOUND",
                     "params":{
                         "value": 1
-                    }
+                    },
+                    "target": "other"
                 }
             ]
         }

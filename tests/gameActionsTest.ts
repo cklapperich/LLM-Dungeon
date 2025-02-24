@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { createTestCombatScenario, createDefaultTestCharacters } from '../src/testing/stateGenerators';
-import { executeAction } from '../src/game_engine/gameActions';
-import { getLegalActions } from '../src/game_engine/combat';
+import { executeAction } from '../src/game_engine/modifyGameState';
+import { getLegalActions } from '../src/game_engine/combatEngine';
 import { TraitUIAction } from '../src/react_ui/types/uiTypes';
 
 describe('Combat Flow', () => {

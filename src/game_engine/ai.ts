@@ -1,22 +1,23 @@
-import { CombatState, GameState } from '../types/gamestate';
-import { UIAction } from '../react_ui/types/uiTypes';
-import { getCurrentActorActions } from './combat';
+import { GameState } from '../types/gamestate';
+import { CombatState } from '../types/combatState';
+import { Trait } from '../types/abilities';
+import { Character } from '../types/actor';
+import { getAvailableActions } from './getAvailableActions';
+import { system_actions } from './default_abilities';
 
 // Get a random action for the AI to take, excluding system actions
-export function getAIAction(state: CombatState, gameState: GameState): UIAction {
-    // Get current actor's actions and filter out system actions
-    const availableActions = getCurrentActorActions(state, gameState).filter(
-        action => action.category !== 'system'
+export function getAIAction(actor: Character, state: CombatState, gameState: GameState): Trait {
+    const { actions, reasons } = getAvailableActions(actor, state, gameState);
+    
+    // Filter out system actions and disabled actions
+    const availableActions = actions.filter(action => 
+        !Object.values(system_actions).some(sysAction => sysAction.name === action.name) && 
+        !(action.name in reasons)
     );
 
     if (availableActions.length === 0) {
         // If no trait actions available, use PASS action
-        return getCurrentActorActions(state, gameState).find(action => action.type === 'PASS') || {
-            type: 'PASS',
-            label: 'Pass',
-            category: 'system',
-            tooltip: 'End turn without taking any action'
-        };
+        return system_actions.pass;
     }
 
     // Select random action from available actions

@@ -1,8 +1,8 @@
-import { GameState as BackendGameState, CombatState } from '../../types/gamestate';
 import { Character } from '../../types/actor';
-import { Trait, BodyPartRequirements, Effect } from '../../types/abilities';
+import { Trait,  Effect } from '../../types/abilities';
 import { SkillName } from '../../types/skilltypes';
 import { RarityType, TargetType } from '../../types/constants';
+import { GameState } from '../../types/gamestate';
 import { 
     Sword, 
     Shield, 
@@ -43,33 +43,30 @@ export interface UICharacterCard {
     stats: UICardStats;
 }
 
-// Base interface for all UI actions
-export interface BaseUIAction {
+// Unified interface for all combat actions
+export interface CombatUIAction {
     type: string;
     label: string;
+    description: string;
     disabled?: boolean;
     tooltip?: string;
-    category: 'trait' | 'system';  // Extend with more categories as needed
+    rarity?: typeof RarityType[keyof typeof RarityType];
+    skill?: SkillName;
+    defenseOptions?: SkillName[];
+    modifier?: number;
+    priority?: boolean;
+    //bodyParts?: BodyPartRequirements;
+    effects: Effect[];
 }
 
-// For trait-based actions
-export interface TraitUIAction extends BaseUIAction {
-    category: 'trait';
-    trait: {
-        description: string;
-        rarity: typeof RarityType[keyof typeof RarityType];
-        skill: SkillName;
-        defenseOptions: SkillName[];
-        modifier: number;
-        target: typeof TargetType[keyof typeof TargetType];
-        priority: boolean;
-        bodyParts?: BodyPartRequirements;
-        effects: Effect[];
-    }
-}
+// For backwards compatibility
+export type UIAction = CombatUIAction;
 
-// Union type for all UI actions
-export type UIAction = BaseUIAction | TraitUIAction;
+export interface UIActionResult {
+    success: boolean;
+    newState: GameState;
+    message?: string;
+}
 
 // Theme configurations
 export const CharacterThemes = {

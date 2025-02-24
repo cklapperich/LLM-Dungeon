@@ -1,42 +1,30 @@
 import { RollResult, SKILL_CONSTANTS, OpposedCheckResult, SkillName} from '../../types/skilltypes.ts';
 import { marginModifiers, getSkillAttribute } from './dataLoader.ts';
-import { Character, getAttributeValue, getSkillBonus } from '../../types/actor.ts';
+import { Character, getAttributeValue, getSkillModifier } from '../../types/actor.ts';
 import { IntensityType, IntensityTypes } from '../../types/constants';
-
 interface InitiativeResult {
-    firstActor: Character;
+    initiatives: [number, number];
     margin: number;
     description: string;
 }
 
 export function processInitiative(char1: Character, char2: Character): InitiativeResult {
     // Roll initiative for both characters
-    const roll1 = roll2d10();
-    const roll2 = roll2d10();
-    const init1 = roll1 - char1.grace;
-    const init2 = roll2 - char2.grace;
+    const init1 = roll2d10() - char1.grace;
+    const init2 = roll2d10() - char2.grace;
 
-    // Calculate margin and determine who goes first (lower initiative goes first)
+    // Calculate margin between initiatives (lower is better)
     const margin = Math.abs(init1 - init2);
-    const firstActor = init1 <= init2 ? char1 : char2;
-    const intensity = getIntensityLevel(null, margin); // Using a fresh roll for intensity
+    const intensity = getIntensityLevel(null, margin);
 
     // Get description from initiative category
     const description = getSkillDescription('initiative', intensity);
 
     return {
-        firstActor,
+        initiatives: [init1, init2],
         margin,
         description
     };
-}
-
-// Lower numbers go first
-// Example: Grace 13, roll 15 = initiative 2 (15-13)
-//         Grace 13, roll 8 = initiative -5 (8-13)
-export function rollInitiative(character: Character): number {
-    const roll = roll2d10();
-    return roll - character.grace;
 }
 
 /**
@@ -69,8 +57,12 @@ function getSkillDescription(skillName: string | undefined, intensity: Intensity
     else if (skillName=='initiative')
         prompts = marginModifiers.initiative[intensity];
     else
-       prompts = marginModifiers.skills[skillName][intensity];
-    
+       try{
+           prompts = marginModifiers.skills[skillName][intensity];
+       } catch {
+           console.warn(`No skill description found for ${skillName}`);
+           prompts = marginModifiers.generic[intensity];
+       }
     // Return a random prompt
     return prompts[Math.floor(Math.random() * prompts.length)];
 }
@@ -92,6 +84,9 @@ function roll2d10(): number {
  * @param modifier additional modifiers
  * @returns The result of the roll
  */
+/**
+ * Make a skill check
+ */
 export function makeSkillCheck(
     character: Character,
     skillName: SkillName,
@@ -99,7 +94,7 @@ export function makeSkillCheck(
 ): RollResult {
     const attribute = getSkillAttribute(skillName);
     const baseAttribute = getAttributeValue(character, attribute);
-    const skillBonus = getSkillBonus(character, skillName);
+    const skillBonus = getSkillModifier(character, skillName);
     
     const roll = roll2d10();
     const modifiedAttribute = baseAttribute + skillBonus + modifier;
@@ -138,7 +133,7 @@ function getBestDefensiveSkill(character: Character, defenseOptions: SkillName[]
     for (const skillName of defenseOptions) {
         const attribute = getSkillAttribute(skillName);
         const baseAttribute = getAttributeValue(character, attribute);
-        const skillBonus = getSkillBonus(character, skillName);
+        const skillBonus = getSkillModifier(character, skillName);
         const total = baseAttribute + skillBonus;
 
         if (total > bestTotal) {

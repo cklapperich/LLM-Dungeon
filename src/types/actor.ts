@@ -2,7 +2,8 @@ import { Attribute, SkillName } from './skilltypes.js';
 import { Trait } from './abilities.js';
 import { abilities } from '../game_engine/default_abilities.ts';
 import { copyTrait } from './abilities.js';
-import { MonsterSize, CharacterType, CharacterTypeValue, Limb, LimbType } from './constants.js';
+import { MonsterSize, CharacterType, CharacterTypeValue, BodyPart, BodyPartType } from './constants.js';
+import { Status} from './status.js';
 
 export interface Character {
     id: string;
@@ -22,7 +23,9 @@ export interface Character {
     flags: Record<string, number>;
     size?: MonsterSize; // Optional size field for monsters
     initiative?: number; // Track initiative in combat
-    limbs: Record<Limb, boolean>; // Track which limbs the character has
+    clothing: number; // Track clothing level (0-5)
+    limbs: Partial<Record<BodyPart, number>>; // Track which limbs the character has
+    statuses: Status[]; // Track active status effects
 }
 
 export function calculateMaxVitality(might: number): number {
@@ -66,48 +69,51 @@ export function createCharacter(attributes: Partial<Character> = {}): Character 
         conviction: calculateMaxConviction(will),
         description: attributes.description ?? "",
         flags: attributes.flags ?? {},
+        clothing: attributes.clothing ?? 1, // Default clothing level is 1
         limbs: attributes.limbs ?? {
-            [LimbType.LEFT_ARM]: true,
-            [LimbType.RIGHT_ARM]: true,
-            [LimbType.LEFT_LEG]: true,
-            [LimbType.RIGHT_LEG]: true,
-            [LimbType.MOUTH]: true
-        }
+            [BodyPartType.ARM]: 2,
+            [BodyPartType.LEG]: 2,
+            [BodyPartType.MOUTH]: 1
+        },
+        statuses: attributes.statuses ?? [] // Initialize empty status array
     };
 }
+
 
 export function getAttributeValue(character: Character, attribute: Attribute): number {
     return character[attribute.toLowerCase() as keyof Pick<Character, 'might' | 'grace' | 'wit' | 'will'>];
 }
 
-export function getSkillBonus(character: Character, skillName: SkillName): number {
+export function getSkillModifier(character: Character, skillName: SkillName): number {
     return character.skills[skillName] || 0;
 }
 
 /**
  * Check if a character has the required limbs for a trait
  */
-export function hasRequiredLimbs(character: Character, trait: Trait): boolean {
-    if (!trait.requirements?.limbs) return true;
 
-    const requiredArms = trait.requirements.limbs.arms ?? 0;
-    const requiredLegs = trait.requirements.limbs.legs ?? 0;
-    const requiredMouth = trait.requirements.limbs.mouth ?? 0;
+// TODO - UPDATE TO NEW LIMB STORAGE REQUIREMENTS WHERE WE STORE A RECORD OF LIMBTYPE:NUMBER
+// export function hasRequiredLimbs(character: Character, trait: Trait): boolean {
+//     if (!trait.requirements?.limbs) return true;
 
-    let availableArms = 0;
-    if (character.limbs[LimbType.LEFT_ARM]) availableArms++;
-    if (character.limbs[LimbType.RIGHT_ARM]) availableArms++;
+//     const requiredArms = trait.requirements.limbs.arms ?? 0;
+//     const requiredLegs = trait.requirements.limbs.legs ?? 0;
+//     const requiredMouth = trait.requirements.limbs.mouth ?? 0;
 
-    let availableLegs = 0;
-    if (character.limbs[LimbType.LEFT_LEG]) availableLegs++;
-    if (character.limbs[LimbType.RIGHT_LEG]) availableLegs++;
+//     let availableArms = 0;
+//     if (character.limbs[LimbType.LEFT_ARM]) availableArms++;
+//     if (character.limbs[LimbType.RIGHT_ARM]) availableArms++;
 
-    const hasMouth = character.limbs[LimbType.MOUTH];
+//     let availableLegs = 0;
+//     if (character.limbs[LimbType.LEFT_LEG]) availableLegs++;
+//     if (character.limbs[LimbType.RIGHT_LEG]) availableLegs++;
 
-    return availableArms >= requiredArms && 
-           availableLegs >= requiredLegs && 
-           (requiredMouth === 0 || hasMouth);
-}
+//     const hasMouth = character.limbs[LimbType.MOUTH];
+
+//     return availableArms >= requiredArms && 
+//            availableLegs >= requiredLegs && 
+//            (requiredMouth === 0 || hasMouth);
+// }
 
 /**
  * Save a character to JSON string
@@ -128,7 +134,7 @@ export function loadCharacter(json: string): Character {
         data.traits = data.traits.map((trait: string | Trait) => {
             if (typeof trait === 'string') {
                 // Look up trait in default abilities and create a copy
-                const defaultTrait = (abilities as Record<string, Trait>)[trait.toLowerCase()];
+                const defaultTrait = (abilities as Record<string, Trait>)[trait];
                 if (!defaultTrait) {
                     throw new Error(`Unknown trait: ${trait}`);
                 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { CombatState } from '../../../game_engine/combatState';
+import { CombatState } from '../../../types/combatState';
 import { characterToUICard } from '../../types/uiTypes';
 import { useLoading } from '../../context/LoadingContext';
 import Card from '../Card';
@@ -8,9 +8,10 @@ import { Character } from '../../../types/actor';
 interface CombatAreaProps {
     combatState?: CombatState;
     allCharacters: Record<string, Character>;
+    debugEnabled?: boolean;
 }
 
-export const CombatArea: React.FC<CombatAreaProps> = ({ combatState, allCharacters }) => {
+export const CombatArea: React.FC<CombatAreaProps> = ({ combatState, allCharacters, debugEnabled }) => {
     if (!combatState) {
         return (
             <div className="w-2/3 p-6 bg-slate-100">
@@ -34,6 +35,21 @@ export const CombatArea: React.FC<CombatAreaProps> = ({ combatState, allCharacte
                 <h2 className="text-xl font-bold mb-4">Current Encounter | {combatState.roomId} | Round {combatState.round}</h2>
                 
                 {/* Combat Stage */}
+                {/* Debug View */}
+                {debugEnabled && (
+                    <div className="mb-4 flex gap-4 overflow-auto">
+                        {combatState.characterIds.map((id, index) => (
+                            <div key={index} className="flex-1 p-4 bg-slate-100 rounded overflow-auto">
+                                <h3 className="font-bold mb-2">{index === 0 ? 'Hero' : 'Monster'}</h3>
+                                <pre className="text-xs whitespace-pre-wrap">
+                                    {JSON.stringify(allCharacters[id], null, 2)}
+                                </pre>
+                            </div>
+                        ))}
+                    </div>
+                )}
+                
+                {/* Combat View */}
                 <div className="flex-1 flex justify-center items-center relative">
                     {combatState.characterIds.map((id, index) => (
                         <div key={index} className="flex-1 w-[47%]">

@@ -1,5 +1,37 @@
 {
   "skills": {
+      "Grapple[Grace]": {
+        "minimal_success": [
+          "They dart in to catch their target with sudden speed",
+          "Their quick hands barely secure the hold",
+          "They snatch their target with barely controlled precision"
+        ],
+        "solid_success": [
+          "They strike like a serpent to secure the hold",
+          "Their swift technique locks the target in place",
+          "They catch their opponent with precise, practiced grace"
+        ],
+        "critical_success": [
+          "They move faster than the eye can follow to secure control",
+          "Their lightning technique creates an inescapable web",
+          "They strike with impossible speed and perfect precision"
+        ],
+        "minimal_failure": [
+          "Their quick grab misses by inches",
+          "Their swift technique falls just short",
+          "Their precise approach barely fails to secure hold"
+        ],
+        "solid_failure": [
+          "Their quick grapple fails to connect",
+          "Their swift technique misses entirely",
+          "Their precise approach fails to secure control"
+        ],
+        "critical_failure": [
+          "Their lightning-fast grab sends them stumbling past",
+          "Their quick technique leaves them completely exposed",
+          "Their precise approach backfires spectacularly"
+        ]
+    },
     "Heavy Weapons[Might]": {
       "minimal_success": [
         "The weapon connects with basic effectiveness",

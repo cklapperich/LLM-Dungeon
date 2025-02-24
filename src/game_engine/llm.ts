@@ -1,25 +1,18 @@
 import { TaskType, PROMPTS } from './prompts.js';
 import { Character } from '../types/actor.js';
-import { CombatState } from './combatState.js';
+import { CombatState } from '../types/combatState.js';
+import { formatCharactersForLLM } from './narrativeFormatter';
+import descriptions from '../../data/descriptions.json';
 
 interface ChatMessage {
     role: 'system' | 'user' | 'assistant';
     content: string;
 }
 
-// Format character information for the prompt
-function formatCharacterInfo(hero: Character, monster: Character): string {
-    return `HERO: ${hero.name} - ${hero.description}
-Stats: Might ${hero.might}, Grace ${hero.grace}, Wit ${hero.wit}, Will ${hero.will}
-Skills: ${Object.entries(hero.skills).map(([skill, level]) => `${skill} (${level})`).join(', ')}
-
-MONSTER: ${monster.name} - ${monster.description}
-Stats: Might ${monster.might}, Grace ${monster.grace}, Wit ${monster.wit}, Will ${monster.will}
-Skills: ${Object.entries(monster.skills).map(([skill, level]) => `${skill} (${level})`).join(', ')}`;
-}
 
 // Determine narration settings based on combat state and action type
 function getNarrationSettings(state: CombatState, isInitialNarration: boolean = false): { spiceLevel: string, length: string } {
+    const { NONE, SUGGESTIVE, EXPLICIT } = descriptions.spiceLevels;
     // Initial narration is always SUGGESTIVE/MEDIUM
     if (isInitialNarration) {
         return { spiceLevel: 'SUGGESTIVE', length: '4 sentences, a short paragraph.' };
@@ -27,16 +20,31 @@ function getNarrationSettings(state: CombatState, isInitialNarration: boolean = 
 
     // Check current round's combat logs for grapple actions
     const currentRoundLog = state.combatLog[state.round - 1];
+    if (currentRoundLog?.combatLogs.some(log => log.toLowerCase().includes('penetrat'))) {
+        return { spiceLevel: EXPLICIT, length: 'A detailed paragraph, 6-8 sentences.' };
+    }
     if (currentRoundLog?.combatLogs.some(log => 
         log.toLowerCase().includes('grapple') || 
         log.toLowerCase().includes('prone') ||
         log.toLowerCase().includes('heat')
     )) {
-        return { spiceLevel: 'SUGGESTIVE', length: 'A meaty paragraph, 4-6 sentences.' };
+        return { spiceLevel: SUGGESTIVE, length: 'A meaty paragraph, 4-6 sentences.' };
     }
 
     // Default to NONE/SHORT for regular combat actions
-    return { spiceLevel: 'NONE', length: '2-3 sentences, a short paragraph.' };
+    return { spiceLevel: NONE, length: '2-3 sentences, a short paragraph.' };
+}
+
+// Filter out roll information from combat logs before sending to LLM
+function filterCombatLogs(logs: string[]): string[] {
+    return logs.filter(log => {
+        // Remove lines containing roll information - pattern: {word} rolled {number} vs target {number}
+        if (log.match(/\w+ rolled \d+ vs target \d+/)) {
+            return false;
+        }
+        // Remove the following line which contains the roll result description
+        return true;
+    });
 }
 
 // Format the system prompt with all required information
@@ -60,8 +68,8 @@ function formatSystemPrompt(
         .replace('{spiceLevel}', spiceLevel)
         .replace('{length}', length)
         .replace('{roomDescription}', roomSection)
-        .replace('{characterInfo}', formatCharacterInfo(hero, monster))
-        .replace('{combatLogs}', combatLogs.join('\n'))
+        .replace('{characterInfo}', formatCharactersForLLM(hero, monster))
+        .replace('{combatLogs}', filterCombatLogs(combatLogs).join('\n'))
         .replace('{previousNarration}', previousNarration.join('\n'))
         .replace('{task}', task);
 }
@@ -125,5 +133,5 @@ export async function callLLM(
 export const narrationHelpers = {
     formatSystemPrompt,
     getNarrationSettings,
-    formatCharacterInfo
+    formatCharactersForLLM
 };

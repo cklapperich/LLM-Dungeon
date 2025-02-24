@@ -1,13 +1,10 @@
 import { Character } from './actor.js';
 import { type Trait } from './abilities.js';
 import { 
-    RoomCapacity,
-    MonsterSize,
-    LimbType,
     RarityType,
 } from './constants.js';
 import { DungeonLayout } from './dungeon.js';
-import type { CombatState } from '../game_engine/combatState';
+import type { CombatState } from './combatState.js';
 
 export interface GameLogMessage {
     text: string;
@@ -35,6 +32,9 @@ export interface Trap {
 export type GamePhase = 'combat' | 'dungeon_building' | 'planning' | 'event';
 
 export interface GameState {
+    // Game settings
+    narrationEnabled: boolean;
+
     // Time tracking
     turnCounter: number;
     dayCounter: number;
@@ -67,6 +67,7 @@ export interface GameState {
 // Helper function to create a minimal GameState for testing
 export function createTestGameState(overrides: Partial<GameState> = {}): GameState {
     return {
+        narrationEnabled: false,
         turnCounter: 0,
         dayCounter: 0,
         dungeon: {

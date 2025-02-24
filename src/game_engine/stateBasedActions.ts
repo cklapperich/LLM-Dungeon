@@ -1,5 +1,8 @@
-import { CombatState } from './combatState';
+import { CombatState } from '../types/combatState';
 import { GameState, getCharactersFromIdList } from '../types/gamestate';
+import { updateStatusDurations } from './modifyGameState';
+import { generateAfterMathNarration } from './combatNarration';
+import { handleCombatEnd } from './combatEngine';
 
 /**
  * State-based actions are automatic game rules that are checked and applied during combat
@@ -27,26 +30,42 @@ import { GameState, getCharactersFromIdList } from '../types/gamestate';
  * This system ensures that game rules are consistently enforced and
  * that complex interactions resolve in a predictable order.
  */
-export function processStateBasedActions(state: CombatState, gameState: GameState): CombatState {
-    // TODO: Process status effects and round-based effects when between rounds
-    
-    // TODO: Check for heroine capture condition
-    
-    // Check each character for defeat via HP
+export async function processBetweenActions(state: CombatState, gameState: GameState): Promise<CombatState> {
+    // Get all characters once
     const characters = getCharactersFromIdList(state.characterIds, gameState);
+    
+    // Update status durations and check for defeat
     for (const char of characters) {
         if (char.vitality <= 0) {
-            state.isComplete = true;
-            // Log the winner
             const winner = characters.find(c => c !== char);
             if (winner) {
-                const currentRoundLog = state.combatLog[state.round - 1];
-                currentRoundLog.combatLogs.push(
-                    `Combat ended - ${winner.name} wins (${char.name} defeated at 0 HP)`
+                handleCombatEnd(
+                    state,
+                    gameState,
+                    winner,
+                    `${char.name} defeated at 0 HP`
                 );
+                
+                // Generate aftermath narration if enabled
+                if (gameState.narrationEnabled) {
+                    const aftermathNarration = await generateAfterMathNarration(state, gameState);
+                    state.combatLog[state.round - 1].narrations.push(aftermathNarration);
+                }
             }
             break;
         }
+    }
+
+    return state;
+}
+
+export function processBetweenRounds(state: CombatState, gameState: GameState): CombatState {
+    // Get all characters once
+    const characters = getCharactersFromIdList(state.characterIds, gameState);
+    
+    // Process status effects and round-based effects
+    for (const char of characters) {
+        updateStatusDurations(gameState, char);
     }
 
     return state;

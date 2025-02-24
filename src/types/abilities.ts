@@ -1,28 +1,30 @@
 import { SkillName, Skills } from './skilltypes.js';
 import { 
     TargetType, 
-    RarityType, 
-    EffectType,
+    RarityType,
     type Target,
-    type Rarity,
-    type EffectTypes
+    type Rarity
 } from './constants.js';
+import { Effect } from '../game_engine/effect.js';
 
-type Effect = {
-  type: EffectTypes;
-  params: Record<string, any>;  // Different params for different effect types
+import { BodyPartType, type BodyPart } from './constants.js';
+
+type StatusRequirement = {
+  name: string,
+  stacks: number,
+  target: 'self' | 'other'
 }
 
-type Requirements = {
-  limbs?: {
-    arms?: number;
-    legs?: number;
-    mouth?: number;
+type BodyPartRequirements = {
+  parts?: Partial<Record<BodyPart, number>>,
+  statuses?: StatusRequirement[],
+  clothing?: {
+    maxLevel: number
   }
 }
 
 type Trait = {
-  name: string;
+  name: string;  // Display name shown to players
   description: string;
   rarity: Rarity;
   
@@ -30,18 +32,11 @@ type Trait = {
   skill: SkillName;
   defenseOptions: SkillName[]; // Array of skills the defender can choose from
   modifier: number;
-  target: Target;
   priority: boolean;
-  requirements?: Requirements;
+  requirements?: BodyPartRequirements;
   
   // What happens on hit
   effects: Effect[];
-
-  // Cooldown tracking
-  cooldown?: {
-    duration: number;  // How many rounds the cooldown lasts
-    current: number;   // Current rounds remaining on cooldown
-  }
 }
 
 // Create a new trait with default values
@@ -53,12 +48,19 @@ function createTrait(name: string, defaults: Partial<Trait> = {}): Trait {
     skill: defaults.skill ?? Skills.GRAPPLE_MIGHT,
     defenseOptions: defaults.defenseOptions ?? [], // Empty array means use same skill as attacker
     modifier: defaults.modifier ?? 0,
-    target: defaults.target ?? TargetType.OPPONENT,
     priority: defaults.priority ?? false,
     effects: defaults.effects ?? [],
-    ...(defaults.requirements && { requirements: defaults.requirements }),
-    ...(defaults.cooldown && { cooldown: { ...defaults.cooldown, current: 0 } })
+    ...(defaults.requirements && { requirements: defaults.requirements })
   };
+}
+
+// Helper functions to determine trait targeting
+function targetsSelf(trait: Trait): boolean {
+  return trait.effects.some(effect => effect.target === 'self');
+}
+
+function targetsOther(trait: Trait): boolean {
+  return trait.effects.some(effect => effect.target === 'other' || !effect.target); // default is 'other'
 }
 
 // Deep copy a trait
@@ -66,34 +68,15 @@ function copyTrait(trait: Trait): Trait {
   return JSON.parse(JSON.stringify(trait));
 }
 
-const defaultDefenseOptions=["Dodge[Grace]","Block[Might"];
-// Example trait
-const bite = createTrait('Bite', {
-  description: 'A sharp bite attack',
-  skill: Skills.HEAVY_WEAPONS,
-  defenseOptions: [Skills.DODGE_GRACE, Skills.BLOCK_MIGHT], // Defender can use either Dodge or Block
-  modifier: 2,
-  requirements: {
-    limbs: {
-      mouth: 1
-    }
-  },
-    effects: [
-      {
-        type: EffectType.WOUND,
-        params: { value: 1 }
-      }
-    ]
-});
-
 export type {
   Effect,
-  Requirements,
+  BodyPartRequirements,
   Trait
 };
 
 export {
   createTrait,
   copyTrait,
-  defaultDefenseOptions
+  targetsSelf,
+  targetsOther
 };

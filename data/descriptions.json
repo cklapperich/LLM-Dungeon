@@ -1,0 +1,138 @@
+{
+  "clothing": {
+    "5": [
+      "fully armored from head to toe",
+      "protected by layers of sturdy armor",
+      "wearing complete battle regalia"
+    ],
+    "4": [
+      "wearing partial armor over their clothing",
+      "protected by light combat gear",
+      "dressed in reinforced battle attire"
+    ],
+    "3": [
+      "lightly armored but mostly covered",
+      "wearing basic protective gear",
+      "dressed in simple combat attire"
+    ],
+    "2": [
+      "their armor showing significant damage",
+      "their protective gear barely holding together",
+      "their battle attire torn and tattered"
+    ],
+    "1": [
+      "most of their armor stripped away",
+      "left with mere scraps of protection",
+      "their defenses almost completely compromised"
+    ],
+    "0": [
+      "completely exposed and vulnerable",
+      "stripped of all protection",
+      "left without any defensive covering"
+    ]
+  },
+  "attributes": {
+    "6_or_less": [
+      "severely limited",
+      "critically weak",
+      "drastically impaired"
+    ],
+    "7": [
+      "notably weak",
+      "clearly lacking",
+      "distinctly poor"
+    ],
+    "8_9": [
+      "somewhat lacking",
+      "slightly deficient",
+      "marginally weak"
+    ],
+    "10": [
+      "average",
+      "typical",
+      "unremarkable"
+    ],
+    "11_12": [
+      "above average",
+      "notably capable",
+      "well-developed"
+    ],
+    "13_14": [
+      "exceptional",
+      "impressive",
+      "remarkable"
+    ],
+    "15_16": [
+      "amazing",
+      "extraordinary",
+      "outstanding"
+    ],
+    "17_18": [
+      "legendary",
+      "incredible",
+      "awe-inspiring"
+    ],
+    "19_20": [
+      "mythical",
+      "godlike",
+      "beyond mortal limits"
+    ],
+    "21_plus": [
+      "superhuman",
+      "transcendent",
+      "reality-defying"
+    ]
+  },
+  "vitality": {
+    "full": [
+      "in perfect condition",
+      "completely unharmed",
+      "at their peak"
+    ],
+    "high": [
+      "showing minor signs of wear",
+      "slightly winded",
+      "mostly fresh"
+    ],
+    "medium": [
+      "noticeably wounded",
+      "showing clear signs of injury",
+      "visibly struggling"
+    ],
+    "low": [
+      "severely wounded",
+      "barely standing",
+      "gravely injured"
+    ]
+  },
+  "status": {
+    "grappled": [
+      "caught in a firm hold",
+      "struggling against restraint",
+      "locked in their opponent's grasp"
+    ],
+    "prone": [
+      "knocked to the ground",
+      "struggling to regain footing",
+      "forced down and vulnerable"
+    ],
+    "bound_arms": [
+      "arms firmly restrained",
+      "upper limbs held fast",
+      "hands bound and useless"
+    ],
+    "bound_legs": [
+      "legs tightly bound",
+      "lower limbs restrained",
+      "feet trapped and immobile"
+    ],
+    "penetrated": [
+      "the hero has a monster inside of them - a phallus, tentacle, or other appendage. The monster is trying to breed with them!"
+    ],
+    "ability_cooldown": [
+      "catching their breath",
+      "regaining their composure",
+      "preparing for another attempt"
+    ]
+  }
+}

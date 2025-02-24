@@ -1,6 +1,6 @@
 import { GameState } from '../types/gamestate';
-import { CombatState, createCombatState } from '../game_engine/combatState';
-import { initializeCombat } from '../game_engine/combat';
+import { CombatState } from '../types/combatState';
+import { initializeCombat } from '../game_engine/combatEngine';
 import { Character } from '../types/actor';
 import claraJson from '../../data/monsters/clara.json';
 import greenSlimeJson from '../../data/monsters/green_slime.json';
@@ -17,27 +17,12 @@ export function createDefaultTestCharacters(): { player: Character; monster: Cha
     };
 }
 
-export function createTestCombatState(roomId: string, characterIds: string[] = [], overrides: Partial<CombatState> = {}): CombatState {
-    const state = createCombatState(characterIds, roomId);
-    
-    // Add default combat log
-    state.combatLog = [{
-        round: 1,
-        combatLogs: ["Combat Initialized."],
-        narrations: ["A detested HEROINE approaches!"]
-    }];
-
-    return {
-        ...state,
-        ...overrides
-    };
-}
-
 export function createTestGameState(overrides: Partial<GameState> = {}): GameState {
     // Load the profaned temple dungeon
     const dungeon = loadDungeonFromJson(JSON.stringify(profanedTempleJson));
 
     return {
+        narrationEnabled: false,
         turnCounter: 0,
         dayCounter: 0,
         dungeon,
@@ -65,9 +50,6 @@ export async function createTestCombatScenario(
         },
         ...overrides
     });
-    
-    const characterIds = Object.keys(gameState.characters);
-    const characters = [player, monster] as [Character, Character];
     
     // Initialize combat state with proper setup
     const combatState = await initializeCombat(gameState, roomId);

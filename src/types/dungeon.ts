@@ -1,4 +1,3 @@
-import { Character } from './actor.js';
 import { RoomCapacity, RoomType, RoomTypeValue } from './constants.js';
 
 // Helper type for grid values
