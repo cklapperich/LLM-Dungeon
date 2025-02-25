@@ -12,23 +12,6 @@ export interface CombatRoundLog {
     round: number;
 }
 
-// Snapshot of character state at a point in time
-export interface CharacterSnapshot {
-    vitality: number;
-    conviction: number;
-    clothing: number;
-    statuses: string[];  // Just store status names for snapshots
-}
-
-// Snapshot of game state after an action
-export interface StateSnapshot {
-    timestamp: number;
-    round: number;
-    activeCharacterIndex: number;
-    characters: Record<string, CharacterSnapshot>;
-    eventIndex: number;  // Index into combatLog[round].events array
-}
-
 export interface CombatState {
     roomId: string;
     characterIds: string[];  // Store character IDs instead of direct references
@@ -37,14 +20,12 @@ export interface CombatState {
     activeCharacterIndex: number;
     playerActions: UIAction[];  // Available actions for the monster (player-controlled character)
     combatLog: CombatRoundLog[];
-    stateHistory: StateSnapshot[];  // History of state changes
     currentHistoryIndex: number;    // Current position in history, -1 means latest
 }
 
 // Core state management functions
 export function createCombatState(characterIds: string[], roomId: string): CombatState {
     const initialState: CombatState = {
-        stateHistory: [],
         currentHistoryIndex: -1,
         roomId,
         characterIds,
@@ -63,20 +44,6 @@ export function createCombatState(characterIds: string[], roomId: string): Comba
     };
 
     return initialState;
-}
-
-// State history navigation functions
-export function canStepBackward(state: CombatState): boolean {
-    return state.currentHistoryIndex > 0;
-}
-
-export function canStepForward(state: CombatState): boolean {
-    return state.currentHistoryIndex >= 0 && state.currentHistoryIndex < state.stateHistory.length - 1;
-}
-
-export function getStateAtHistoryIndex(state: CombatState, index: number): StateSnapshot | null {
-    if (index < 0 || index >= state.stateHistory.length) return null;
-    return state.stateHistory[index];
 }
 
 // Log utility functions moved from gamestate.ts

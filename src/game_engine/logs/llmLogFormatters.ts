@@ -17,6 +17,7 @@ import {
     TurnEvent,
     InitiativeEvent
 } from '../events/eventTypes';
+import { Character } from '../../types/actor';
 import { DescriptionManager } from '../utils/descriptionManager';
 
 export class LLMLogFormatters {
@@ -240,5 +241,33 @@ export class LLMLogFormatters {
         }
         
         return descriptions;
+    }
+
+    /**
+     * Formats character information for LLM consumption
+     * Creates a narrative-friendly description of characters for the LLM
+     */
+    static formatCharactersForLLM(hero: Character, monster: Character): string {
+        const formatCharacter = (character: Character, isHero: boolean) => {
+            const type = isHero ? 'Hero' : 'Monster';
+            const vitalityDesc = DescriptionManager.getVitalityDescription(character.vitality);
+            const clothingDesc = DescriptionManager.getClothingDescription(character.clothing);
+            
+            // Format active statuses
+            const statusDescriptions = character.statuses
+                .map(status => DescriptionManager.getStatusDescription(status.name))
+                .filter(Boolean);
+            
+            const statusSection = statusDescriptions.length > 0 
+                ? `\nCondition: ${statusDescriptions.join(', ')}`
+                : '';
+                
+            return `=== ${type}: ${character.name} ===
+Vitality: ${vitalityDesc}
+Appearance: ${clothingDesc}${statusSection}
+${character.description ? `\n${character.description}` : ''}`;
+        };
+
+        return `${formatCharacter(hero, true)}\n\n${formatCharacter(monster, false)}`;
     }
 }

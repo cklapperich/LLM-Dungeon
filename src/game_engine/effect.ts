@@ -17,7 +17,6 @@ import { Character } from '../types/actor.js';
 import { applyWound, applyGrapple, applyStatus, modifyClothing } from './modifyGameState.ts';
 import { applyBreakFreeSkillcheckSuccess } from './grapplingRules.js';
 import { GameState } from '../types/gamestate.js';
-import { formatStatusDescription, getVitalityDescription, getClothingDescription } from './narrativeFormatter';
 import { StatusSource } from '../types/status';
 import { handleCombatEnd } from './combatEngine.js';
 
@@ -88,13 +87,11 @@ export const effectHandlers: Record<typeof EffectType[keyof typeof EffectType], 
             amount: effect.params.value
         });
 
-        // Get description of target's vitality state
-        const vitalityDesc = getVitalityDescription(target.vitality);
         const message = result.message || `${source.name} wounded ${target.name} for ${effect.params.value}`;
         
         return {
             success: result.success,
-            message: vitalityDesc ? `${message}\n[${target.name} ${vitalityDesc}]` : message
+            message: message
         };
     },
     [EffectType.STATUS]: (effect, source, target, gameState) => {
@@ -103,17 +100,6 @@ export const effectHandlers: Record<typeof EffectType[keyof typeof EffectType], 
             duration: effect.params.duration,
             stacks: effect.params.stacks,
             abilityName: effect.params.abilityName
-        });
-
-        // Get narrative description for this status
-        const statusDesc = formatStatusDescription({
-            id: crypto.randomUUID(),
-            name: effect.params.type,
-            source: StatusSource.OTHER,
-            stacks: effect.params.stacks || 1,
-            max_stacks: 1,
-            is_negative: true,
-            params: {}
         });
 
         let message = result.message || `Applied ${effect.params.type} status to ${target.name}`;
@@ -144,7 +130,7 @@ export const effectHandlers: Record<typeof EffectType[keyof typeof EffectType], 
 
         return {
             success: result.success,
-            message: statusDesc ? `${message}\n[${statusDesc}]` : message
+            message: message
         };
     },
     [EffectType.HEAL]: (effect, source, target, gameState) => {
@@ -157,21 +143,10 @@ export const effectHandlers: Record<typeof EffectType[keyof typeof EffectType], 
             limbType: effect.params.limbType
         });
 
-        // Get narrative description for grapple status if successful
-        const statusDesc = result.success ? formatStatusDescription({
-            id: crypto.randomUUID(),
-            name: 'grappled',
-            source: StatusSource.OTHER,
-            stacks: 1,
-            max_stacks: 1,
-            is_negative: true,
-            params: {}
-        }) : null;
-
         const message = result.message || `${source.name} attempted to ${type} ${target.name}`;
         return {
             success: result.success,
-            message: statusDesc ? `${message}\n[${statusDesc}]` : message
+            message: message
         };
     },
     [EffectType.CORRUPT]: (effect, source, target, gameState) => {
@@ -182,13 +157,11 @@ export const effectHandlers: Record<typeof EffectType[keyof typeof EffectType], 
             amount: effect.params.amount
         });
 
-        // Get description of new clothing state
-        const clothingDesc = getClothingDescription(target.clothing);
         const message = result.message || `${source.name} modified ${target.name}'s clothing by ${effect.params.amount}`;
         
         return {
             success: result.success,
-            message: clothingDesc ? `${message}\n[${target.name} is now ${clothingDesc}]` : message
+            message: message
         };
     }
 };

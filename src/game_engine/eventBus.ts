@@ -1,5 +1,5 @@
 // src/game_engine/eventBus.ts
-import { EventEmitter } from 'events';
+import mitt from 'mitt';
 
 // Create a single instance of the event bus
-export const combatEventBus = new EventEmitter();
+export const combatEventBus = mitt();
