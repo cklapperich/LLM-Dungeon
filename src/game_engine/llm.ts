@@ -22,13 +22,18 @@ function getNarrationSettings(state: CombatState, isInitialNarration: boolean = 
 
     // Check current round's combat logs for grapple actions
     const currentRoundLog = state.combatLog[state.round - 1];
-    if (currentRoundLog?.combatLogs.some(log => log.toLowerCase().includes('penetrat'))) {
+    if (!currentRoundLog) {
+        return { spiceLevel: 'SUGGESTIVE', length: '4 sentences, a short paragraph.' };
+    }
+
+    const logs = currentRoundLog.llmContextLog || [];
+    if (logs.some(log => log?.toLowerCase().includes('penetrat'))) {
         return { spiceLevel: EXPLICIT, length: 'A detailed paragraph, 6-8 sentences.' };
     }
-    if (currentRoundLog?.combatLogs.some(log => 
-        log.toLowerCase().includes('grapple') || 
-        log.toLowerCase().includes('prone') ||
-        log.toLowerCase().includes('heat')
+    if (logs.some(log => 
+        log?.toLowerCase().includes('grapple') || 
+        log?.toLowerCase().includes('prone') ||
+        log?.toLowerCase().includes('heat')
     )) {
         return { spiceLevel: SUGGESTIVE, length: 'A meaty paragraph, 4-6 sentences.' };
     }
@@ -37,14 +42,17 @@ function getNarrationSettings(state: CombatState, isInitialNarration: boolean = 
     return { spiceLevel: NONE, length: '2-3 sentences, a short paragraph.' };
 }
 
-// Filter out roll information from combat logs before sending to LLM
-function filterCombatLogs(logs: string[]): string[] {
+// Filter out mechanical information from combat logs before sending to LLM
+function filterCombatLogs(logs: string[] = []): string[] {
     return logs.filter(log => {
-        // Remove lines containing roll information - pattern: {word} rolled {number} vs target {number}
-        if (log.match(/\w+ rolled \d+ vs target \d+/)) {
-            return false;
-        }
-        // Remove the following line which contains the roll result description
+        if (!log) return false;
+        
+        // Filter out mechanical information
+        if (log.match(/\[.*?\]/)) return false; // Remove lines with brackets
+        if (log.match(/Roll:|Attribute:|Margin:|Success:|Critical:/i)) return false; // Remove mechanical terms
+        if (log.match(/\w+ rolled/)) return false; // Remove roll information
+        if (log.match(/modified .* by/)) return false; // Remove modification information
+        
         return true;
     });
 }

@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { Book } from 'lucide-react';
 import { CombatState, getAllLogsWithRounds, getMonsterCharacterId } from '../../../types/combatState';
-import { UIAction } from '../../types/uiTypes';
+import { UIAction, LogType } from '../../types/uiTypes';
 import { useLoading } from '../../context/LoadingContext';
 import { Character } from '../../../types/actor';
 
@@ -17,13 +17,13 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
     onAction 
 }) => {
     const { isLoading } = useLoading();
-    const [logType, setLogType] = React.useState<'combat' | 'narration'>('narration');
+    const [logType, setLogType] = React.useState<LogType>('llm_narration');
     const logContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const scrollToBottom = () => {
             if (logContainerRef.current) {
-                const element = logContainerRef.current;
+                   const element = logContainerRef.current;
                 setTimeout(() => {
                     element.scrollTop = element.scrollHeight;
                 }, 100);
@@ -66,21 +66,46 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
                 </div>
             </div>
 
-            {/* Log Type Toggle */}
-            <button 
-                className={`mb-4 flex items-center justify-center gap-2 px-4 py-2 rounded
-                    border-[3px] border-white/50 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_2px_4px_rgba(0,0,0,0.2)]
-                    bg-slate-800 ${
-                    isLoading 
-                        ? 'opacity-50 text-slate-400 cursor-not-allowed'
-                        : 'text-white hover:bg-slate-700 active:bg-slate-900'
-                }`}
-                disabled={isLoading}
-                onClick={() => setLogType(logType === 'combat' ? 'narration' : 'combat')}
-            >
-                <Book size={16} />
-                {logType === 'combat' ? 'Show Narration' : 'Show Combat'}
-            </button>
+            {/* Log Type Selector */}
+            <div className="mb-4 flex rounded-lg shadow-lg shadow-black/25 border-[3px] border-white/50 overflow-hidden">
+                <button 
+                    onClick={() => setLogType('event')}
+                    disabled={isLoading}
+                    className={`flex-1 px-3 py-1 flex items-center justify-center gap-2 ${
+                        logType === 'event' ? 'bg-slate-600' : 'bg-slate-800 hover:bg-slate-700'
+                    } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                    <Book size={16} />
+                    Events
+                </button>
+                <button 
+                    onClick={() => setLogType('debug')}
+                    disabled={isLoading}
+                    className={`flex-1 px-3 py-1 flex items-center justify-center gap-2 border-l-2 border-white/50 ${
+                        logType === 'debug' ? 'bg-slate-600' : 'bg-slate-800 hover:bg-slate-700'
+                    } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                    Debug
+                </button>
+                <button 
+                    onClick={() => setLogType('llm_context')}
+                    disabled={isLoading}
+                    className={`flex-1 px-3 py-1 flex items-center justify-center gap-2 border-l-2 border-white/50 ${
+                        logType === 'llm_context' ? 'bg-slate-600' : 'bg-slate-800 hover:bg-slate-700'
+                    } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                    Context
+                </button>
+                <button 
+                    onClick={() => setLogType('llm_narration')}
+                    disabled={isLoading}
+                    className={`flex-1 px-3 py-1 flex items-center justify-center gap-2 border-l-2 border-white/50 ${
+                        logType === 'llm_narration' ? 'bg-slate-600' : 'bg-slate-800 hover:bg-slate-700'
+                    } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                    Narrative
+                </button>
+            </div>
 
             {/* Log Panel */}
             <div ref={logContainerRef} className="flex-1 bg-black rounded-lg p-4 overflow-y-auto min-h-0 shadow-lg shadow-black/25 border-2 border-white/40">
@@ -105,7 +130,7 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
                                     {entries.map((entry, i) => (
                                         <div 
                                             key={`${entry.type}-${round}-${i}`}
-                                            className={`text-sm ${logType === 'narration' ? 'italic' : ''}`}
+                                            className={`text-sm ${logType === 'llm_narration' ? 'italic' : ''}`}
                                         >
                                             {entry.text}
                                         </div>

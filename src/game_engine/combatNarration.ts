@@ -28,7 +28,7 @@ export async function generateInitialNarration(
             characters[1],
             spiceLevel,
             length,
-            currentRoundLog.combatLogs,
+            currentRoundLog.llmContextLog || [],
             [], // No previous narrations for initial
             TASKS.INITIAL_COMBAT,
             room?.description
@@ -51,7 +51,7 @@ export async function generateRoundNarration(
         const currentRoundLog = state.combatLog[state.round];
         const previousNarrations = state.combatLog
             .slice(0, state.round)
-            .flatMap(log => log.narrations);
+            .flatMap(log => log.llmNarrations);
         
         const { spiceLevel, length } = narrationHelpers.getNarrationSettings(state, false);
         
@@ -61,7 +61,7 @@ export async function generateRoundNarration(
             characters[1],
             spiceLevel,
             length,
-            currentRoundLog.combatLogs,
+            currentRoundLog.llmContextLog || [],
             previousNarrations,
             TASKS.CONTINUE_COMBAT,
             null // No room description needed for round narration
@@ -82,7 +82,7 @@ export async function generateAfterMathNarration(
         const characters = getCharactersFromIdList(state.characterIds, gameState);
         const currentRoundLog = state.combatLog[state.round - 1];
         const previousNarrations = state.combatLog
-            .flatMap(log => log.narrations);
+            .flatMap(log => log.llmNarrations);
         
         const { spiceLevel, length } = narrationHelpers.getNarrationSettings(state, false);
         
@@ -92,7 +92,7 @@ export async function generateAfterMathNarration(
             characters[1],
             spiceLevel,
             length,
-            currentRoundLog.combatLogs,
+            currentRoundLog.llmContextLog || [],
             previousNarrations,
             TASKS.COMBAT_AFTERMATH,
             null

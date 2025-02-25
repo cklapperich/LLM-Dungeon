@@ -1,13 +1,12 @@
 import React from 'react';
+import { LogType } from '../../types/uiTypes';
 
 interface TopBarProps {
     turnCounter?: number;
     dayCounter?: number;
     infamy?: number;
-    narrationEnabled?: boolean;
-    onToggleNarration?: () => void;
-    debugEnabled?: boolean;
-    onToggleDebug?: () => void;
+    narrationEnabled: boolean;
+    onToggleNarration: () => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({ 
@@ -15,9 +14,7 @@ export const TopBar: React.FC<TopBarProps> = ({
     dayCounter = 0,
     infamy = 0,
     narrationEnabled = false,
-    onToggleNarration,
-    debugEnabled = false,
-    onToggleDebug
+    onToggleNarration
 }) => {
     return (
         <div className="bg-slate-800 text-white p-4 flex justify-between items-center shadow-lg shadow-black/25">
@@ -34,15 +31,9 @@ export const TopBar: React.FC<TopBarProps> = ({
                     >
                         Narration: {narrationEnabled ? 'On' : 'Off'}
                     </button>
-                    <button 
-                        onClick={onToggleDebug}
-                        className={`px-3 py-1 rounded shadow-lg shadow-black/25 relative
-                            border-[3px] border-white/50
-                            bg-slate-800 hover:bg-slate-700 active:bg-slate-900`}
-                    >
-                        Debug: {debugEnabled ? 'On' : 'Off'}
-                    </button>
-                    <span className="px-3 py-1 bg-slate-800 rounded shadow-lg shadow-black/25 border-[3px] border-white/50">Infamy: {infamy}</span>
+                    <span className="px-3 py-1 bg-slate-800 rounded shadow-lg shadow-black/25 border-[3px] border-white/50">
+                        Infamy: {infamy}
+                    </span>
                 </div>
             </div>
         </div>

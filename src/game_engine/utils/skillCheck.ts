@@ -1,7 +1,8 @@
-import { RollResult, SKILL_CONSTANTS, OpposedCheckResult, SkillName, Skills} from '../../types/skilltypes.ts';
+import { RollResult, SKILL_CONSTANTS, OpposedCheckResult, SkillName, Skills, SkillNames} from '../../types/skilltypes.ts';
 import { marginModifiers, getSkillAttribute } from './dataLoader.ts';
 import { Character, getAttributeValue, getSkillModifier, getAttributeBonus, getSkillBonus } from '../../types/actor.ts';
 import { IntensityType, IntensityTypes } from '../../types/constants';
+import { getStatusModifiers } from '../statusEffects';
 interface InitiativeResult {
     initiatives: [number, number];
     margin: number;
@@ -10,15 +11,15 @@ interface InitiativeResult {
 
 export function processInitiative(char1: Character, char2: Character, gameState: any = {}): InitiativeResult {
     // Make initiative checks for both characters
-    const check1 = makeSkillCheck(char1, Skills.INITIATIVE, 0, gameState);
-    const check2 = makeSkillCheck(char2, Skills.INITIATIVE, 0, gameState);
+    const check1 = makeSkillCheck(char1, SkillNames.INITIATIVE, 0, gameState);
+    const check2 = makeSkillCheck(char2, SkillNames.INITIATIVE, 0, gameState);
 
     // Calculate margin between initiatives
     const margin = Math.abs(check1.margin - check2.margin);
     const intensity = getIntensityLevel(null, margin);
 
     // Get description from initiative category
-    const description = getSkillDescription(Skills.INITIATIVE, intensity);
+    const description = getSkillDescription(SkillNames.INITIATIVE, intensity);
 
     return {
         initiatives: [check1.roll, check2.roll],
@@ -56,7 +57,9 @@ function getSkillDescription(skillName: string | undefined, intensity: Intensity
         prompts = marginModifiers.generic[intensity];
     } else {
         try {
-            prompts = marginModifiers.skills[skillName][intensity];
+            // Use the clean skill name from SkillNames
+            const cleanSkillName = Object.values(SkillNames).find(name => name === skillName) || skillName;
+            prompts = marginModifiers.skills[cleanSkillName][intensity];
         } catch {
             console.warn(`No skill description found for ${skillName}`);
             prompts = marginModifiers.generic[intensity];
@@ -96,8 +99,49 @@ export function makeSkillCheck(
     const baseAttribute = getAttributeBonus(character, attribute, gameState);
     const skillBonus = getSkillBonus(character, skillName, gameState);
     
+    // Track all modifiers
+    const modifiers = [];
+    if (skillBonus) {
+        modifiers.push({
+            value: skillBonus,
+            reason: `${skillName} proficiency`
+        });
+    }
+    if (modifier) {
+        modifiers.push({
+            value: modifier,
+            reason: 'ability modifier'
+        });
+    }
+
+    // Calculate status effect modifiers
+    let statusSkillMod = 0;
+    let statusAttributeMod = 0;
+    character.statuses?.forEach(status => {
+        const statusMods = getStatusModifiers(status, gameState);
+        // Add skill modifiers
+        if (skillName in statusMods.skill_modifiers) {
+            const value = statusMods.skill_modifiers[skillName];
+            statusSkillMod += value;
+            modifiers.push({
+                value,
+                reason: `${status.name} (${status.stacks} stacks)`
+            });
+        }
+        // Add attribute modifiers
+        const skillAttribute = getSkillAttribute(skillName);
+        if (skillAttribute in statusMods.attribute_modifiers) {
+            const value = statusMods.attribute_modifiers[skillAttribute];
+            statusAttributeMod += value;
+            modifiers.push({
+                value,
+                reason: `${status.name} affects ${skillAttribute}`
+            });
+        }
+    });
+
     const roll = roll2d10();
-    const modifiedAttribute = baseAttribute + skillBonus + modifier;
+    const modifiedAttribute = baseAttribute + skillBonus + modifier + statusSkillMod + statusAttributeMod;
     const margin = modifiedAttribute - roll;
     const intensity = getIntensityLevel(roll, margin);
     const isCriticalSuccess = roll <= 3;
@@ -112,7 +156,8 @@ export function makeSkillCheck(
         isCriticalSuccess,
         isCriticalFailure,
         intensity,
-        description: getSkillDescription(skillName, intensity)
+        description: getSkillDescription(skillName, intensity),
+        modifiers
     };
 }
 
@@ -134,8 +179,21 @@ function getBestDefensiveSkill(character: Character, defenseOptions: SkillName[]
         const attribute = getSkillAttribute(skillName);
         const baseAttribute = getAttributeBonus(character, attribute, gameState);
         const skillBonus = getSkillBonus(character, skillName, gameState);
-        const total = baseAttribute + skillBonus;
+        
+        // Calculate status modifiers
+        let statusSkillMod = 0;
+        let statusAttributeMod = 0;
+        character.statuses?.forEach(status => {
+            const statusMods = getStatusModifiers(status, gameState);
+            if (skillName in statusMods.skill_modifiers) {
+                statusSkillMod += statusMods.skill_modifiers[skillName];
+            }
+            if (attribute in statusMods.attribute_modifiers) {
+                statusAttributeMod += statusMods.attribute_modifiers[attribute];
+            }
+        });
 
+        const total = baseAttribute + skillBonus + statusSkillMod + statusAttributeMod;
         if (total > bestTotal) {
             bestTotal = total;
             bestSkill = skillName;

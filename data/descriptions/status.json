@@ -1,0 +1,30 @@
+{
+  "grappled": [
+    "caught in a firm hold",
+    "struggling against restraint",
+    "locked in their opponent's grasp"
+  ],
+  "prone": [
+    "knocked to the ground",
+    "struggling to regain footing",
+    "forced down and vulnerable"
+  ],
+  "bound_arms": [
+    "arms firmly restrained",
+    "upper limbs held fast",
+    "hands bound and useless"
+  ],
+  "bound_legs": [
+    "legs tightly bound",
+    "lower limbs restrained",
+    "feet trapped and immobile"
+  ],
+  "penetrated": [
+    "the hero has a monster inside of them - a phallus, tentacle, or other appendage. The monster is trying to breed with them!"
+  ],
+  "ability_cooldown": [
+    "catching their breath",
+    "regaining their composure",
+    "preparing for another attempt"
+  ]
+}

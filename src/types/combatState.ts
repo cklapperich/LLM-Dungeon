@@ -1,12 +1,32 @@
 import { Character } from './actor';
 import { CharacterType } from './constants';
-import { UIAction } from '../react_ui/types/uiTypes';
+import { UIAction, LogType } from '../react_ui/types/uiTypes';
+import { GameEvent } from '../game_engine/events/eventTypes';
 
 // Types moved from gamestate.ts
 export interface CombatRoundLog {
-    combatLogs: string[];
+    events: GameEvent[];          // Raw event data for structured logging
+    debugLog: string[];          // Technical debug log with roll details
+    llmContextLog: string[];     // Narrative descriptions for LLM context
+    llmNarrations: string[];     // Generated narrative output from LLM
     round: number;
-    narrations: string[];
+}
+
+// Snapshot of character state at a point in time
+export interface CharacterSnapshot {
+    vitality: number;
+    conviction: number;
+    clothing: number;
+    statuses: string[];  // Just store status names for snapshots
+}
+
+// Snapshot of game state after an action
+export interface StateSnapshot {
+    timestamp: number;
+    round: number;
+    activeCharacterIndex: number;
+    characters: Record<string, CharacterSnapshot>;
+    eventIndex: number;  // Index into combatLog[round].events array
 }
 
 export interface CombatState {
@@ -17,36 +37,64 @@ export interface CombatState {
     activeCharacterIndex: number;
     playerActions: UIAction[];  // Available actions for the monster (player-controlled character)
     combatLog: CombatRoundLog[];
+    stateHistory: StateSnapshot[];  // History of state changes
+    currentHistoryIndex: number;    // Current position in history, -1 means latest
 }
 
 // Core state management functions
 export function createCombatState(characterIds: string[], roomId: string): CombatState {
-    return {
+    const initialState: CombatState = {
+        stateHistory: [],
+        currentHistoryIndex: -1,
         roomId,
         characterIds,
         round: 0,
         isComplete: false,
         activeCharacterIndex: 0,
         playerActions: [],
-        // we really do need a round 0. Its for initial narrations.
+        // we really do need a round 0. Its for initial events.
         combatLog: [{
-            combatLogs: [],
-            round: 0,
-            narrations: []
+            events: [],
+            debugLog: [],
+            llmContextLog: [],
+            llmNarrations: [],
+            round: 0
         }],
     };
+
+    return initialState;
+}
+
+// State history navigation functions
+export function canStepBackward(state: CombatState): boolean {
+    return state.currentHistoryIndex > 0;
+}
+
+export function canStepForward(state: CombatState): boolean {
+    return state.currentHistoryIndex >= 0 && state.currentHistoryIndex < state.stateHistory.length - 1;
+}
+
+export function getStateAtHistoryIndex(state: CombatState, index: number): StateSnapshot | null {
+    if (index < 0 || index >= state.stateHistory.length) return null;
+    return state.stateHistory[index];
 }
 
 // Log utility functions moved from gamestate.ts
-export function getAllNarrations(combatState: CombatState): string[] {
-    return combatState.combatLog.reduce((allNarrations: string[], roundLog: CombatRoundLog) => {
-        return [...allNarrations, ...roundLog.narrations];
+export function getAllEvents(combatState: CombatState): GameEvent[] {
+    return combatState.combatLog.reduce((allEvents: GameEvent[], roundLog: CombatRoundLog) => {
+        return [...allEvents, ...roundLog.events];
     }, []);
 }
 
-export function getAllCombatLogs(combatState: CombatState): string[] {
+export function getAllDebugLogs(combatState: CombatState): string[] {
     return combatState.combatLog.reduce((allLogs: string[], roundLog: CombatRoundLog) => {
-        return [...allLogs, ...roundLog.combatLogs];
+        return [...allLogs, ...roundLog.debugLog];
+    }, []);
+}
+
+export function getAllLLMContextLogs(combatState: CombatState): string[] {
+    return combatState.combatLog.reduce((allLogs: string[], roundLog: CombatRoundLog) => {
+        return [...allLogs, ...roundLog.llmContextLog];
     }, []);
 }
 
@@ -62,21 +110,33 @@ export function getHeroCharacterId(combatState: CombatState, characters: Record<
 export function getAllLogsWithRounds(combatState: CombatState): Array<{
     text: string;
     round: number;
-    type: 'narration' | 'combat';
+    type: LogType;
 }> {
     return combatState.combatLog.reduce((allLogs, roundLog) => {
-        const combatLogs = roundLog.combatLogs.map(log => ({
+        const debugLogs = roundLog.debugLog.map(log => ({
             text: log,
             round: roundLog.round,
-            type: 'combat' as const
+            type: 'debug' as const
         }));
         
-        const narrationLogs = roundLog.narrations.map(log => ({
+        const contextLogs = roundLog.llmContextLog.map(log => ({
             text: log,
             round: roundLog.round,
-            type: 'narration' as const
+            type: 'llm_context' as const
+        }));
+
+        const narrationLogs = roundLog.llmNarrations.map(log => ({
+            text: log,
+            round: roundLog.round,
+            type: 'llm_narration' as const
+        }));
+
+        const eventLogs = roundLog.events.map(event => ({
+            text: JSON.stringify(event),
+            round: roundLog.round,
+            type: 'event' as const
         }));
         
-        return [...allLogs, ...combatLogs, ...narrationLogs];
-    }, [] as Array<{text: string; round: number; type: 'narration' | 'combat'}>);
+        return [...allLogs, ...debugLogs, ...contextLogs, ...narrationLogs, ...eventLogs];
+    }, [] as Array<{text: string; round: number; type: LogType}>);
 }

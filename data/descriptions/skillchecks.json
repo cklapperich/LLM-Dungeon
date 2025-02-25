@@ -1,6 +1,7 @@
 {
   "skills": {
-      "Grapple[Grace]": {
+      "Quick Grapple": {
+        "description": ["Wrestling and physical control using agility and technique"],
         "minimal_success": [
           "They dart in to catch their target with sudden speed",
           "Their quick hands barely secure the hold",
@@ -32,7 +33,8 @@
           "Their precise approach backfires spectacularly"
         ]
     },
-    "Heavy Weapons[Might]": {
+    "Heavy Weapons": {
+      "description": ["Proficiency with large, powerful weapons that require strength"],
       "minimal_success": [
         "The weapon connects with basic effectiveness",
         "A simple strike finds its mark",
@@ -64,7 +66,8 @@
         "The attack backfires spectacularly"
       ]
     },
-    "Light Weapons[Grace]": {
+    "Light Weapons": {
+      "description": ["Skill with quick, precise weapons that rely on agility"],
       "minimal_success": [
         "The blade grazes its target",
         "A quick strike barely connects",
@@ -96,7 +99,8 @@
         "Their technique falls apart completely"
       ]
     },
-    "Grapple[Might]": {
+    "Strong Grapple": {
+      "description": ["Wrestling and physical control using raw strength"],
       "minimal_success": [
         "They barely manage to grab hold",
         "A tenuous grip is established",
@@ -128,7 +132,8 @@
         "Their technique backfires completely"
       ]
     },
-    "Break Free[Might]": {
+    "Break Free": {
+      "description": ["Using raw strength to break free from holds and bindings"],
       "minimal_success": [
         "They barely manage to break the hold",
         "They struggle free with great effort",
@@ -160,7 +165,8 @@
         "Their attempt at freedom makes things worse"
       ]
     },
-    "Slip Free[Grace]": {
+    "Slip Free": {
+      "description": ["Using agility to escape holds and bindings"],
       "minimal_success": [
         "They barely squirm out of the hold",
         "A slight twist gains them freedom",
@@ -192,7 +198,8 @@
         "Their attempted escape backfires completely"
       ]
     },
-    "Block[Might]": {
+    "Block": {
+      "description": ["Using strength to physically block attacks"],
       "minimal_success": [
         "They barely deflect the attack",
         "Their defense holds by a thread",
@@ -224,7 +231,8 @@
         "They fail to defend in the worst way possible"
       ]
     },
-    "Dodge[Grace]": {
+    "Dodge": {
+      "description": ["Using agility to avoid attacks"],
       "minimal_success": [
         "They barely avoid the attack",
         "A slight movement saves them",
@@ -256,7 +264,8 @@
         "Their attempted evasion goes horribly wrong"
       ]
     },
-    "Parry[Grace]": {
+    "Parry": {
+      "description": ["Using precise movements to deflect attacks"],
       "minimal_success": [
         "They barely deflect the attack",
         "Their blade catches the strike at the last moment",
@@ -288,7 +297,8 @@
         "The attempt at defense backfires completely"
       ]
     },
-    "Stealth[Grace]": {
+    "Stealth": {
+      "description": ["Ability to move silently and avoid detection"],
       "minimal_success": [
         "They remain barely undetected",
         "Their presence goes just unnoticed",
@@ -320,7 +330,8 @@
         "Every step seems to echo loudly"
       ]
     },
-    "Perception[Wit]": {
+    "Perception": {
+      "description": ["Ability to notice details and spot hidden things"],
       "minimal_success": [
         "They notice something slightly unusual",
         "A faint detail catches their attention",
@@ -352,7 +363,8 @@
         "They focus on all the wrong details"
       ]
     },
-    "Disarm Trap[Grace]": {
+    "Disarm Trap": {
+      "description": ["Skill at safely disabling mechanical traps and devices"],
       "minimal_success": [
         "They barely manage to disable the mechanism",
         "The trap is neutralized by the smallest margin",
@@ -385,6 +397,7 @@
       ]
     },
     "Might": {
+      "description": ["Physical strength and power"],
       "minimal_success": [
         "They barely succeed through raw strength",
         "Their power proves just sufficient",
@@ -417,6 +430,7 @@
       ]
     },
     "Grace": {
+      "description": ["Agility and coordination"],
       "minimal_success": [
         "They barely maintain their balance",
         "Their agility proves just sufficient",
@@ -449,6 +463,7 @@
       ]
     },
     "Wit": {
+      "description": ["Intelligence and mental acuity"],
       "minimal_success": [
         "They barely puzzle it out",
         "Their mind grasps the basics",
@@ -481,6 +496,7 @@
       ]
     },
     "Will": {
+      "description": ["Determination and resolve"],
       "minimal_success": [
         "Their resolve barely holds",
         "Their will proves just strong enough",
@@ -512,7 +528,8 @@
         "Their determination backfires entirely"
       ]
     },
-    "Initiative[Grace]": {
+    "Initiative": {
+      "description": ["Determines who acts first in combat"],
       "minimal_success": [
         "They react just a fraction faster",
         "Their timing is barely superior",
@@ -546,6 +563,7 @@
     }
   },
   "generic": {
+    "description": ["Generic skill check"],
     "minimal_success": [
       "They barely complete the task",
       "The attempt succeeds by a narrow margin",

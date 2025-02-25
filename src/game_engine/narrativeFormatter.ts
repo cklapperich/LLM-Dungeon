@@ -3,36 +3,39 @@ import { Effect } from './effect';
 import { Status, StatusName } from '../types/status';
 import descriptionsJson from '../../data/descriptions.json';
 
-// Get attribute description based on value
+// Get attribute description
 function getAttributeDescription(value: number): string {
-    if (value <= 6) return "6_or_less";
-    if (value === 7) return "7";
-    if (value <= 9) return "8_9";
-    if (value === 10) return "10";
-    if (value <= 12) return "11_12";
-    if (value <= 14) return "13_14";
-    if (value <= 16) return "15_16";
-    if (value <= 18) return "17_18";
-    if (value <= 20) return "19_20";
-    return "21_plus";
+    const ranges = {
+        weak: (v: number) => v <= 6,
+        untrained: (v: number) => v <= 9,
+        average: (v: number) => v <= 12,
+        skilled: (v: number) => v <= 14,
+        exceptional: (v: number) => v <= 16,
+        masterful: (v: number) => v <= 18,
+        legendary: (v: number) => v <= 20,
+        mythical: (v: number) => v > 20
+    };
+
+    for (const [key, check] of Object.entries(ranges)) {
+        if (check(value)) return key;
+    }
+    return 'mythical';
 }
 
-// Get clothing description based on level
+// Get clothing description
 export function getClothingDescription(level: number): string | null {
-    const options = descriptionsJson.clothing[level.toString()];
+    const states = ['unprotected', 'lightly_protected', 'protected', 'well_protected'];
+    const state = states[Math.min(level, states.length - 1)];
+    const options = descriptionsJson.clothing[state];
     return options ? options[Math.floor(Math.random() * options.length)] : null;
 }
 
-// Get vitality state and description
+// Get vitality description
 export function getVitalityDescription(current: number, max: number = 3): string | null {
-    // Calculate state
-    const ratio = current / max;
-    let state = "low";
-    if (ratio === 1) state = "full";
-    else if (ratio >= 0.7) state = "high";
-    else if (ratio >= 0.3) state = "medium";
-
-    // Get description for this state
+    const state = current === max ? 'energetic' :
+                 current > max * 0.7 ? 'healthy' :
+                 current > max * 0.3 ? 'wounded' : 'critical';
+    
     const options = descriptionsJson.vitality[state];
     return options ? options[Math.floor(Math.random() * options.length)] : null;
 }
@@ -62,31 +65,32 @@ export function formatCharacterAsNarrative(character: Character): string {
     const clothingDesc = getClothingDescription(character.clothing);
     const vitalityDesc = getVitalityDescription(character.vitality);
 
-    // Format skills into a readable list
-    const skills = Object.entries(character.skills)
-        .filter(([_, level]) => level > 0)
-        .map(([skill, _]) => skill)
-        .join(', ');
+    // Build narrative description without mechanical terms
+    let description = `${character.name} ${character.description}. `;
+    
+    if (clothingDesc) description += `${clothingDesc}. `;
+    if (mightDesc) description += `${mightDesc}. `;
+    if (graceDesc) description += `${graceDesc}. `;
+    if (witDesc) description += `${witDesc}. `;
+    if (willDesc) description += `${willDesc}. `;
+    if (vitalityDesc) description += `${vitalityDesc}. `;
 
-    // Build the narrative description
-    return `${character.name} is ${character.description}. ${clothingDesc ? `They are ${clothingDesc}.` : ''} ${
-        mightDesc ? `Their might is ${mightDesc}` : ''}, ${
-        graceDesc ? `their grace ${graceDesc}` : ''}, ${
-        witDesc ? `their wit ${witDesc}` : ''}, ${
-        willDesc ? `and their will ${willDesc}` : ''}. ${
-        skills ? `They are skilled in ${skills}.` : ''} ${
-        vitalityDesc ? `They appear ${vitalityDesc}.` : ''}`;
+    return description.trim();
 }
 
-// Format a status effect as a narrative description
+// Format a status effect as a narrative description without brackets
 export function formatStatusDescription(status: Status): string | null {
     const statusKey = status.name.toLowerCase();
-    return getRandomDescription('status', statusKey);
+    const description = getRandomDescription('status', statusKey);
+    return description ? description.replace(/\[.*?\]/g, '').trim() : null;
 }
 
-// Format characters for LLM context
+// Format characters for LLM context without mechanical terms
 export function formatCharactersForLLM(hero: Character, monster: Character): string {
-    return `HERO: ${formatCharacterAsNarrative(hero)}
+    const heroDesc = formatCharacterAsNarrative(hero);
+    const monsterDesc = formatCharacterAsNarrative(monster);
+    
+    return `${heroDesc}
 
-MONSTER: ${formatCharacterAsNarrative(monster)}`;
+${monsterDesc}`;
 }

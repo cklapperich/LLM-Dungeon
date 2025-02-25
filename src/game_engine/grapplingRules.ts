@@ -1,9 +1,10 @@
 import { Character } from '../types/actor';
-import { GameState } from '../types/gamestate';
+import { GameState, GameActionResult } from '../types/gamestate';
 import { BodyPartType, CombatFlags } from '../types/constants';
 import { createStatus, hasStatus, getStatus } from './statusEffects';
 import { StatusName } from '../types/status';
 import { Status } from '../types/status';
+import { modifyStatusStacks, removeStatus, removeStatusesWithZeroStacks, applyStatus } from './modifyGameState';
 
 const BINDABLE_PARTS = [
     BodyPartType.ARM,
@@ -13,12 +14,6 @@ const BINDABLE_PARTS = [
 ] as const;
 
 export type BindablePart = typeof BINDABLE_PARTS[number];
-
-// Base interface for all game actions
-export interface GameActionResult {
-    success: boolean;
-    message?: string;  // Optional message for logging/debugging
-}
 
 export function isCharacterGrappled(character: Character): boolean {
     return hasStatus(character.statuses, StatusName.GRAPPLED);
@@ -44,7 +39,7 @@ export function getTotalBoundLimbs(character: Character): Partial<Record<Bindabl
     return result;
 }
 
-// Track binding during grapple
+// Track binding during grapple. NO NEED TO EMIT events,.
 export function trackBoundLimb(character: Character, limbType: BindablePart, effectId: string): void {
     const grappleStatus = getStatus(character.statuses, StatusName.GRAPPLED);
     if (!grappleStatus) return;
@@ -57,7 +52,10 @@ export function trackBoundLimb(character: Character, limbType: BindablePart, eff
 }
 
 // Remove random bound limb that was bound during the current grapple instance
-export function removeRandomBoundLimbThisGrapple(character: Character): boolean {
+export function removeRandomBoundLimbThisGrapple(
+    gameState: GameState,
+    character: Character
+): boolean {
     const grappleStatus = getStatus(character.statuses, StatusName.GRAPPLED);
     if (!grappleStatus) return false;
 
@@ -74,15 +72,13 @@ export function removeRandomBoundLimbThisGrapple(character: Character): boolean 
     
     if (effects.length > 0) {
         // Remove random effect
+        // this is fine cause we're not modifying the status
         const effectId = effects[Math.floor(Math.random() * effects.length)];
         effects.splice(effects.indexOf(effectId), 1);
         
-        // Reduce bound status stack
+        // Reduce bound status stack using modifyStatusStacks
         const statusName = `bound_${randomType.toLowerCase()}${randomType === BodyPartType.ARM || randomType === BodyPartType.LEG ? 's' : ''}`;
-        const boundStatus = getStatus(character.statuses, statusName);
-        if (boundStatus && boundStatus.stacks > 0) {
-            boundStatus.stacks--;
-        }
+        modifyStatusStacks(gameState, character, statusName, -1);
         
         return true;
     }
@@ -91,7 +87,10 @@ export function removeRandomBoundLimbThisGrapple(character: Character): boolean 
 }
 
 // Remove all limbs bound during current grapple
-export function removeAllBoundLimbs(character: Character): void {
+export function removeAllBoundLimbs(
+    gameState: GameState,
+    character: Character
+): void {
     const grappleStatus = getStatus(character.statuses, StatusName.GRAPPLED);
     if (!grappleStatus) return;
 
@@ -99,11 +98,10 @@ export function removeAllBoundLimbs(character: Character): void {
     BINDABLE_PARTS.forEach(part => {
         const effects = grappleStatus.params.boundDuringGrapple[part];
         const statusName = `bound_${part.toLowerCase()}${part === BodyPartType.ARM || part === BodyPartType.LEG ? 's' : ''}`;
-        const boundStatus = getStatus(character.statuses, statusName);
         
-        // Remove stacks equal to number of effects
-        if (boundStatus) {
-            boundStatus.stacks = Math.max(0, boundStatus.stacks - effects.length);
+        // Remove stacks equal to number of effects using modifyStatusStacks
+        if (effects.length > 0) {
+            modifyStatusStacks(gameState, character, statusName, -effects.length);
         }
         
         // Clear effects array
@@ -133,37 +131,31 @@ export function applyBreakFreeSkillcheckSuccess(
     source: Character,
     target: Character
 ): GameActionResult {
-    // Apply exhaustion
+    // Apply exhaustion using applyStatus
     let exhaustionStatus = getStatus(target.statuses, StatusName.EXHAUSTION);
     if (!exhaustionStatus) {
-        exhaustionStatus = createStatus(StatusName.EXHAUSTION);
-        target.statuses.push(exhaustionStatus);
+        applyStatus(gameState, source, target, { type: StatusName.EXHAUSTION });
     } else {
-        exhaustionStatus.stacks = Math.min(4, exhaustionStatus.stacks + 1);
+        modifyStatusStacks(gameState, target, StatusName.EXHAUSTION, 1);
     }
 
     // If penetrated, handle penetration first
     if (isCharacterPenetrated(target)) {
         // First remove a random limb bound during this grapple
-        removeRandomBoundLimbThisGrapple(target);
+        removeRandomBoundLimbThisGrapple(gameState, target);
         
-        // Remove penetrated status
-        target.statuses = target.statuses.filter(s => s.name !== StatusName.PENETRATED);
+        // Remove penetrated status using removeStatus
+        removeStatus(gameState, target, StatusName.PENETRATED);
     }
 
     // Free all limbs bound during this grapple instance
-    removeAllBoundLimbs(target);
-    
-    // Remove grapple status
-    target.statuses = target.statuses.filter(s => s.name !== StatusName.GRAPPLED);
+    removeAllBoundLimbs(gameState, target);
+
+    // Remove grapple status using removeStatus
+    removeStatus(gameState, target, StatusName.GRAPPLED);
 
     // Remove any bound statuses with 0 stacks
-    target.statuses = target.statuses.filter(s => {
-        if (s.name.startsWith('bound_')) {
-            return s.stacks > 0;
-        }
-        return true;
-    });
+    removeStatusesWithZeroStacks(gameState, target);
 
     return {
         success: true,

@@ -1,0 +1,74 @@
+{
+  "WOUND": {
+    "success": [
+      "reels from the attack",
+      "takes a solid hit",
+      "staggers from the blow"
+    ],
+    "failure": [
+      "dodges the attack",
+      "deflects the strike",
+      "avoids the blow"
+    ]
+  },
+  "HEAL": {
+    "success": [
+      "feels their wounds mending",
+      "regains their strength",
+      "recovers from their injuries"
+    ],
+    "failure": [
+      "resists the healing magic",
+      "remains in their wounded state",
+      "shows no signs of recovery"
+    ]
+  },
+  "CORRUPT": {
+    "success": [
+      "succumbs to dark energies",
+      "feels corruption spreading through them",
+      "writhes as darkness takes hold"
+    ],
+    "failure": [
+      "resists the dark influence",
+      "maintains their purity",
+      "fights off the corruption"
+    ]
+  },
+  "BREAK_FREE": {
+    "success": [
+      "breaks free from their bonds",
+      "escapes their captor's grasp",
+      "wrenches themselves loose"
+    ],
+    "failure": [
+      "remains firmly held",
+      "fails to break free",
+      "struggles in vain"
+    ]
+  },
+  "END_COMBAT": {
+    "success": [
+      "stands victorious",
+      "emerges triumphant",
+      "claims victory"
+    ],
+    "failure": [
+      "the battle draws to a close",
+      "the conflict subsides",
+      "hostilities cease"
+    ]
+  },
+  "generic": {
+    "success": [
+      "is affected by the action",
+      "succumbs to the effect",
+      "fails to resist"
+    ],
+    "failure": [
+      "resists the effect",
+      "remains unaffected",
+      "shrugs it off"
+    ]
+  }
+}

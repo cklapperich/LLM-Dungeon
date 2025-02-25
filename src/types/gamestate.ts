@@ -6,6 +6,12 @@ import {
 import { DungeonLayout } from './dungeon.js';
 import type { CombatState } from './combatState.js';
 
+// Base interface for all game actions
+export interface GameActionResult {
+    success: boolean;
+    message?: string;  // Optional message for logging/debugging
+}
+
 export interface GameLogMessage {
     text: string;
     type: 'narration' | 'combat';

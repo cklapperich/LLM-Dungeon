@@ -48,6 +48,10 @@ export interface RollResult {
     isCriticalFailure: boolean;
     description?: string;
     intensity?: IntensityTypes;
+    modifiers?: {
+        value: number;
+        reason: string;
+    }[];
 }
 
 /**
@@ -87,24 +91,27 @@ export function isSkillProficient(skillLevels: SkillLevels, skillName: string): 
     return (skillLevels[skillName] || 0) === 4;
 }
 
-export const Skills = {
+/**
+ * Clean skill names without attribute brackets
+ */
+export const SkillNames = {
     // System
     NONE: "None",
-    INITIATIVE: "Initiative[Grace]",
+    INITIATIVE: "Initiative",
     // Combat
-    GRAPPLE_MIGHT: "Grapple[Might]",
-    GRAPPLE_GRACE: "Grapple[Grace]",
-    LIGHT_WEAPONS: "Light Weapons[Grace]",
-    HEAVY_WEAPONS: "Heavy Weapons[Might]",
-    BLOCK_MIGHT: "Block[Might]",
-    DODGE_GRACE: "Dodge[Grace]",
-    PARRY_GRACE: "Parry[Grace]",
-    BREAK_FREE_MIGHT: "Break Free[Might]",
-    SLIP_FREE_GRACE: "Slip Free[Grace]",
+    GRAPPLE_MIGHT: "Strong Grapple",
+    GRAPPLE_GRACE: "Quick Grapple",
+    LIGHT_WEAPONS: "Light Weapons",
+    HEAVY_WEAPONS: "Heavy Weapons",
+    BLOCK: "Block",
+    DODGE: "Dodge",
+    PARRY: "Parry",
+    BREAK_FREE: "Break Free",
+    SLIP_FREE: "Slip Free",
     // Stealth & Detection
-    STEALTH: "Stealth[Grace]",
-    PERCEPTION: "Perception[Wit]",
-    DISARM_TRAP: "Disarm Trap[Grace]",
+    STEALTH: "Stealth",
+    PERCEPTION: "Perception",
+    DISARM_TRAP: "Disarm Trap",
     // Attribute-based skills: the skill is literally just the attribute
     MIGHT: "Might",
     GRACE: "Grace",
@@ -112,4 +119,63 @@ export const Skills = {
     WILL: "Will",
 } as const;
 
-export type SkillName = typeof Skills[keyof typeof Skills];
+/**
+ * Mapping of skill names to their associated attributes
+ */
+export const SkillAttributeMap: Record<string, Attribute> = {
+    [SkillNames.NONE]: "Grace", // Default
+    [SkillNames.INITIATIVE]: "Grace",
+    [SkillNames.GRAPPLE_MIGHT]: "Might",
+    [SkillNames.GRAPPLE_GRACE]: "Grace",
+    [SkillNames.LIGHT_WEAPONS]: "Grace",
+    [SkillNames.HEAVY_WEAPONS]: "Might",
+    [SkillNames.BLOCK]: "Might",
+    [SkillNames.DODGE]: "Grace",
+    [SkillNames.PARRY]: "Grace",
+    [SkillNames.BREAK_FREE]: "Might",
+    [SkillNames.SLIP_FREE]: "Grace",
+    [SkillNames.STEALTH]: "Grace",
+    [SkillNames.PERCEPTION]: "Wit",
+    [SkillNames.DISARM_TRAP]: "Grace",
+    [SkillNames.MIGHT]: "Might",
+    [SkillNames.GRACE]: "Grace",
+    [SkillNames.WIT]: "Wit",
+    [SkillNames.WILL]: "Will",
+};
+
+/**
+ * For backward compatibility - will be deprecated
+ */
+export const Skills = {
+    // System
+    NONE: SkillNames.NONE,
+    INITIATIVE: SkillNames.INITIATIVE,
+    // Combat
+    GRAPPLE_MIGHT: SkillNames.GRAPPLE_MIGHT,
+    GRAPPLE_GRACE: SkillNames.GRAPPLE_GRACE,
+    LIGHT_WEAPONS: SkillNames.LIGHT_WEAPONS,
+    HEAVY_WEAPONS: SkillNames.HEAVY_WEAPONS,
+    BLOCK_MIGHT: SkillNames.BLOCK,
+    DODGE_GRACE: SkillNames.DODGE,
+    PARRY_GRACE: SkillNames.PARRY,
+    BREAK_FREE_MIGHT: SkillNames.BREAK_FREE,
+    SLIP_FREE_GRACE: SkillNames.SLIP_FREE,
+    // Stealth & Detection
+    STEALTH: SkillNames.STEALTH,
+    PERCEPTION: SkillNames.PERCEPTION,
+    DISARM_TRAP: SkillNames.DISARM_TRAP,
+    // Attribute-based skills: the skill is literally just the attribute
+    MIGHT: SkillNames.MIGHT,
+    GRACE: SkillNames.GRACE,
+    WIT: SkillNames.WIT,
+    WILL: SkillNames.WILL,
+} as const;
+
+export type SkillName = typeof SkillNames[keyof typeof SkillNames];
+
+/**
+ * Get the attribute associated with a skill
+ */
+export function getSkillAttribute(skillName: string): Attribute {
+    return SkillAttributeMap[skillName] || "Grace"; // Default to Grace if not found
+}

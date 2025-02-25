@@ -2,6 +2,9 @@ import { Character } from '../../types/actor';
 import { Trait,  Effect } from '../../types/abilities';
 import { SkillName } from '../../types/skilltypes';
 import { RarityType, TargetType } from '../../types/constants';
+
+// Log view types for the combat system
+export type LogType = 'event' | 'debug' | 'llm_context' | 'llm_narration';
 import { GameState } from '../../types/gamestate';
 import { 
     Sword, 

@@ -14,21 +14,29 @@
  * 3. Test combat logic in isolation
  * 4. Maintain a clear boundary between game rules and state management
  */
-
+import {combatEventBus} from './eventBus.ts';
 import { Character } from '../types/actor.ts';
 import { makeSkillCheck, makeOpposedCheck} from './utils/skillCheck.js';
-import { SkillName } from '../types/skilltypes.ts';
+import { SkillName, RollResult, Skills } from '../types/skilltypes.ts';
 import { Trait } from '../types/abilities.ts';
 import { CharacterType } from '../types/constants.ts';
 import { GameState, getCharactersFromIdList } from '../types/gamestate.ts';
 import { CombatState, createCombatState } from '../types/combatState.ts';
 import { applyEffect } from './effect.js';
-import { generateInitialNarration, generateRoundNarration, generateAfterMathNarration } from './combatNarration.js';
 import { processBetweenActions, processBetweenRounds } from './stateBasedActions.ts';
 import { getAvailableActions } from './getAvailableActions.ts';
 import { getAIAction } from './ai.ts';
 import { CombatUIAction, UIActionResult } from '../react_ui/types/uiTypes.ts';
 import { processInitiative } from './utils/skillCheck';
+import {
+    SkillCheckEvent,
+    AbilityEvent,
+    EffectEvent,
+    CombatEvent,
+    InitiativeEvent
+} from './events/eventTypes';
+
+const eventContext='combat';
 
 // Convert game actions to UI actions
 export function convertToUIActions(actionData: { actions: Trait[], reasons: Record<string, string> }): CombatUIAction[] {
@@ -70,10 +78,18 @@ export function setupInitialTurnOrder(
     const firstActor = init1 <= init2 ? char1 : char2;
     state.activeCharacterIndex = characters.indexOf(firstActor);
     
-    // Log initiative with actual values
-    state.combatLog[0].combatLogs.push(
-        `${firstActor.name} moves first! (${char1.name}: ${init1}, ${char2.name}: ${init2}) ${initiativeResult.description}`
-    );
+    // Get full roll results from initiative checks
+    const check1 = makeSkillCheck(char1, Skills.INITIATIVE, 0, gameState);
+    const check2 = makeSkillCheck(char2, Skills.INITIATIVE, 0, gameState);
+
+    // Create and push initiative event
+    const initiativeEvent: InitiativeEvent = {
+        type: 'INITIATIVE',
+        characters: [char1, char2],
+        results: [check1, check2],
+        first_actor: firstActor
+    };
+    combatEventBus.emit(`${eventContext}:${initiativeEvent.type}`, initiativeEvent);
 }
 
 export async function initializeCombat(gameState: GameState, roomId: string): Promise<CombatState> {
@@ -82,7 +98,10 @@ export async function initializeCombat(gameState: GameState, roomId: string): Pr
         throw new Error('Combat must be initialized with exactly 2 characters');
     }
 
-    const characters = characterIds.map(id => gameState.characters[id]) as [Character, Character];
+    const characters: [Character, Character] = [
+        gameState.characters[characterIds[0]],
+        gameState.characters[characterIds[1]]
+    ];
     
     // Create basic state
     const state = createCombatState(characterIds, roomId);
@@ -99,19 +118,17 @@ export async function initializeCombat(gameState: GameState, roomId: string): Pr
     const actionData = getAvailableActions(monster, state, gameState);
     state.playerActions = convertToUIActions(actionData);
 
-    // Add initial narration
-    state.combatLog[0].narrations.push(
-        gameState.narrationEnabled 
-            ? await generateInitialNarration(state, gameState)
-            : `Combat begins between ${characters[0].name} and ${characters[1].name}.`
-    );
-
+    // Emit combat start event
+    const combatStartEvent: CombatEvent = {
+        type: 'COMBAT',
+        subtype: 'START' as const,
+        characters,
+        room_id: roomId
+    };
+    combatEventBus.emit(`${eventContext}:${combatStartEvent.type}`, combatStartEvent);
     return state;
 }
-/*
-* Note: Roll information must match pattern "{word} rolled {number} vs target {number}"
-* for LLM filtering in llm.ts
-*/
+
 // Execute a trait
 export async function executeTrait(
     trait: Trait, 
@@ -120,72 +137,61 @@ export async function executeTrait(
     state: CombatState,
     gameState: GameState
 ): Promise<CombatState> {    
-    // Get or create the current round's log
-    let currentRoundLog = state.combatLog.find(log => log.round === state.round);
-    if (!currentRoundLog) {
-        currentRoundLog = {
-            combatLogs: [],
-            round: state.round,
-            narrations: []
-        };
-        state.combatLog.push(currentRoundLog);
-    }
-
-    // Log the action and its description
-    currentRoundLog.combatLogs.push(`${actor.name} used ${trait.name}!`);
-    currentRoundLog.combatLogs.push(`[${trait.description}]`);
-
-    // Skip skill check for "None" skill traits (system actions)
-    if (trait.skill === "None") {
-        // Apply effects directly for system actions
-        trait.effects.forEach(effect => {
-            const updatedGameState = {
-                ...gameState,
-                activeCombat: state
-            };
-            // Use effect's target to determine who to apply it to
-            const effectTarget = effect.target === 'other' ? target : actor;
-            const effectResult = applyEffect(effect, actor, effectTarget, updatedGameState);
-            currentRoundLog.combatLogs.push(effectResult.message);
-        });
-        return state;
-    }
-
-    // Get modifier from trait
-    const modifier = trait.modifier ?? 0;
-    let skillCheck;
-    if (target && target !== actor) {
-        // Perform opposed skill check
-        skillCheck = makeOpposedCheck(
-            actor, 
-            trait.skill as SkillName,
-            target,
-            undefined, // Let the system determine the opposing skill
-            modifier,
-            gameState
-        );
-    } else {
-        // Perform regular skill check
-        skillCheck = makeSkillCheck(
-            actor, 
-            trait.skill as SkillName,
-            modifier,
-            gameState
-        );
-    }
-
-    // For opposed checks, we need to access the attacker's result
-    const result = target ? skillCheck.attacker : skillCheck;
+    // Emit ability event
+    const abilityEvent: AbilityEvent = {
+        type: 'ABILITY',
+        actor,
+        ability: trait,
+        target
+    };
+    combatEventBus.emit(`${eventContext}:${abilityEvent.type}`, abilityEvent);
     
-    // Log skill check result with description
-    currentRoundLog.combatLogs.push(
-        `${actor.name} rolled ${result.roll} vs target ${result.attribute} (${result.success ? 'Success' : 'Failure'} by ${Math.abs(result.margin)})`
-    );
-    currentRoundLog.combatLogs.push(result.description);
+    let skillCheckResult = null;
+    if (trait.skill!==Skills.NONE){
+        // Perform skill check
+        // Get modifier from trait
+        const modifier = trait.modifier ?? 0;
+        let skillCheck;
+        if (target && target !== actor) {
+            // Perform opposed skill check
+            skillCheck = makeOpposedCheck(
+                actor, 
+                trait.skill,
+                target,
+                undefined, // Let the system determine the opposing skill
+                modifier,
+                gameState
+            );
+        } else {
+            // Perform regular skill check
+            skillCheck = makeSkillCheck(
+                actor, 
+                trait.skill,
+                modifier,
+                gameState
+            );
+        }
 
+        // For opposed checks, we need to access the attacker's result
+        skillCheckResult = target ? skillCheck.attacker : skillCheck;
+        
+        // Emit skill check event
+        const skillCheckEvent: SkillCheckEvent = {
+            type: 'SKILL_CHECK',
+            actor,
+            target,
+            skill: trait.skill,
+            result: skillCheckResult,
+            is_opposed: !!target,
+            opposed_result: target ? skillCheck.defender : undefined
+        };
+        combatEventBus.emit(`${eventContext}:${skillCheckEvent.type}`, skillCheckEvent);
+
+    }
     // Apply effects that should happen regardless of success/failure
     trait.effects.forEach(effect => {
-        if (effect.applyOnSkillCheckFailure || result.success) {
+        // if apply on failure, or apply on success and the check was successful, or no skill check, apply effect
+        if (effect.applyOnSkillCheckFailure || trait.skill!==Skills.NONE || skillCheckResult.success) {
             // Pass the full game state to apply effect
             const updatedGameState = {
                 ...gameState,
@@ -195,13 +201,19 @@ export async function executeTrait(
             const effectTarget = effect.target === 'other' ? target : actor;
             const effectResult = applyEffect(effect, actor, effectTarget, updatedGameState);
             
-            // Log the result message to combat log
-            currentRoundLog.combatLogs.push(effectResult.message);
+            // Emit effect event
+            const effectEvent: EffectEvent = {
+                type: 'EFFECT',
+                effect,
+                source: actor,
+                target: effectTarget,
+                success: effectResult.success
+            };
+            combatEventBus.emit(`${eventContext}:${effectEvent.type}`, effectEvent);
         }
     });
     return state;
 }
-
 
 export function handleCombatEnd(
     state: CombatState,
@@ -209,20 +221,26 @@ export function handleCombatEnd(
     winner: Character,
     reason: string
 ): void {
-    const currentRoundLog = state.combatLog[state.round - 1];
-    
     // Mark combat as complete
     state.isComplete = true;
     
-    // Log the victory
-    currentRoundLog.combatLogs.push(
-        `Combat ended - ${winner.name} wins (${reason})`
-    );
+    // Emit combat end event
+    const combatEndEvent: CombatEvent = {
+        type: 'COMBAT',
+        subtype: 'END' as const,
+        winner,
+        reason
+    };
+    combatEventBus.emit(`${eventContext}:${combatEndEvent.type}`, combatEndEvent);
 }
 
 export async function executeCombatRound(state: CombatState, gameState: GameState, playerAction: Trait) {
     // Get characters for this round
-    const characters = getCharactersFromIdList(state.characterIds, gameState) as [Character, Character];
+    const characterArray = getCharactersFromIdList(state.characterIds, gameState);
+    if (characterArray.length !== 2) {
+        throw new Error('Combat round requires exactly 2 characters');
+    }
+    const characters: [Character, Character] = [characterArray[0], characterArray[1]];
     
     // Get actors in initiative order for the upcoming round
     const initiativeResult = processInitiative(characters[0], characters[1], gameState);
@@ -262,25 +280,22 @@ export async function executeCombatRound(state: CombatState, gameState: GameStat
     
     // Process round-based effects (like cooldowns)
     processBetweenRounds(state, gameState);
-    
-    // Generate narration for the current round if enabled
-    if (gameState.narrationEnabled) {
-        const narration = await generateRoundNarration(state, gameState);
-        state.combatLog[state.round].narrations.push(narration);
-    }
-    
-    // Increment round counter and create new round log
+
+    // Increment round counter
     state.round += 1;
-    state.combatLog.push({
-        combatLogs: [],
-        round: state.round,
-        narrations: []
-    });
     
-    // Log initiative for next round
-    state.combatLog[state.round].combatLogs.push(
-        `${firstActor.name} moves first! ${initiativeResult.description}`
-    );
+    // Get full roll results from initiative checks
+    const check1 = makeSkillCheck(char1, Skills.INITIATIVE, 0, gameState);
+    const check2 = makeSkillCheck(char2, Skills.INITIATIVE, 0, gameState);
+
+    // Emit initiative event for next round
+    const initiativeEvent: InitiativeEvent = {
+        type: 'INITIATIVE',
+        characters: [char1, char2],
+        results: [check1, check2],
+        first_actor: firstActor
+    };
+    combatEventBus.emit(`${eventContext}:${initiativeEvent.type}`, initiativeEvent);
     
     return state;
 }

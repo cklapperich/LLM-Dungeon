@@ -1,0 +1,22 @@
+{
+  "full": [
+    "in perfect condition",
+    "completely unharmed",
+    "at their peak"
+  ],
+  "high": [
+    "showing minor signs of wear",
+    "slightly winded",
+    "mostly fresh"
+  ],
+  "medium": [
+    "noticeably wounded",
+    "showing clear signs of injury",
+    "visibly struggling"
+  ],
+  "low": [
+    "severely wounded",
+    "barely standing",
+    "gravely injured"
+  ]
+}

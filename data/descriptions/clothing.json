@@ -1,0 +1,32 @@
+{
+  "5": [
+    "fully armored from head to toe",
+    "protected by layers of sturdy armor",
+    "wearing complete battle regalia"
+  ],
+  "4": [
+    "wearing partial armor over their clothing",
+    "protected by light combat gear",
+    "dressed in reinforced battle attire"
+  ],
+  "3": [
+    "lightly armored but mostly covered",
+    "wearing basic protective gear",
+    "dressed in simple combat attire"
+  ],
+  "2": [
+    "their armor showing significant damage",
+    "their protective gear barely holding together",
+    "their battle attire torn and tattered"
+  ],
+  "1": [
+    "most of their armor stripped away",
+    "left with mere scraps of protection",
+    "their defenses almost completely compromised"
+  ],
+  "0": [
+    "completely exposed and vulnerable",
+    "stripped of all protection",
+    "left without any defensive covering"
+  ]
+}
