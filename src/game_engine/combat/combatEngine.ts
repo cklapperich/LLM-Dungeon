@@ -23,7 +23,7 @@ import { CharacterType, CombatEndReasonType } from '../../types/constants.ts';
 import { CombatState, createCombatState } from '../../types/combatState.ts';
 import { applyEffect } from './effect.ts';
 import { processBetweenActions, processBetweenRounds } from './stateBasedActions.ts';
-import { getAvailableActions as getAvailableCombatActions } from './getAvailableActions.ts';
+import { getAvailableActions as getAvailableCombatActions, checkRequirements } from './getAvailableActions.ts';
 import { getAIAction } from './combatAI.ts';
 import { UIActionResult } from '../../react_ui/uiTypes.ts';
 import { CombatGameAction } from '../../types/gamestate.ts';
@@ -108,14 +108,24 @@ export async function executeTrait(
     target: Character | undefined, 
     state: CombatState
 ): Promise<CombatState> {    
-    // Emit ability event
+    // Check requirements before proceeding
+    const requirementsCheck = checkRequirements(actor, trait, state);
+    
+    // Emit ability event with success/failure info
     const abilityEvent: AbilityEvent = {
         type: 'ABILITY',
         actor,
         ability: trait,
-        target
+        target,
+        success: requirementsCheck.success,
+        failureReason: !requirementsCheck.success ? requirementsCheck.reason : undefined
     };
     await logAndEmitCombatEvent(abilityEvent, state);
+    
+    // If requirements aren't met, exit early without applying effects
+    if (!requirementsCheck.success) {
+        return state;
+    }
     
     let skillCheckResult = null;
     if (trait.skill!==Skills.NONE){
@@ -194,15 +204,26 @@ export async function executeCombatRound(state: CombatState, playerAction:Trait)
     
     // Set up turn order - this is an async function so we need to await it
     await setupInitialTurnOrder(state);
-    const firstActor = characters[state.activeCharacterIndex];
-    const secondActor = characters[1 - state.activeCharacterIndex];
-
+    let firstActor = characters[state.activeCharacterIndex];
+    let secondActor = characters[1 - state.activeCharacterIndex];
+    
     // Get both actors' actions first
-    const firstAction = firstActor.type === CharacterType.MONSTER ? 
+    let firstAction = firstActor.type === CharacterType.MONSTER ? 
         playerAction : getAIAction(firstActor, state);
-    const secondAction = secondActor.type === CharacterType.MONSTER ?
+    let secondAction = secondActor.type === CharacterType.MONSTER ?
         playerAction : getAIAction(secondActor, state);
 
+    // priority check
+    const priorities = [firstAction.priority, secondAction.priority]
+    if (priorities[0] && !priorities[1]) {
+        firstActor = characters[0]; secondActor = characters[1];
+        firstAction = firstAction; secondAction = secondAction;
+        }
+    else if (priorities[0] && !priorities[1]) {
+        firstActor = characters[1]; secondActor = characters[0];
+        firstAction = secondAction; secondAction = firstAction;
+    }
+    
     // Execute first actor's turn
     await executeTrait(firstAction, firstActor, secondActor, state);
 

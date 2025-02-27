@@ -1,8 +1,7 @@
-import { GameState } from '../../types/gamestate';
 import { CombatState } from '../../types/combatState';
 import { callLLM, formatSystemPrompt } from '../llm';
 import { LLMLogFormatters } from '../llmLogFormatters';
-import { SpiceLevel, Length, PromptsData } from '../../types/prompts';
+import { SpiceLevel, Length, PromptsData, SpiceLevels, Lengths } from '../../types/prompts';
 
 // Import JSON data
 import promptsData from '../../../data/prompts.json';
@@ -19,7 +18,7 @@ const PROMPTS = promptsData.prompts;
 function getNarrationSettings(state: CombatState, isInitialNarration: boolean = false, roundIndex?: number): { spiceLevel: SpiceLevel, length: Length } {
     // Initial narration is always SUGGESTIVE/MEDIUM
     if (isInitialNarration) {
-        return { spiceLevel: 'SUGGESTIVE', length: 'MEDIUM' };
+        return { spiceLevel: SpiceLevels.SUGGESTIVE, length: Lengths.MEDIUM };
     }
 
     // Use provided round index or default to current round
@@ -28,7 +27,7 @@ function getNarrationSettings(state: CombatState, isInitialNarration: boolean = 
     // Check target round's combat logs for events
     const targetRoundLog = state.combatLog[targetRoundIndex];
     if (!targetRoundLog) {
-        return { spiceLevel: 'SUGGESTIVE', length: 'MEDIUM' };
+        return { spiceLevel: SpiceLevels.SUGGESTIVE, length: Lengths.MEDIUM };
     }
 
     // Check events in the combat log (only for this specific round)
@@ -45,7 +44,7 @@ function getNarrationSettings(state: CombatState, isInitialNarration: boolean = 
     });
     
     if (hasPenetration) {
-        return { spiceLevel: 'EXPLICIT', length: 'LONG' };
+        return { spiceLevel: SpiceLevels.EXPLICIT, length: Lengths.LONG };
     }
     
     // Check for grapple, bound, or heat statuses
@@ -69,11 +68,11 @@ function getNarrationSettings(state: CombatState, isInitialNarration: boolean = 
     });
     
     if (hasIntimateContact) {
-        return { spiceLevel: 'SUGGESTIVE', length: 'MEATY' };
+        return { spiceLevel: SpiceLevels.SUGGESTIVE, length: Lengths.MEDIUM };
     }
 
     // Default to NONE/SHORT for regular combat actions
-    return { spiceLevel: 'NONE', length: 'SHORT' };
+    return { spiceLevel: SpiceLevels.NONE, length: Lengths.SHORT };
 }
 
 export async function generateInitialNarration(
@@ -89,8 +88,6 @@ export async function generateInitialNarration(
         
         const systemPrompt = formatSystemPrompt(
             PROMPTS.narrate.system,
-            characters[0],
-            characters[1],
             spiceLevel,
             length,
             currentRoundLog.llmContextLog || [],
@@ -124,8 +121,6 @@ export async function generateRoundNarration(
         
         const systemPrompt = formatSystemPrompt(
             PROMPTS.narrate.system,
-            characters[0],
-            characters[1],
             spiceLevel,
             length,
             currentRoundLog.llmContextLog || [],
@@ -157,14 +152,11 @@ export async function generateAfterMathNarration(
         
         const systemPrompt = formatSystemPrompt(
             PROMPTS.narrate.system,
-            characters[0],
-            characters[1],
             spiceLevel,
             length,
             currentRoundLog.llmContextLog || [],
             previousNarrations,
             TASKS.COMBAT_AFTERMATH,
-            null,
             characterInfo
         );
 

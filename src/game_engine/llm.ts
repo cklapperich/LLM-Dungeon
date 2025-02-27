@@ -13,8 +13,6 @@ interface ChatMessage {
 // Format the system prompt with all required information
 export function formatSystemPrompt(
     prompt: string,
-    hero: Character,
-    monster: Character,
     spiceLevel: string,
     length: string,
     combatLogs: string[],

@@ -176,7 +176,18 @@ export class CombatLogFormatters {
     private static formatAbility(event: AbilityEvent): string {
         if (this.mode === FormatMode.DEBUG) {
             return `ABILITY: ${event.actor.name} -> ${event.ability.name}\n` +
-                   `Skill: ${event.ability.skill}, Modifier: ${event.ability.modifier}`;
+                   `Skill: ${event.ability.skill}, Modifier: ${event.ability.modifier}` +
+                   (event.success === false ? `\nFailed: ${event.failureReason || 'Unknown reason'}` : '');
+        }
+
+        // Check if the ability failed due to requirements not being met
+        if (event.success === false) {
+            return `${event.actor.name} attempted to use ${event.ability.name}` +
+                   (event.target ? ` on ${event.target.name}` : '') +
+                   `\nDescription: ${event.ability.description}` +
+                   `\nFAILED: ${event.failureReason || 'Requirements not met'}` +
+                   `\nSkill: ${event.ability.skill}` +
+                   `\nModifier: ${event.ability.modifier}`;
         }
 
         return `${event.actor.name} used ${event.ability.name}` +

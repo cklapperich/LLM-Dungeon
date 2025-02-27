@@ -129,7 +129,8 @@ export const penetrate = createTrait('Penetrate', {
     {
       type: EffectType.STATUS,
       params: {
-        type: StatusName.PENETRATED
+        type: StatusName.PENETRATED,
+        inseminate_if_x_stacks: 2
       },
       target: 'other'
     },

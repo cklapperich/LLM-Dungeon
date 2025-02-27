@@ -38,7 +38,13 @@ export class LLMLogFormatters {
     }
 
     private static formatAbility(event: AbilityEvent): string {
-        const target = event.target.name ?? "itself";
+        const target = event.target?.name ?? "itself";
+        
+        // Check if the ability failed due to requirements not being met
+        if (event.success === false && event.failureReason) {
+            return `${event.actor.name} tries to use ${event.ability.description} on ${target}, but fails: ${event.failureReason}`;
+        }
+        
         return `${event.actor.name} uses ${event.ability.description} on ${target}`;
     }
 

@@ -58,6 +58,8 @@ export interface AbilityEvent {
     actor: Character;
     ability: Trait;
     target?: Character;
+    success?: boolean;
+    failureReason?: string;
 }
 
 export interface EffectEvent {

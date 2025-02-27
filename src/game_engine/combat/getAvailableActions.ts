@@ -6,6 +6,111 @@ import { system_actions, hero_actions } from './default_abilities';
 import { StatusName } from '../../types/status';
 
 /**
+ * Checks if an ability's requirements are met
+ * 
+ * @param actor - The character attempting to use the ability
+ * @param ability - The ability to check requirements for
+ * @param state - Current combat state
+ * @returns Object with success flag and optional reason for failure
+ */
+export function checkRequirements(
+    actor: Character,
+    ability: Trait,
+    state: CombatState
+): { 
+    success: boolean;
+    reason?: string;
+} {
+    // Check if ability is on cooldown
+    const cooldownStatus = actor.statuses?.find(s => 
+        s.name === StatusName.ABILITY_COOLDOWN && 
+        s.sourceAbility === ability.name
+    );
+    
+    if (cooldownStatus) {
+        return {
+            success: false,
+            reason: `On cooldown (${cooldownStatus.duration} turns remaining)`
+        };
+    }
+
+    // Check body part requirements
+    if (ability.requirements?.parts) {
+        const requiredParts = ability.requirements.parts;
+        
+        // Check each required part
+        for (const [partType, requiredCount] of Object.entries(requiredParts)) {
+            let boundCount = 0;
+            
+            // Check both specific and generic bound statuses
+            if (actor.statuses) {
+                // Check specific bound status (e.g. BOUND_ARMS for ARM)
+                const specificStatusName = `bound_${partType.toLowerCase()}${partType === BodyPartType.ARM || partType === BodyPartType.LEG ? 's' : ''}`;
+                const specificBoundStatus = actor.statuses.find(s => s.name === specificStatusName);
+                boundCount += specificBoundStatus?.stacks || 0;
+
+                // Check generic BOUND_MONSTER_PART statuses
+                const monsterPartStatuses = actor.statuses.filter(s => 
+                    s.name === StatusName.BOUND_MONSTER_PART && 
+                    s.params.part === partType
+                );
+                boundCount += monsterPartStatuses.reduce((total, status) => 
+                    total + status.stacks, 0
+                );
+            }
+            
+            if (boundCount >= requiredCount) {
+                const partName = partType.toLowerCase();
+                return {
+                    success: false,
+                    reason: `Requires ${requiredCount} free ${partName}${requiredCount > 1 ? 's' : ''}. (${boundCount} ${partName}${boundCount > 1 ? 's' : ''} bound)`
+                };
+            }
+        }
+    }
+
+    // Check status requirements
+    if (ability.requirements?.statuses) {
+        for (const requirement of ability.requirements.statuses) {
+            // Get the character to check based on the requirement target
+            const characterToCheck = requirement.target === 'other' ?
+                state.characters.find(c => c.type !== actor.type) :
+                actor;
+
+            // Convert enum value back to string for status check
+            const status = characterToCheck?.statuses?.find(s => s.name === requirement.name.toLowerCase());
+            const currentStacks = status?.stacks || 0;
+            if (currentStacks < requirement.stacks) {
+                const targetText = requirement.target === 'other' ? 'target' : 'self';
+                return {
+                    success: false,
+                    reason: `Requires ${targetText} to have ${requirement.stacks} stack${requirement.stacks > 1 ? 's' : ''} of ${requirement.name.toLowerCase()}`
+                };
+            }
+        }
+    }
+
+    // Check clothing level requirements
+    if (ability.requirements?.clothing?.maxLevel !== undefined) {
+        // Find target character for this action
+        const target = ability.effects.some(e => e.target === 'other') ? 
+            state.characters.find(c => c.type !== actor.type) :
+            actor;
+        
+        const clothingLevel = target?.clothing || 0;
+        if (clothingLevel > ability.requirements.clothing.maxLevel) {
+            return {
+                success: false,
+                reason: `Requires clothing level ${ability.requirements.clothing.maxLevel} or less`
+            };
+        }
+    }
+    
+    // All requirements passed
+    return { success: true };
+}
+
+/**
  * Gets ALL possible actions for a given actor, along with reasons why certain actions might be disabled.
  * available ones. The reasons object indicates which actions should be disabled in the UI and why.
  * 
@@ -21,7 +126,6 @@ import { StatusName } from '../../types/status';
  * 
  * @param actor - The character whose actions we're getting
  * @param state - Current combat state
- * @param gameState - Overall game state
  * @returns Object containing all actions and reasons for disabled ones
  */
 export function getAvailableActions(actor: Character, state: CombatState): {
@@ -55,77 +159,10 @@ export function getAvailableActions(actor: Character, state: CombatState): {
 
     // Add all traits from the actor first
     actor.traits.forEach(trait => {
-        // Check if ability is on cooldown
-        const cooldownStatus = actor.statuses?.find(s => 
-            s.name === StatusName.ABILITY_COOLDOWN && 
-            s.sourceAbility === trait.name
-        );
-        
-        if (cooldownStatus) {
-            reasons[trait.name] = `On cooldown (${cooldownStatus.duration} turns remaining)`;
-        }
-
-        // Check body part requirements
-        if (trait.requirements?.parts) {
-            const requiredParts = trait.requirements.parts;
-            
-            // Check each required part
-            for (const [partType, requiredCount] of Object.entries(requiredParts)) {
-                let boundCount = 0;
-                
-                // Check both specific and generic bound statuses
-                if (actor.statuses) {
-                    // Check specific bound status (e.g. BOUND_ARMS for ARM)
-                    const specificStatusName = `bound_${partType.toLowerCase()}${partType === BodyPartType.ARM || partType === BodyPartType.LEG ? 's' : ''}`;
-                    const specificBoundStatus = actor.statuses.find(s => s.name === specificStatusName);
-                    boundCount += specificBoundStatus?.stacks || 0;
-
-                    // Check generic BOUND_MONSTER_PART statuses
-                    const monsterPartStatuses = actor.statuses.filter(s => 
-                        s.name === StatusName.BOUND_MONSTER_PART && 
-                        s.params.part === partType
-                    );
-                    boundCount += monsterPartStatuses.reduce((total, status) => 
-                        total + status.stacks, 0
-                    );
-                }
-                
-                if (boundCount >= requiredCount) {
-                    const partName = partType.toLowerCase();
-                    reasons[trait.name] = `Requires ${requiredCount} free ${partName}${requiredCount > 1 ? 's' : ''}. (${boundCount} ${partName}${boundCount > 1 ? 's' : ''} bound)`;
-                }
-            }
-        }
-
-        // Check status requirements
-        if (trait.requirements?.statuses) {
-            for (const requirement of trait.requirements.statuses) {
-                // Get the character to check based on the requirement target
-                const characterToCheck = requirement.target === 'other' ?
-                    state.characters.find(c => c.type !== actor.type) :
-                    actor;
-
-                // Convert enum value back to string for status check
-                const status = characterToCheck?.statuses?.find(s => s.name === requirement.name.toLowerCase());
-                const currentStacks = status?.stacks || 0;
-                if (currentStacks < requirement.stacks) {
-                    const targetText = requirement.target === 'other' ? 'target' : 'self';
-                    reasons[trait.name] = `Requires ${targetText} to have ${requirement.stacks} stack${requirement.stacks > 1 ? 's' : ''} of ${requirement.name.toLowerCase()}`;
-                }
-            }
-        }
-
-        // Check clothing level requirements
-        if (trait.requirements?.clothing?.maxLevel !== undefined) {
-            // Find target character for this action
-            const target = trait.effects.some(e => e.target === 'other') ? 
-                state.characters.find(c => c.type !== actor.type) :
-                actor;
-            
-            const clothingLevel = target?.clothing || 0;
-            if (clothingLevel > trait.requirements.clothing.maxLevel) {
-                reasons[trait.name] = `Requires clothing level ${trait.requirements.clothing.maxLevel} or less`;
-            }
+        // Check requirements and add reason if they're not met
+        const requirementsCheck = checkRequirements(actor, trait, state);
+        if (!requirementsCheck.success && requirementsCheck.reason) {
+            reasons[trait.name] = requirementsCheck.reason;
         }
         
         // Always add the action to the list

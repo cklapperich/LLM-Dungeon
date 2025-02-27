@@ -163,7 +163,7 @@ export const effectHandlers: Record<typeof EffectType[keyof typeof EffectType], 
             };
         }
 
-        // Check if we should apply inseminate status
+        // Check if we should apply inseminate status   
         if (effect.params.inseminate_if_x_stacks) {
             const penetratedStatus = getStatus(target.statuses, StatusName.PENETRATED);
             if (penetratedStatus && penetratedStatus.stacks >= effect.params.inseminate_if_x_stacks) {
