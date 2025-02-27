@@ -22,7 +22,7 @@
             "description": "A more skillful attack, reaching out with a tentacle to strike.",
             "rarity": "common",
             "skill": "Grace",
-            "defenseOptions": ["Dodge[Grace]", "Block[Might]"],
+            "defenseOptions": ["Dodge", "Block"],
             "modifier": 2,
             "priority": false,
             "effects": [

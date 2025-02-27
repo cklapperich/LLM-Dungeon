@@ -14,7 +14,7 @@ import {
     canBindLimb,
     applyBreakFreeSkillcheckSuccess,
     BindablePart
-} from '../src/game_engine/grapplingRules.js';
+} from '../src/game_engine/combat/grapplingRules.js';
 
 describe('Grappling System Tests', () => {
     let source: Character;

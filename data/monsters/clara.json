@@ -16,8 +16,8 @@
             "name": "Stab",
             "description": "A skillfull rapier thrust",
             "rarity": "common",
-            "skill": "Light Weapons[Grace]",
-            "defenseOptions": ["Dodge[Grace]","Block[Might]"],
+            "skill": "Light Weapons",
+            "defenseOptions": ["Dodge","Block"],
             "modifier": 2,
             "priority": false,
             "effects": [

@@ -5,7 +5,7 @@ import {
     type Target,
     type Rarity
 } from './constants.js';
-import { Effect } from '../game_engine/effect.js';
+import { Effect } from '../game_engine/combat/effect.js';
 
 import { BodyPartType, type BodyPart } from './constants.js';
 

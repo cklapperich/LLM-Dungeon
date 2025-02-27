@@ -34,40 +34,40 @@
         ]
     },
     "Heavy Weapons": {
-      "description": ["Proficiency with large, powerful weapons that require strength"],
+      "description": ["Proficiency with large, powerful attacks that require strength"],
       "minimal_success": [
-        "The weapon connects with basic effectiveness",
+        "The attack connects with basic effectiveness",
         "A simple strike finds its mark",
         "The attack lands, if barely"
       ],
       "solid_success": [
-        "The massive weapon strikes true with devastating force",
+        "The massive attack strikes true with devastating force",
         "A powerful overhead swing connects solidly",
         "The heavy blow lands with crushing impact"
       ],
       "critical_success": [
         "An absolutely perfect strike demolishes all defense",
-        "The weapon becomes an unstoppable force of destruction",
+        "The attack becomes an unstoppable force of destruction",
         "A masterful blow that would fell giants"
       ],
       "minimal_failure": [
-        "The weapon swings just wide of the mark",
+        "The attack swings just wide of the mark",
         "The attack barely misses its target",
         "The strike falls short by inches"
       ],
       "solid_failure": [
-        "The heavy weapon misses completely",
+        "The heavy attack misses completely",
         "The attack goes wide of its mark",
         "The strike fails to connect"
       ],
       "critical_failure": [
-        "The weapon's weight works against them catastrophically",
-        "They lose control of the massive weapon entirely",
+        "The attack's weight works against them catastrophically",
+        "They lose control of the massive attack entirely",
         "The attack backfires spectacularly"
       ]
     },
     "Light Weapons": {
-      "description": ["Skill with quick, precise weapons that rely on agility"],
+      "description": ["Skill with quick, precise attacks that rely on agility"],
       "minimal_success": [
         "The blade grazes its target",
         "A quick strike barely connects",
@@ -94,7 +94,7 @@
         "The strike misses its mark"
       ],
       "critical_failure": [
-        "They lose their grip on the weapon entirely",
+        "They lose their grip on the attack entirely",
         "The attack leaves them completely exposed",
         "Their technique falls apart completely"
       ]
@@ -293,7 +293,7 @@
       ],
       "critical_failure": [
         "Their failed parry leaves them exposed",
-        "They lose their weapon trying to defend",
+        "They lose their attack trying to defend",
         "The attempt at defense backfires completely"
       ]
     },

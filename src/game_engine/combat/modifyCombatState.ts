@@ -1,38 +1,17 @@
-import { Character } from '../types/actor';
-import { GameState, GameActionResult } from '../types/gamestate';
-import { CombatFlags, GrappleType, BodyPartType } from '../types/constants';
-import { createStatus, hasStatus, getStatus } from './statusEffects';
-import { combatEventBus } from './eventBus';
-import { StatusEvent } from './events/eventTypes';
-
-import { StatusName } from '../types/status';
+import { Character } from '../../types/actor';
+import { GameActionResult } from '../../types/gamestate';
+import { CombatFlags, GrappleType, BodyPartType, CombatEndReasonType } from '../../types/constants';
+import { createStatus, hasStatus, getStatus } from '../statusEffects';
+import { StatusEvent, CombatEvent } from '../../events/eventTypes';
+import { logAndEmitCombatEvent } from './combatLogManager';
+import { CombatState} from '../../types/combatState';
+import { StatusName } from '../../types/status';
 import { canBindLimb, trackBoundLimb, BindablePart } from './grapplingRules';
 
-// Helper function to emit status events
-function emitStatusEvent(
-    status: StatusName | string | any, // Using any to accommodate Status objects
-    target: Character,
-    action: 'ADDED' | 'REMOVED' | 'STACKS_INCREASED' | 'STACKS_DECREASED',
-    stackChange?: number
-): void {
-    // If status is a string, get the status object
-    const statusObj = typeof status === 'string' ? getStatus(target.statuses, status) : status;
-    
-    if (!statusObj) return;
-    
-    const statusEvent: StatusEvent = {
-        type: 'STATUS',
-        status: statusObj,
-        target,
-        action,
-        stackChange
-    };
-    
-    combatEventBus.emit('STATUS', statusEvent);
-}
+const message_default = 'MESSAGE STRING NOT SUPPORTED';
 
 export function applyGrapple(
-    gameState: GameState,
+    state: CombatState,
     source: Character,
     target: Character,
     params: {
@@ -48,8 +27,14 @@ export function applyGrapple(
         target.statuses.push(grappleStatus);
         target.flags[CombatFlags.GRAPPLED] = 1;
         
-        // Emit status event for new grapple status
-        emitStatusEvent(grappleStatus, target, 'ADDED');
+        // Create and emit status event
+        const statusEvent: StatusEvent = {
+            type: 'STATUS',
+            status: grappleStatus,
+            target,
+            action: 'ADDED'
+        };
+        logAndEmitCombatEvent(statusEvent, state);
     }
 
     // If penetrating, add penetrated status
@@ -59,8 +44,14 @@ export function applyGrapple(
             target.statuses.push(penetratedStatus);
             target.flags[CombatFlags.PENETRATED] = 1;
             
-            // Emit status event for new penetrated status
-            emitStatusEvent(penetratedStatus, target, 'ADDED');
+            // Create and emit status event for new penetrated status
+            const statusEvent: StatusEvent = {
+                type: 'STATUS',
+                status: penetratedStatus,
+                target,
+                action: 'ADDED'
+            };
+            logAndEmitCombatEvent(statusEvent, state);
         }
     }
 
@@ -69,7 +60,7 @@ export function applyGrapple(
         if (!canBindLimb(target, limbType)) {
             return {
                 success: false,
-                message: `Cannot bind ${target.name}'s ${limbType}, already bound. `
+                message: message_default
             };
         }
 
@@ -85,26 +76,39 @@ export function applyGrapple(
             // Increment stacks
             boundStatus.stacks++;
             
-            // Emit status event for stack increase
-            emitStatusEvent(boundStatus, target, 'STACKS_INCREASED', 1);
+            // Create and emit status event for stack increase
+            const stackIncreaseEvent: StatusEvent = {
+                type: 'STATUS',
+                status: boundStatus,
+                target,
+                action: 'STACKS_INCREASED',
+                stackChange: 1
+            };
+            logAndEmitCombatEvent(stackIncreaseEvent, state);
         } else {
             // Create and add new bound status
             const newBoundStatus = createStatus(statusName);
             target.statuses.push(newBoundStatus);
             
-            // Emit status event for new bound status
-            emitStatusEvent(newBoundStatus, target, 'ADDED');
+            // Create and emit status event for new bound status
+            const newStatusEvent: StatusEvent = {
+                type: 'STATUS',
+                status: newBoundStatus,
+                target,
+                action: 'ADDED'
+            };
+            logAndEmitCombatEvent(newStatusEvent, state);
         }
     }
 
     return {
         success: true,
-        message: `${source.name} ${type === GrappleType.PENETRATE ? 'penetrated' : 'grappled'} ${target.name}. `
+        message: message_default
     };
 }
 
 export function applyStatus(
-    gameState: GameState,
+    state: CombatState,
     source: Character,
     target: Character,
     params: {
@@ -117,7 +121,7 @@ export function applyStatus(
     if (!target.statuses) {
         return { 
             success: false, 
-            message: 'Target has no statuses array' 
+            message: message_default 
         };
     }
 
@@ -128,18 +132,25 @@ export function applyStatus(
         if (existingStatus.stacks >= existingStatus.max_stacks) {
             return {
                 success: false,
-                message: `${target.name} already has maximum amount (${existingStatus.max_stacks}) of ${params.type}. `
+                message: message_default
             };
         }
         // Increment stacks
         existingStatus.stacks++;
         
-        // Emit status event for stack increase
-        emitStatusEvent(existingStatus, target, 'STACKS_INCREASED', 1);
+        // Create and emit status event for stack increase
+        const stackIncreaseEvent: StatusEvent = {
+            type: 'STATUS',
+            status: existingStatus,
+            target,
+            action: 'STACKS_INCREASED',
+            stackChange: 1
+        };
+        logAndEmitCombatEvent(stackIncreaseEvent, state);
         
         return {
             success: true,
-            message: `Increased intensity of ${params.type} to ${existingStatus.stacks} on ${target.name}. `
+            message: message_default
         };
     }
 
@@ -147,25 +158,31 @@ export function applyStatus(
     const status = createStatus(params.type, params);
     target.statuses.push(status);
     
-    // Emit status event for new status
-    emitStatusEvent(status, target, 'ADDED');
+    // Create and emit status event for new status
+    const newStatusEvent: StatusEvent = {
+        type: 'STATUS',
+        status: status,
+        target,
+        action: 'ADDED'
+    };
+    logAndEmitCombatEvent(newStatusEvent, state);
 
     return {
         success: true,
-        message: `Applied ${params.type} status to ${target.name}.`
+        message: message_default
     };
 }
 
 // Remove a status from a character
 export function removeStatus(
-    gameState: GameState,
+    state: CombatState,
     target: Character,
     statusName: string
 ): GameActionResult {
     if (!target.statuses) {
         return {
             success: false,
-            message: 'Character has no statuses array'
+            message: message_default
         };
     }
     
@@ -173,7 +190,7 @@ export function removeStatus(
     if (statusIndex === -1) {
         return {
             success: false,
-            message: `${target.name} does not have ${statusName} status`
+            message: message_default
         };
     }
     
@@ -183,18 +200,24 @@ export function removeStatus(
     // Remove the status
     target.statuses.splice(statusIndex, 1);
     
-    // Emit status event for removal
-    emitStatusEvent(status, target, 'REMOVED');
+    // Create and emit status event for removal
+    const removedEvent: StatusEvent = {
+        type: 'STATUS',
+        status: status,
+        target,
+        action: 'REMOVED'
+    };
+    logAndEmitCombatEvent(removedEvent, state);
     
     return {
         success: true,
-        message: `Removed ${statusName} status from ${target.name}`
+        message: message_default
     };
 }
 
 // Modify status stacks
 export function modifyStatusStacks(
-    gameState: GameState,
+    state: CombatState,
     target: Character,
     statusName: string,
     stackChange: number
@@ -202,7 +225,7 @@ export function modifyStatusStacks(
     if (!target.statuses) {
         return {
             success: false,
-            message: 'Character has no statuses array'
+            message: message_default
         };
     }
     
@@ -210,7 +233,7 @@ export function modifyStatusStacks(
     if (!status) {
         return {
             success: false,
-            message: `${target.name} does not have ${statusName} status`
+            message: message_default
         };
     }
     
@@ -225,43 +248,64 @@ export function modifyStatusStacks(
         // Remove the status
         target.statuses = target.statuses.filter(s => s.name !== statusName);
         
-        // Emit a single event indicating the status was removed due to 0 stacks
-        emitStatusEvent(status, target, 'REMOVED', Math.abs(stackChange));
+        // Create and emit a single event indicating the status was removed due to 0 stacks
+        const removedEvent: StatusEvent = {
+            type: 'STATUS',
+            status: status,
+            target,
+            action: 'REMOVED',
+            stackChange: Math.abs(stackChange)
+        };
+        logAndEmitCombatEvent(removedEvent, state);
         
         return {
             success: true,
-            message: `Removed ${statusName} from ${target.name} as stacks reached 0`
+            message: message_default
         };
     }
     
     // Otherwise, emit a stack change event
     const action = stackChange > 0 ? 'STACKS_INCREASED' : 'STACKS_DECREASED';
     
-    emitStatusEvent(status, target, action, Math.abs(stackChange));
+    // Create and emit stack change event
+    const stackChangeEvent: StatusEvent = {
+        type: 'STATUS',
+        status: status,
+        target,
+        action,
+        stackChange: Math.abs(stackChange)
+    };
+    logAndEmitCombatEvent(stackChangeEvent, state);
     
     return {
         success: true,
-        message: `Modified ${statusName} stacks on ${target.name} from ${oldStacks} to ${status.stacks}`
+        message: message_default
     };
 }
 
 // Remove statuses with zero stacks
 export function removeStatusesWithZeroStacks(
-    gameState: GameState,
+    state: CombatState,
     target: Character
 ): GameActionResult {
     if (!target.statuses) {
         return {
             success: false,
-            message: 'Character has no statuses array'
+            message: message_default
         };
     }
     
     const statusesToRemove = target.statuses.filter(s => s.stacks === 0);
     
-    // Emit events for each removed status
+    // Create and emit events for each removed status
     statusesToRemove.forEach(status => {
-        emitStatusEvent(status, target, 'REMOVED');
+        const removedEvent: StatusEvent = {
+            type: 'STATUS',
+            status: status,
+            target,
+            action: 'REMOVED'
+        };
+        logAndEmitCombatEvent(removedEvent, state);
     });
     
     // Filter out statuses with zero stacks
@@ -269,18 +313,18 @@ export function removeStatusesWithZeroStacks(
     
     return {
         success: true,
-        message: `Removed ${statusesToRemove.length} zero-stack statuses from ${target.name}`
+        message: message_default
     };
 }
 
 export function updateStatusDurations(
-    gameState: GameState,
+    state: CombatState,
     character: Character
 ): GameActionResult {
     if (!character.statuses) {
         return {
             success: false,
-            message: 'Character has no statuses array'
+            message: message_default
         };
     }
 
@@ -293,12 +337,12 @@ export function updateStatusDurations(
 
     return {
         success: true,
-        message: `Updated status durations for ${character.name}. `
+        message: message_default
     };
 }
 
 export function modifyClothing(
-    gameState: GameState,
+    state: CombatState,
     source: Character,
     target: Character,
     params: {
@@ -312,12 +356,12 @@ export function modifyClothing(
 
     return {
         success: true,
-        message: `${source.name} modified ${target.name}'s clothing by ${amount}. `
+        message: message_default
     };
 }
 
 export function applyWound(
-    gameState: GameState,
+    state: CombatState,
     source: Character,
     target: Character,
     params: {
@@ -330,6 +374,30 @@ export function applyWound(
 
     return {
         success: true,
-        message: `${source.name} wounded ${target.name} for ${amount} damage. `
+        message: message_default
+    };
+}
+
+export async function applyEndCombat(
+    state: CombatState,
+    winner: Character,
+    reason: CombatEndReasonType | string
+): Promise<GameActionResult> {
+    // Mark combat as complete
+    state.isComplete = true;
+    
+    // Emit combat end event
+    const combatEndEvent: CombatEvent = {
+        type: 'PHASECHANGE',
+        subtype: 'END' as const,
+        winner,
+        reason,
+        room: state.room
+    };
+    await logAndEmitCombatEvent(combatEndEvent, state);
+    
+    return {
+        success: true,
+        message: message_default
     };
 }

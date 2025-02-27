@@ -1,10 +1,12 @@
-import { Character } from '../types/actor';
-import { GameState, GameActionResult } from '../types/gamestate';
-import { BodyPartType, CombatFlags } from '../types/constants';
-import { createStatus, hasStatus, getStatus } from './statusEffects';
-import { StatusName } from '../types/status';
-import { Status } from '../types/status';
-import { modifyStatusStacks, removeStatus, removeStatusesWithZeroStacks, applyStatus } from './modifyGameState';
+import { Character } from '../../types/actor';
+import { GameActionResult } from '../../types/gamestate';
+import { CombatState } from '../../types/combatState';
+import { BodyPartType } from '../../types/constants';
+import { hasStatus, getStatus } from '../statusEffects';
+import { StatusName } from '../..//types/status';
+import { modifyStatusStacks, removeStatus, removeStatusesWithZeroStacks, applyStatus } from './modifyCombatState';
+
+const message_default = 'MESSAGE STRING NOT SUPPORTED';
 
 const BINDABLE_PARTS = [
     BodyPartType.ARM,
@@ -53,7 +55,7 @@ export function trackBoundLimb(character: Character, limbType: BindablePart, eff
 
 // Remove random bound limb that was bound during the current grapple instance
 export function removeRandomBoundLimbThisGrapple(
-    gameState: GameState,
+    combatState: CombatState,
     character: Character
 ): boolean {
     const grappleStatus = getStatus(character.statuses, StatusName.GRAPPLED);
@@ -78,7 +80,7 @@ export function removeRandomBoundLimbThisGrapple(
         
         // Reduce bound status stack using modifyStatusStacks
         const statusName = `bound_${randomType.toLowerCase()}${randomType === BodyPartType.ARM || randomType === BodyPartType.LEG ? 's' : ''}`;
-        modifyStatusStacks(gameState, character, statusName, -1);
+        modifyStatusStacks(combatState, character, statusName, -1);
         
         return true;
     }
@@ -88,7 +90,7 @@ export function removeRandomBoundLimbThisGrapple(
 
 // Remove all limbs bound during current grapple
 export function removeAllBoundLimbs(
-    gameState: GameState,
+    combatState: CombatState,
     character: Character
 ): void {
     const grappleStatus = getStatus(character.statuses, StatusName.GRAPPLED);
@@ -101,7 +103,7 @@ export function removeAllBoundLimbs(
         
         // Remove stacks equal to number of effects using modifyStatusStacks
         if (effects.length > 0) {
-            modifyStatusStacks(gameState, character, statusName, -effects.length);
+            modifyStatusStacks(combatState, character, statusName, -effects.length);
         }
         
         // Clear effects array
@@ -127,38 +129,42 @@ export function canBindLimb(character: Character, limbType: BindablePart): boole
  * First removes penetration if penetrated, then removes all bindings from current grapple
  */
 export function applyBreakFreeSkillcheckSuccess(
-    gameState: GameState,
+    combatState: CombatState,
     source: Character,
     target: Character
 ): GameActionResult {
     // Apply exhaustion using applyStatus
     let exhaustionStatus = getStatus(target.statuses, StatusName.EXHAUSTION);
     if (!exhaustionStatus) {
-        applyStatus(gameState, source, target, { type: StatusName.EXHAUSTION });
-    } else {
-        modifyStatusStacks(gameState, target, StatusName.EXHAUSTION, 1);
+        applyStatus(combatState, source, target, { type: StatusName.EXHAUSTION });
     }
+
+    const grappleStatus = getStatus(target.statuses, StatusName.GRAPPLED);
+    if (!grappleStatus) return {
+        success:true,
+        message: message_default
+    };
 
     // If penetrated, handle penetration first
     if (isCharacterPenetrated(target)) {
         // First remove a random limb bound during this grapple
-        removeRandomBoundLimbThisGrapple(gameState, target);
+        removeRandomBoundLimbThisGrapple(combatState, target);
         
         // Remove penetrated status using removeStatus
-        removeStatus(gameState, target, StatusName.PENETRATED);
+        removeStatus(combatState, target, StatusName.PENETRATED);
     }
 
     // Free all limbs bound during this grapple instance
-    removeAllBoundLimbs(gameState, target);
+    removeAllBoundLimbs(combatState, target);
 
     // Remove grapple status using removeStatus
-    removeStatus(gameState, target, StatusName.GRAPPLED);
+    removeStatus(combatState, target, StatusName.GRAPPLED);
 
     // Remove any bound statuses with 0 stacks
-    removeStatusesWithZeroStacks(gameState, target);
+    removeStatusesWithZeroStacks(combatState, target);
 
     return {
         success: true,
-        message: `${target.name} broke free`
+        message: message_default
     };
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { GameState } from '../types/gamestate';
-import { UIAction } from './types/uiTypes';
+import { UIAction } from './uiTypes';
 import CombatRoom from './components/CombatRoom';
 
 interface UIPrototypeProps {

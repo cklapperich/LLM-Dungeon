@@ -1,11 +1,8 @@
-import { Character } from '../../types/actor';
-import { Trait,  Effect } from '../../types/abilities';
-import { SkillName } from '../../types/skilltypes';
-import { RarityType, TargetType } from '../../types/constants';
-
+import { Character } from '../types/actor';
+import { GamePhase } from '../types/gamestate';
 // Log view types for the combat system
 export type LogType = 'event' | 'debug' | 'llm_context' | 'llm_narration';
-import { GameState } from '../../types/gamestate';
+import { GameState } from '../types/gamestate';
 import { 
     Sword, 
     Shield, 
@@ -21,6 +18,12 @@ import {
     Flame,
     Wind
 } from 'lucide-react';
+
+export enum UIActionType {
+    COMBAT = 'combat',
+    DUNGEON = 'dungeon',
+    SYSTEM = 'system'
+}
 
 // UI-specific types that transform backend data for display
 export interface UICardStats {
@@ -46,24 +49,17 @@ export interface UICharacterCard {
     artworkUrl?: string;
 }
 
-// Unified interface for all combat actions
-export interface CombatUIAction {
-    type: string;
-    label: string;
-    description: string;
-    disabled?: boolean;
-    tooltip?: string;
-    rarity?: typeof RarityType[keyof typeof RarityType];
-    skill?: SkillName;
-    defenseOptions?: SkillName[];
-    modifier?: number;
-    priority?: boolean;
-    //bodyParts?: BodyPartRequirements;
-    effects: Effect[];
-}
+import { GameAction } from '../types/gamestate';
 
-// For backwards compatibility
-export type UIAction = CombatUIAction;
+// Base interface for all UI actions
+export interface UIAction {
+    name: string;
+    context: UIActionType;
+    disabled: boolean;
+    tooltips: string[];
+    disabledReason?: string;
+    gameAction: GameAction; // Required reference to the underlying game action
+}
 
 export interface UIActionResult {
     success: boolean;

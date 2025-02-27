@@ -1,5 +1,5 @@
 import React from 'react';
-import { UICharacterCard } from '../../types/uiTypes';
+import { UICharacterCard } from '../../uiTypes';
 
 interface CardProps {
     data: UICharacterCard;

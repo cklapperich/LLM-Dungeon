@@ -1,9 +1,17 @@
 import React, { useRef, useEffect } from 'react';
 import { Book } from 'lucide-react';
-import { CombatState, getAllLogsWithRounds, getMonsterCharacterId } from '../../../types/combatState';
-import { UIAction, LogType } from '../../types/uiTypes';
-import { useLoading } from '../../context/LoadingContext';
+import { CombatState, getAllLogsWithRounds } from '../../../types/combatState';
+import { UIAction, LogType } from '../../uiTypes';
+import { useLoading } from '../../LoadingContext';
 import { Character } from '../../../types/actor';
+import { CharacterType } from '../../../types/constants';
+import { convertGameActionToUIAction } from '../../../game_engine/gameEngine';
+
+// Helper function to get the monster character ID from combat state
+function getMonsterCharacterId(combatState: CombatState, allCharacters: Record<string, Character>): string {
+    const monster = combatState.characters.find(c => c.type === CharacterType.MONSTER);
+    return monster ? monster.id : '';
+}
 
 interface ActionPanelProps {
     combatState?: CombatState;
@@ -43,26 +51,30 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
                     }
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 overflow-y-auto pr-2 flex-1">
-                    {(combatState?.playerActions || []).map((action, i) => (
+                    {(combatState?.playerActions || []).map((action, i) => {
+                        // Convert CombatGameAction to UIAction
+                        const uiAction = convertGameActionToUIAction(action);
+                        return (
                         <button
                             key={i}
-                            onClick={async () => await onAction(action)}
-                            disabled={action.disabled || isLoading}
+                            onClick={async () => await onAction(uiAction)}
+                            disabled={uiAction.disabled || isLoading}
                             className={`w-full px-4 py-3 rounded flex flex-col items-center justify-center text-center
                                 border-[3px] border-white/50 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_2px_4px_rgba(0,0,0,0.2)]
                                 bg-slate-800
-                                ${action.disabled || isLoading
+                                ${uiAction.disabled || isLoading
                                     ? 'opacity-50 text-slate-400 cursor-not-allowed' 
                                     : 'text-white hover:bg-slate-700 active:bg-slate-900'}`}
                         >
                             <div className="w-full">
-                                <div className="font-medium">{action.label}</div>
-                                {action.disabled && action.tooltip && (
-                                    <div className="text-sm mt-1 text-slate-300">{action.tooltip}</div>
+                                <div className="font-medium">{uiAction.name}</div>
+                                {uiAction.disabled && uiAction.disabledReason && (
+                                    <div className="text-sm mt-1 text-slate-300">{uiAction.disabledReason}</div>
                                 )}
                             </div>
                         </button>
-                     ))}
+                        );
+                     })}
                 </div>
             </div>
 

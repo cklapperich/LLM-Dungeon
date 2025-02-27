@@ -52,8 +52,8 @@ export const StatusEffects: Record<string, BuiltInStatus> = {
             };
         }
     },
-    [StatusName.BOUND_ARMS]: {
-        name: StatusName.BOUND_ARMS,
+    [StatusName.BOUND_ARM]: {
+        name: StatusName.BOUND_ARM,
         defaultParams: {},
         getModifiers: (status: Status): ModifierResult => ({
             skill_modifiers: {},
@@ -61,7 +61,7 @@ export const StatusEffects: Record<string, BuiltInStatus> = {
         }),
         createInstance: (params?: Record<string, any>): Status => ({
             id: crypto.randomUUID(),
-            name: StatusName.BOUND_ARMS,
+            name: StatusName.BOUND_ARM,
             source: StatusSource.SYSTEM,
             stacks: params?.stacks ?? 1,
             max_stacks: 2,
@@ -69,8 +69,8 @@ export const StatusEffects: Record<string, BuiltInStatus> = {
             params: { ...params }
         })
     },
-    [StatusName.BOUND_LEGS]: {
-        name: StatusName.BOUND_LEGS,
+    [StatusName.BOUND_LEG]: {
+        name: StatusName.BOUND_LEG,
         defaultParams: {},
         getModifiers: (status: Status): ModifierResult => ({
             skill_modifiers: {},
@@ -78,7 +78,7 @@ export const StatusEffects: Record<string, BuiltInStatus> = {
         }),
         createInstance: (params?: Record<string, any>): Status => ({
             id: crypto.randomUUID(),
-            name: StatusName.BOUND_LEGS,
+            name: StatusName.BOUND_LEG,
             source: StatusSource.SYSTEM,
             stacks: params?.stacks ?? 1,
             max_stacks: 2,

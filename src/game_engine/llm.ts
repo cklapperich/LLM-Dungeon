@@ -50,7 +50,7 @@ function cleanLLMResponse(response: string): string {
 export async function callLLM(
     taskType: TaskType,
     messages: string[],
-    model = 'anthropic/claude-3.5-sonnet' // 'meta-llama/llama-3.3-70b-instruct:free'
+    model = 'anthropic/claude-3.7-sonnet' // 'meta-llama/llama-3.3-70b-instruct:free'
 ): Promise<string> {
     const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
     if (!apiKey) {

@@ -19,7 +19,9 @@ export const EffectType = {
     BREAK_FREE: 'BREAK_FREE',
     ADVANCE_TURN: 'ADVANCE_TURN',
     END_COMBAT: 'END_COMBAT',
-    MODIFY_CLOTHING: 'MODIFY_CLOTHING'
+    MODIFY_CLOTHING: 'MODIFY_CLOTHING',
+    SCRIPT: 'SCRIPT',
+    PENETRATE: 'PENETRATE'
 } as const;
 
 export const BodyPartType = {
@@ -100,3 +102,18 @@ export const GrappleType = {
 
 export type CombatFlagTypes = typeof CombatFlags[keyof typeof CombatFlags];
 export type GrappleTypes = typeof GrappleType[keyof typeof GrappleType];
+
+export const EventContext = {
+    STATUS: 'status'
+} as const;
+
+export type EventContextType = typeof EventContext[keyof typeof EventContext];
+
+export const CombatEndReason = {
+    DEATH: 'death',
+    BREEDING: 'breeding',
+    ESCAPE: 'escape',
+    SURRENDER: 'surrender'
+} as const;
+
+export type CombatEndReasonType = typeof CombatEndReason[keyof typeof CombatEndReason];

@@ -1,9 +1,9 @@
 import { describe, test, expect } from 'vitest';
 import { createCharacter } from '../src/types/actor.js';
-import { applyEffect } from '../src/game_engine/effect.js';
+import { applyEffect } from '../src/game_engine/combat/effect.js';
 import { EffectType, CombatFlags, GrappleType } from '../src/types/constants.js';
 import { createTestGameState } from '../src/types/gamestate.js';
-import { applyStatus } from '../src/game_engine/modifyGameState.js';
+import { applyStatus } from '../src/game_engine/combat/modifyCombatState.js';
 import { StatusName } from '../src/types/status.js';
 
 // Helper functions for tests

@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { createTestCombatScenario, createDefaultTestCharacters } from '../src/testing/stateGenerators';
-import { executeAction } from '../src/game_engine/modifyGameState';
+import { executeAction } from '../src/game_engine/combat/modifyCombatState';
 import { getLegalActions } from '../src/game_engine/combatEngine';
-import { TraitUIAction } from '../src/react_ui/types/uiTypes';
+import { TraitUIAction } from '../src/react_ui/uiTypes';
 
 describe('Combat Flow', () => {
     it('should execute a legal action in combat', async () => {

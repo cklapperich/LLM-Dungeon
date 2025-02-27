@@ -1,4 +1,10 @@
 {
+  "lengths": {
+    "SHORT": "2-3 sentences, a short paragraph.",
+    "MEDIUM": "4 sentences, a short paragraph.",
+    "LONG": "A detailed paragraph, 6-8 sentences.",
+    "MEATY": "A meaty paragraph, 4-6 sentences."
+  },
   "spiceLevels": {
     "NONE": "NONE",
     "SUGGESTIVE": "SUGGESTIVE: Hints as to what the monster is planning to do. the implciations that the monster ewants to violate or breed her. Mildly erotic.",

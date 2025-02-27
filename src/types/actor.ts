@@ -1,6 +1,6 @@
 import { Attribute, SkillName } from './skilltypes.js';
 import { Trait } from './abilities.js';
-import { abilities } from '../game_engine/default_abilities.ts';
+import { abilities } from '../game_engine/combat/default_abilities.ts';
 import { copyTrait } from './abilities.js';
 import { MonsterSize, CharacterType, CharacterTypeValue, BodyPart, BodyPartType } from './constants.js';
 import { Status, ModifierResult } from './status.js';
@@ -126,33 +126,6 @@ export function getSkillBonus(character: Character, skillName: SkillName, gameSt
     const statusMods = getCombinedModifiers(character.statuses, gameState);
     return baseSkill + (statusMods.skill_modifiers[skillName] || 0);
 }
-
-/**
- * Check if a character has the required limbs for a trait
- */
-
-// TODO - UPDATE TO NEW LIMB STORAGE REQUIREMENTS WHERE WE STORE A RECORD OF LIMBTYPE:NUMBER
-// export function hasRequiredLimbs(character: Character, trait: Trait): boolean {
-//     if (!trait.requirements?.limbs) return true;
-
-//     const requiredArms = trait.requirements.limbs.arms ?? 0;
-//     const requiredLegs = trait.requirements.limbs.legs ?? 0;
-//     const requiredMouth = trait.requirements.limbs.mouth ?? 0;
-
-//     let availableArms = 0;
-//     if (character.limbs[LimbType.LEFT_ARM]) availableArms++;
-//     if (character.limbs[LimbType.RIGHT_ARM]) availableArms++;
-
-//     let availableLegs = 0;
-//     if (character.limbs[LimbType.LEFT_LEG]) availableLegs++;
-//     if (character.limbs[LimbType.RIGHT_LEG]) availableLegs++;
-
-//     const hasMouth = character.limbs[LimbType.MOUTH];
-
-//     return availableArms >= requiredArms && 
-//            availableLegs >= requiredLegs && 
-//            (requiredMouth === 0 || hasMouth);
-// }
 
 /**
  * Save a character to JSON string

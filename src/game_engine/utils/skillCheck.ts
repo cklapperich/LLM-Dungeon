@@ -5,6 +5,7 @@ import { IntensityType, IntensityTypes } from '../../types/constants';
 import { getStatusModifiers } from '../statusEffects';
 interface InitiativeResult {
     initiatives: [number, number];
+    rollResults: [RollResult, RollResult];
     margin: number;
     description: string;
 }
@@ -23,6 +24,7 @@ export function processInitiative(char1: Character, char2: Character, gameState:
 
     return {
         initiatives: [check1.roll, check2.roll],
+        rollResults: [check1, check2],
         margin,
         description
     };

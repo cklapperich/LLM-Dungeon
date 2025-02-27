@@ -1,6 +1,6 @@
 import React from 'react';
 import { Menu } from 'lucide-react';
-import { navigationItems } from '../../types/uiTypes';
+import { navigationItems } from '../../uiTypes';
 
 interface SidebarProps {
     onNavigate: (view: string) => void;

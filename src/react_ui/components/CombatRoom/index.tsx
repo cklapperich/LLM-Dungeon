@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { GameState as BackendGameState } from '../../../types/gamestate';
-import { UIAction } from '../../types/uiTypes';
-import { useLoading } from '../../context/LoadingContext';
+import { UIAction } from '../../uiTypes';
+import { useLoading } from '../../LoadingContext';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
 import CombatArea from './CombatArea';
@@ -51,6 +51,22 @@ export const CombatRoom: React.FC<CombatRoomProps> = ({
     const { isLoading, setIsLoading } = useLoading();
     const [debugEnabled, setDebugEnabled] = React.useState(false);
 
+    // No longer using event bus for loading state
+
+    // Wrap onAction to set loading state
+    const handleAction = async (action: UIAction) => {
+        console.log('Setting loading state to true');
+        setIsLoading(true);
+        try {
+            await onAction(action);
+            console.log('Action completed, setting loading state to false');
+            setIsLoading(false);
+        } catch (error) {
+            console.error('Error in handleAction:', error);
+            setIsLoading(false);
+        }
+    };
+
     return (
         <div className="h-screen flex bg-slate-900">
             {/* Left Sidebar Navigation */}
@@ -63,7 +79,7 @@ export const CombatRoom: React.FC<CombatRoomProps> = ({
                     turnCounter={gameState.turnCounter}
                     dayCounter={gameState.dayCounter}
                     infamy={gameState.infamy}
-                    narrationEnabled={gameState.narrationEnabled}
+                    narrationEnabled={gameState.settings.narrationEnabled}
                     onToggleNarration={onToggleNarration}
                     debugEnabled={debugEnabled}
                     onToggleDebug={() => setDebugEnabled(!debugEnabled)}
@@ -84,17 +100,22 @@ export const CombatRoom: React.FC<CombatRoomProps> = ({
                             <ActionPanel 
                                 combatState={gameState.activeCombat ?? undefined}
                                 allCharacters={gameState.characters}
-                                onAction={onAction}
+                                onAction={handleAction}
                             />
                         </>
                     ) : (
                         <PreCombatUI
                             onStartCombat={async () => {
                                 if (!onStartCombat || isLoading) return;
+                                console.log('Starting combat, setting loading state to true');
                                 setIsLoading(true);
                                 try {
                                     await onStartCombat();
-                                } finally {
+                                    console.log('Combat started, setting loading state to false');
+                                    setIsLoading(false);
+                                } catch (error) {
+                                    // If there's an error, we should set isLoading to false
+                                    console.error('Error starting combat:', error);
                                     setIsLoading(false);
                                 }
                             }}

@@ -10,7 +10,6 @@
  */
 
 import skillDescriptions from '../../../data/descriptions/skillchecks.json';
-import effects from '../../../data/descriptions/effects.json';
 import status from '../../../data/descriptions/status.json';
 import attributes from '../../../data/descriptions/attributes.json';
 import clothing from '../../../data/descriptions/clothing.json';
@@ -18,17 +17,6 @@ import { IntensityType, IntensityTypes } from '../../types/constants';
 import { RollResult, SkillNames } from '../../types/skilltypes';
 
 export class DescriptionManager {
-    static getEffectDescription(effectType: string, success: boolean): string {
-        try {
-            const state = success ? 'success' : 'failure';
-            const prompts = effects[effectType]?.[state] || effects.generic[state];
-            return prompts ? prompts[Math.floor(Math.random() * prompts.length)] : '';
-        } catch (error) {
-            console.warn(`No effect description found for ${effectType}`);
-            return '';
-        }
-    }
-
     static getSkillDescription(skillName: string, intensity: IntensityTypes): string {
         try {
             // Get the clean skill name from SkillNames if possible

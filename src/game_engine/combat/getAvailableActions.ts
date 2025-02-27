@@ -1,15 +1,12 @@
-import { Character } from '../types/actor';
-import { GameState, getCharactersFromIdList } from '../types/gamestate';
-import { CombatState } from '../types/combatState';
-import { Trait } from '../types/abilities';
-import { TargetType, CharacterType, BodyPartType } from '../types/constants';
-import { system_actions } from './default_abilities';
-import { StatusName } from '../types/status';
+import { Character } from '../../types/actor';
+import { CombatState } from '../../types/combatState';
+import { Trait } from '../../types/abilities';
+import { TargetType, CharacterType, BodyPartType } from '../../types/constants';
+import { system_actions, hero_actions } from './default_abilities';
+import { StatusName } from '../../types/status';
 
 /**
  * Gets ALL possible actions for a given actor, along with reasons why certain actions might be disabled.
- * 
- * IMPORTANT: This function returns ALL actions the actor could potentially take, not just currently
  * available ones. The reasons object indicates which actions should be disabled in the UI and why.
  * 
  * For example:
@@ -27,22 +24,22 @@ import { StatusName } from '../types/status';
  * @param gameState - Overall game state
  * @returns Object containing all actions and reasons for disabled ones
  */
-export function getAvailableActions(actor: Character, state: CombatState, gameState: GameState): {
+export function getAvailableActions(actor: Character, state: CombatState): {
     actions: Trait[];  // ALL possible actions, including disabled ones
     reasons: Record<string, string>;  // Map of action name to reason why it's disabled
 } {
     const actions: Trait[] = [];
     const reasons: Record<string, string> = {};
 
-    // If combat is complete, only allow Pass action
+    // If combat is complete, only allow Exit Combat action
     if (state.isComplete) {
         // Add only Pass from system actions
-        const passAction = system_actions.pass;
+        const passAction = system_actions.exitCombat;
         actions.push(passAction);
         
         // Disable all other system actions
         Object.values(system_actions).forEach((action: Trait) => {
-            if (action.name !== system_actions.pass.name) {
+            if (action.name !== system_actions.exitCombat.name) {
                 reasons[action.name] = 'Combat is over';
             }
         });
@@ -105,7 +102,7 @@ export function getAvailableActions(actor: Character, state: CombatState, gameSt
             for (const requirement of trait.requirements.statuses) {
                 // Get the character to check based on the requirement target
                 const characterToCheck = requirement.target === 'other' ?
-                    getCharactersFromIdList(state.characterIds, gameState).find(c => c.type !== actor.type) :
+                    state.characters.find(c => c.type !== actor.type) :
                     actor;
 
                 // Convert enum value back to string for status check
@@ -122,7 +119,7 @@ export function getAvailableActions(actor: Character, state: CombatState, gameSt
         if (trait.requirements?.clothing?.maxLevel !== undefined) {
             // Find target character for this action
             const target = trait.effects.some(e => e.target === 'other') ? 
-                getCharactersFromIdList(state.characterIds, gameState).find(c => c.type !== actor.type) :
+                state.characters.find(c => c.type !== actor.type) :
                 actor;
             
             const clothingLevel = target?.clothing || 0;
@@ -135,33 +132,33 @@ export function getAvailableActions(actor: Character, state: CombatState, gameSt
         actions.push(trait);
     });
 
-    // Add system actions at the end (only if combat is not complete)
-    Object.values(system_actions).forEach((action: Trait) => {
-        // Always add the action to the list first
-        actions.push(action);
+    // Add hero actions if character is a hero
+    if (actor.type === CharacterType.HERO) {
+        Object.values(hero_actions).forEach(action => {
+            actions.push(action);
+        });
+    }
 
-        // Then check if it should be disabled
-        if (action.name === system_actions.breakFree.name || action.name === system_actions.slipFree.name) {
-            const isGrappled = actor.statuses?.some(status => status.name === StatusName.GRAPPLED);
-            if (!isGrappled) {
-                reasons[action.name] = 'Can only be used while grappled';
-            }
-        } else if (action.name === system_actions.retreat.name) {
-            reasons[action.name] = 'Cannot retreat during combat';
-        }
-    });
+    if (state.isComplete) {
+        actions.push(system_actions.exitCombat);
+    }
+
+    // if every action has a reason or if length is 0, push the system action 'pass'
+    if ((actions.length === 0) || actions.every(action => reasons[action.name])) {
+        actions.push(system_actions.pass);
+    }
 
     return { actions, reasons };
 }
 
 // Get actions for current actor (used by combat/AI logic)
-export function getCurrentActorActions(state: CombatState, gameState: GameState) {
-    const actor = getCharactersFromIdList(state.characterIds, gameState)[state.activeCharacterIndex];
-    return getAvailableActions(actor, state, gameState);
+export function getCurrentActorActions(state: CombatState) {
+    const actor = state.characters[state.activeCharacterIndex];
+    return getAvailableActions(actor, state);
 }
 
 // Get monster's actions (used to update playerActions)
-export function getMonsterActions(state: CombatState, gameState: GameState) {
-    const monster = getCharactersFromIdList(state.characterIds, gameState).find(c => c.type === CharacterType.MONSTER);
-    return monster ? getAvailableActions(monster, state, gameState) : { actions: [], reasons: {} };
+export function getMonsterActions(state: CombatState) {
+    const monster = state.characters.find(c => c.type === CharacterType.MONSTER);
+    return monster ? getAvailableActions(monster, state) : { actions: [], reasons: {} };
 }

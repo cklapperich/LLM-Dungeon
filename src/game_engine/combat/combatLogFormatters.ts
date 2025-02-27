@@ -14,10 +14,10 @@ import {
     AbilityEvent,
     EffectEvent,
     StatusEvent,
-    CombatEvent,
-    TurnEvent,
-    InitiativeEvent
-} from '../events/eventTypes';
+    CombatPhaseChangedEvent,
+    InitiativeEvent,
+    CombatStartEndEvent
+} from '../../events/eventTypes';
 import { RollResult } from '../../types/skilltypes';
 
 export enum FormatMode {
@@ -115,24 +115,45 @@ export class CombatLogFormatters {
                (status.duration ? `\nDuration: ${status.duration} rounds` : '');
     }
 
-    private static formatCombat(event: CombatEvent): string {
+    private static formatCombatPhaseChange(event: CombatPhaseChangedEvent): string {
         if (this.mode === FormatMode.DEBUG) {
-            return `COMBAT: ${event.subtype}\n` +
-                   `Room: ${event.room_id}\n` +
+            return `PHASECHANGE: ${event.subtype}\n` +
+                   `Room: ${event.room.name || 'Unknown'}\n` +
                    `Participants: ${event.characters?.map(c => c.name).join(', ')}`;
         }
 
         if (event.subtype === 'START') {
             const participants = event.characters?.map(c => c.name).join(' vs ') || '';
-            return `Combat started in room ${event.room_id}\nParticipants: ${participants}`;
-        } else {
-            return `Combat ended - ${event.winner?.name} wins (${event.reason})`;
+            return `Combat phase started in ${event.room.name || 'the room'}\nParticipants: ${participants}`;
+        } else if (event.subtype === 'END') {
+            return `Combat phase ended - ${event.winner?.name || 'No winner'} ${event.reason ? `(${event.reason})` : ''}`;
+        } else if (event.subtype === 'TURN') {
+            // Assuming the first character in the array is the active one for the turn
+            const activeCharacter = event.characters?.[0];
+            if (!activeCharacter) return 'Turn phase';
+            return `Turn phase: ${activeCharacter.name}'s turn`;
+        } else if (event.subtype === 'ROUND_END') {
+            return `Round ended in ${event.room.name || 'the room'}`;
         }
+        
+        return `Unknown phase change: ${event.subtype}`;
     }
 
-    private static formatTurn(event: TurnEvent): string {
-        const base = `Round ${event.round}: ${event.actor.name}'s turn`;
-        return this.mode === FormatMode.DEBUG ? `TURN: ${base}` : base;
+    private static formatCombatStateChange(event: CombatStartEndEvent): string {
+        if (this.mode === FormatMode.DEBUG) {
+            return `COMBAT_STATE_CHANGE: ${event.subtype}\n` +
+                   `Room: ${event.room.name || 'Unknown'}\n` +
+                   `Participants: ${event.characters?.map(c => c.name).join(', ')}`;
+        }
+
+        if (event.subtype === 'START') {
+            const participants = event.characters?.map(c => c.name).join(' vs ') || '';
+            return `Combat started in ${event.room.name || 'the room'}\nParticipants: ${participants}`;
+        } else if (event.subtype === 'END') {
+            return `Combat ended - ${event.winner?.name || 'No winner'} ${event.reason ? `(${event.reason})` : ''}`;
+        }
+        
+        return `Unknown combat state change: ${event.subtype}`;
     }
 
     private static formatInitiative(event: InitiativeEvent): string {
@@ -176,12 +197,14 @@ export class CombatLogFormatters {
                 return this.formatEffect(event);
             case 'STATUS':
                 return this.formatStatus(event);
-            case 'COMBAT':
-                return this.formatCombat(event);
-            case 'TURN':
-                return this.formatTurn(event);
+            case 'PHASECHANGE':
+                return this.formatCombatPhaseChange(event);
+            case 'COMBAT_STATE_CHANGE':
+                return this.formatCombatStateChange(event);
             case 'INITIATIVE':
                 return this.formatInitiative(event);
+            case 'MONSTER_ADDED':
+                return `Monster ${event.monster.name} added to ${event.room.name || 'the room'}`;
             default:
                 const defaultMsg = `Unknown event type: ${(event as any).type}`;
                 return this.mode === FormatMode.DEBUG ? 

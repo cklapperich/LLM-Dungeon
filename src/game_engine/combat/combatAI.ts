@@ -1,16 +1,15 @@
-import { GameState } from '../types/gamestate';
-import { CombatState } from '../types/combatState';
-import { Trait } from '../types/abilities';
-import { Character, getCombinedModifiers, getAttributeValue, getSkillModifier } from '../types/actor';
+import { CombatState } from '../../types/combatState';
+import { Trait } from '../../types/abilities';
+import { Character, getCombinedModifiers, getAttributeValue, getSkillModifier } from '../../types/actor';
 import { getAvailableActions } from './getAvailableActions';
 import { system_actions } from './default_abilities';
-import { EffectType } from '../types/constants';
-import { getSkillAttribute } from './utils/dataLoader';
+import { EffectType } from '../../types/constants';
+import { getSkillAttribute } from '../utils/dataLoader';
 
 // Get an action for the AI to take, prioritizing escape if grappled
-export function getAIAction(actor: Character, state: CombatState, gameState: GameState): Trait {
+export function getAIAction(actor: Character, state: CombatState): Trait {
     // Get all available actions and filter out disabled ones first
-    const { actions, reasons } = getAvailableActions(actor, state, gameState);
+    const { actions, reasons } = getAvailableActions(actor, state);
     const availableActions = actions.filter(action => !(action.name in reasons));
     
     // Check if grappled

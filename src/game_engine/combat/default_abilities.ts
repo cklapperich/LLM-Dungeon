@@ -1,8 +1,7 @@
-import { createTrait } from '../types/abilities.ts';
-import { Skills } from '../types/skilltypes.ts';
-import { EffectType, TargetType, GrappleType, RarityType, BodyPartType } from '../types/constants.ts';
-import { Effect } from './effect.ts';
-import { StatusName } from '../types/status.ts';
+import { createTrait } from '../../types/abilities.ts';
+import { Skills } from '../../types/skilltypes.ts';
+import { EffectType, GrappleType, RarityType} from '../../types/constants.ts';
+import { StatusName } from '../../types/status.ts';
 
 export const slam = createTrait('Slam', {
   description: 'A forceful body slam attack',
@@ -49,33 +48,35 @@ export const grab = createTrait('Grab', {
     ]
 });
 
-export const breakFree = createTrait('Break Free', {
-  description: 'Attempt to break free using might, freeing all limbs bound during this grapple',
-  rarity: RarityType.COMMON,
-  skill: Skills.BREAK_FREE_MIGHT,
-  defenseOptions: [Skills.GRAPPLE_MIGHT, Skills.GRAPPLE_GRACE],
-  effects: [
-    {
-      type: EffectType.BREAK_FREE,
-      params: { type: 'full' },
-      target: 'self'
-    }
-  ]
-});
-
-export const slipFree = createTrait('Slip Free', {
-  description: 'Attempt to slip free using grace, freeing all limbs bound during this grapple',
-  rarity: RarityType.COMMON,
-  skill: Skills.SLIP_FREE_GRACE,
-  defenseOptions: [Skills.GRAPPLE_MIGHT, Skills.GRAPPLE_GRACE],
-  effects: [
-    {
-      type: EffectType.BREAK_FREE,
-      params: { type: 'full' },
-      target: 'self'
-    }
-  ]
-});
+// Hero-only actions
+export const hero_actions = { 
+  breakFree: createTrait('Break Free', {
+    description: 'Attempt to break free using might, freeing all limbs bound during this grapple',
+    rarity: RarityType.COMMON,
+    skill: Skills.BREAK_FREE_MIGHT,
+    defenseOptions: [Skills.GRAPPLE_MIGHT, Skills.GRAPPLE_GRACE],
+    effects: [
+      {
+        type: EffectType.BREAK_FREE,
+        params: { type: 'full' },
+        target: 'self'
+      }
+    ]
+  }),
+  slipFree: createTrait('Slip Free', {
+    description: 'Attempt to slip free using grace, freeing all limbs bound during this grapple',
+    rarity: RarityType.COMMON,
+    skill: Skills.SLIP_FREE_GRACE,
+    defenseOptions: [Skills.GRAPPLE_MIGHT, Skills.GRAPPLE_GRACE],
+    effects: [
+      {
+        type: EffectType.BREAK_FREE,
+        params: { type: 'full' },
+        target: 'self'
+      }
+    ]
+  })
+} as const;
 
 // System actions
 export const pass = createTrait('Pass', {
@@ -91,22 +92,22 @@ export const pass = createTrait('Pass', {
     ]
 });
 
-export const retreat = createTrait('Retreat', {
-    description: 'Cannot retreat during combat',
+export const exitCombat = createTrait('Exit Combat', {
+    description: 'Exit combat (only available when combat is complete)',
     skill: Skills.NONE,
     defenseOptions: [],
     effects: [
         {
             type: EffectType.END_COMBAT,
             params: {
-                outcome: 'retreat'
+                outcome: 'exit'
             },
             target: 'self'
         }
     ]
 });
 
-export const system_actions = { pass, retreat, breakFree, slipFree } as const;
+export const system_actions = { pass, exitCombat } as const;
 
 export const penetrate = createTrait('Penetrate', {
   description: 'The monster penetrates an orifice with a tongue, phallus, or other appendage.',
