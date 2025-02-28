@@ -1,13 +1,13 @@
 {
     "name": "Clara",
     "type": "hero",
-    "artworkUrl": "/data/images/rogue1.jpeg",
+    "artworkUrl": "heroes/rogue1.jpeg",
     "might": 8,
     "grace": 14,
     "wit": 12,
     "will": 6,
     "skills": {
-        "Stealth[Grace]": 2
+        "Stealth": 2
     },
     "description": "",
     "size": 1,

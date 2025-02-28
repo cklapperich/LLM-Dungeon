@@ -1,25 +1,36 @@
 import { GameState } from '../types/gamestate.js';
 import { Character } from '../types/actor.js';
-import claraJson from '../../public/data/monsters/clara.json';
-import greenSlimeJson from '../../public/data/monsters/green_slime.json';
-import profanedTempleJson from '../../public/data/dungeons/profaned_temple.json';
-import { loadMonster } from '../game_engine/utils/dataLoader.js';
+// Use Vite's import.meta.glob to import all monster JSON files
+const monsterFiles = import.meta.glob('@assets/monsters/*.json', { eager: true });
+const heroFiles = import.meta.glob('@assets/heroes/*.json', { eager: true });
+import profanedTempleJson from '@assets/dungeons/profaned_temple.json';
 import { loadDungeonFromJson } from '../game_engine/utils/dungeonUtils.js';
-/**
- * Creates default test characters (Clara and Green Slime)
- */
-export function createDefaultTestCharacters(): { player: Character; monster: Character } {
-    return {
-        player: loadMonster(claraJson),
-        monster: loadMonster(greenSlimeJson)
-    };
-}
-
+import { loadMonster } from '@/game_engine/utils/dataLoader.js';
+// Process these files to separate heroes and monsters
+export function loadAllCharacters() {
+    const heroes: Record<string, Character> = {};
+    const monsters: Record<string, Character> = {};
+    
+    Object.values(monsterFiles).forEach((module: any) => {
+      const character = loadMonster(module.default);
+      character.type = 'monster'
+      monsters[character.id] = character;
+    });
+    
+    Object.values(heroFiles).forEach((module: any) => {
+        const character = loadMonster(module.default);
+        character.type = 'hero'
+        heroes[character.id] = character;
+      });
+      
+    return { heroes, monsters };
+  }
+  
 /**
  * Creates a test game state with default values
  */
 export function createTestGameState(overrides: Partial<GameState> = {}): GameState {
-    // Load the profaned temple dungeon
+    const { heroes, monsters } = loadAllCharacters();
     const dungeon = loadDungeonFromJson(JSON.stringify(profanedTempleJson));
 
     return {
@@ -30,7 +41,8 @@ export function createTestGameState(overrides: Partial<GameState> = {}): GameSta
         deck: { baseMonsters: [], traits: [], traps: [] },
         infamy: 0,
         dailyPacksRemaining: 0,
-        characters: {},
+        heroes: heroes,
+        monsters:monsters,
         currentPhase: 'planning',
         activeCombat: null,
         waveCounter: 0,
@@ -45,23 +57,16 @@ export function createTestGameState(overrides: Partial<GameState> = {}): GameSta
  * a dungeon with characters in it
  */
 export function createTestStateWithCharactersInRoom(): GameState {
-    // Create characters
-    const { player, monster } = createDefaultTestCharacters();
-    
-    // Create game state with characters
-    const gameState = createTestGameState({
-        characters: {
-            [player.id]: player,
-            [monster.id]: monster
-        }
-    });
-    
+    const gameState = createTestGameState();
+    const hero_values = Object.values(gameState.heroes)    
+    const hero = hero_values[0];
     // Get the first room from the dungeon
     const roomId = Object.keys(gameState.dungeon.rooms)[0];
+    console.log(roomId)
     const room = gameState.dungeon.rooms[roomId];
     
     // Add both characters to the room
-    room.characters = [player, monster];
+    room.characters = [hero];
     
     return gameState;
 }
@@ -72,22 +77,12 @@ export function createTestStateWithCharactersInRoom(): GameState {
  */
 export function createTestStateWithSeparateCharacters(): GameState {
     // Create characters
-    const { player, monster } = createDefaultTestCharacters();
-    
-    // Ensure player is hero type and monster is monster type
-    player.type = 'hero';
-    monster.type = 'monster';
-    
-    // Create game state with characters
-    const gameState = createTestGameState({
-        settings: { narrationEnabled: false },
-        characters: {
-            [player.id]: player,
-            [monster.id]: monster
-        },
-        gameActions: [] // Initialize with empty array
-    });
-    
+    const gameState = createTestGameState();
+    const hero_values = Object.values(gameState.heroes)    
+    const hero = hero_values[0];
+    const monster_values = Object.values(gameState.monsters)    
+    const monster = monster_values[0];
+
     // Initialize characters array for all rooms
     Object.values(gameState.dungeon.rooms).forEach(room => {
         if (!room.characters) {
@@ -96,21 +91,12 @@ export function createTestStateWithSeparateCharacters(): GameState {
     });
     
     // Get two different rooms from the dungeon
-    const roomIds = Object.keys(gameState.dungeon.rooms);
-    if (roomIds.length < 2) {
+    const rooms = Object.values(gameState.dungeon.rooms);
+    if (rooms.length < 2) {
         throw new Error('Dungeon needs at least 2 rooms for this test state');
     }
-    
-    // Add player to the first room
-    const playerRoom = gameState.dungeon.rooms[roomIds[0]];
-    playerRoom.characters.push(player);
-    
-    // Add monster to the second room
-    const monsterRoom = gameState.dungeon.rooms[roomIds[1]];
-    monsterRoom.characters.push(monster);
-    
-    // Skip generating available actions for now
-    // We'll let the game engine handle this when needed
-    
+    //add the hero to a room
+    rooms[0].characters.push(hero);
+    rooms[1].characters.push(monster);
     return gameState;
 }

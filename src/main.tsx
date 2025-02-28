@@ -1,17 +1,55 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import GameInterface from './react_ui/GameInterface'
-import { createTestStateWithSeparateCharacters } from './testing/stateGenerators'
-import { executeActionFromUI, moveCharacterToRoom } from './game_engine/gameEngine'
-import { UIAction } from './react_ui/uiTypes'
+import { createTestStateWithCharactersInRoom } from './testing/stateGenerators'
+import { executeActionFromUI, addCharacterToRoom } from './game_engine/gameEngine'
+import { characterToUICard, UIAction } from './react_ui/uiTypes'
 import { LoadingProvider, useLoading } from './react_ui/LoadingContext'
 import './index.css'
+import { Character } from './types/actor';
+import { MiniCard } from './react_ui/components/Card';
+interface CharacterSelectionProps {
+  characters: Record<string, Character>;
+  selectedId: string | null;
+  onSelect: (id: string) => void;
+  label: string;
+}
+
+const CharacterSelection: React.FC<CharacterSelectionProps> = ({ 
+  characters, 
+  selectedId, 
+  onSelect, 
+  label 
+}) => (
+  <div className="mb-6 w-full max-w-md">
+    <h3 className="text-xl font-semibold mb-3 text-white">{label}</h3>
+    <div className="flex flex-wrap gap-2">
+      {Object.values(characters).map(character => (
+        <div 
+          key={character.id}
+          onClick={() => onSelect(character.id)}
+          className={`cursor-pointer transition-all ${selectedId === character.id ? 'ring-2 ring-white' : ''}`}
+          style={{ width: '100px' }}
+        >
+          <MiniCard 
+            data={characterToUICard(character, character.type as 'hero' | 'monster')} 
+          />
+        </div>
+      ))}
+    </div>
+  </div>
+);
 
 const GameApp = () => {
   // Initialize test game state with a hero in one room and a monster in another
   const [gameState, setGameState] = React.useState(() => {
-    return createTestStateWithSeparateCharacters();
+    return createTestStateWithCharactersInRoom();
   });
+  
+// State declarations should be:
+  const [selectedHero, setSelectedHero] = React.useState<string | null>(null);
+  const [selectedMonster, setSelectedMonster] = React.useState<string | null>(null);
+  const [combatStarted, setCombatStarted] = React.useState(false);
 
   const handleToggleNarration = React.useCallback(() => {
     setGameState(prevState => ({
@@ -23,42 +61,54 @@ const GameApp = () => {
     }));
   }, []);
 
-  const [combatStarted, setCombatStarted] = React.useState(false);
-
+  // move the selected characters to the room by calling the gamestate.ts functions to move characters
   const initializeCombatState = React.useCallback(async () => {
     try {
-      // Get the hero and a room with the hero
-      const hero = Object.values(gameState.characters).find(char => char.type === 'hero');
-      const heroRoom = Object.values(gameState.dungeon.rooms).find(room => 
-        room.characters.some(char => char.id === hero?.id)
-      );
+      console.log("Selected hero ID:", selectedHero);
+      console.log("Selected monster ID:", selectedMonster);
       
-      if (!hero || !heroRoom) {
-        console.error('Hero or hero room not found');
+      // Find the hero by ID from any room
+      let hero;
+      let heroRoom;
+      
+      // Search through all rooms to find the hero
+      for (const roomId in gameState.dungeon.rooms) {
+        const room = gameState.dungeon.rooms[roomId];
+        const foundHero = room.characters.find(char => char.id === selectedHero);
+        if (foundHero) {
+          hero = foundHero;
+          heroRoom = room;
+          break;
+        }
+      }
+      
+      if (!hero) {
+        console.error("Hero not found with ID:", selectedHero);
         return;
       }
       
-      // Find a monster and its room
-      const monster = Object.values(gameState.characters).find(char => char.type === 'monster');
-      const monsterRoom = Object.values(gameState.dungeon.rooms).find(room => 
-        room.id !== heroRoom.id && room.characters.some(char => char.id === monster?.id)
-      );
-      
-      if (!monster || !monsterRoom) {
-        console.error('Monster or monster room not found');
+      // Get the monster from the monsters object
+      const monster = gameState.monsters[selectedMonster];
+      if (!monster) {
+        console.error("Monster not found with ID:", selectedMonster);
         return;
       }
+      
+      console.log("Found hero:", hero);
+      console.log("Found monster:", monster);
+      console.log("Hero room:", heroRoom);
       
       // Move the monster to the hero's room to trigger combat
-      const newState = { ...gameState };
-      await moveCharacterToRoom(newState, monster, heroRoom);
+      let newState = { ...gameState };
+      console.log("Moving monster to hero's room", monster, heroRoom);
+      newState = await addCharacterToRoom(newState, monster, heroRoom);
       
       setGameState(newState);
       setCombatStarted(true);
     } catch (error) {
       console.error('Error initializing combat:', error);
     }
-  }, [gameState]);
+  }, [gameState, selectedHero, selectedMonster]);
 
   const { setIsLoading } = useLoading();
 
@@ -68,6 +118,13 @@ const GameApp = () => {
       const result = await executeActionFromUI(gameState, action);
       if (result.success) {
         setGameState(result.newState);
+        
+        // If combat has ended, reset UI state
+        if (!result.newState.activeCombat) {
+          setCombatStarted(false);
+          setSelectedMonster(null);
+          // Keep selectedHero so the player can use the same hero for the next battle
+        }
       } else {
         console.error(result.message);
       }
@@ -79,14 +136,46 @@ const GameApp = () => {
   };
 
   return (
-    <GameInterface 
-      gameState={gameState}
-      onAction={handleAction}
-      onNavigate={(view) => console.log('Navigate to:', view)}
-      onToggleNarration={handleToggleNarration}
-      onStartCombat={initializeCombatState}
-      combatStarted={combatStarted}
-    />
+    <>
+      {!combatStarted ? (
+        <div className="flex flex-col items-center justify-center min-h-screen bg-slate-900 p-6">
+          <div className="bg-slate-800 p-8 rounded-lg shadow-lg max-w-lg w-full">
+            <h2 className="text-2xl font-bold mb-6 text-center text-white">Combat Setup</h2>
+            <CharacterSelection 
+              characters={gameState.monsters} 
+              selectedId={selectedMonster} 
+              onSelect={setSelectedMonster}
+              label="Select Monster" 
+            />
+            <CharacterSelection 
+              characters={gameState.heroes} 
+              selectedId={selectedHero} 
+              onSelect={setSelectedHero}
+              label="Select Hero" 
+            />
+            <button 
+              onClick={initializeCombatState}
+              disabled={!selectedHero || !selectedMonster}
+              className={`w-full mt-6 px-6 py-3 rounded-lg text-lg font-semibold
+                ${!selectedHero || !selectedMonster
+                  ? 'bg-slate-600 text-slate-400 cursor-not-allowed'
+                  : 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800'}`}
+            >
+              Begin Combat
+            </button>
+          </div>
+        </div>
+      ) : (
+        <GameInterface 
+          gameState={gameState}
+          onAction={handleAction}
+          onNavigate={(view) => console.log('Navigate to:', view)}
+          onToggleNarration={handleToggleNarration}
+          onStartCombat={initializeCombatState}
+          combatStarted={combatStarted}
+        />
+      )}
+    </>
   );
 };
 

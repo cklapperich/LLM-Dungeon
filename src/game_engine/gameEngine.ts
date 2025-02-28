@@ -65,10 +65,40 @@ export async function populateGameLog(event: GameEvent, gameState: GameState): P
 }
 
 /**
+ * Adds a monster to a specific room and checks if combat should start
+ * @param gameState The current game state
+ * @param monster The monster to add
+ * @param room The destination room
+ * @returns The updated game state
+ */
+export async function addCharacterToRoom(
+    gameState: GameState,
+    character: Character,
+    room: Room
+): Promise<GameState> {
+    // Add monster to room
+    room.characters.push(character);
+    
+    // Create event for game log
+    const characterAddedEvent: MonsterAddedEvent = {
+        type: 'MONSTER_ADDED',
+        monster: character,
+        room
+    };
+    
+    await populateGameLog(characterAddedEvent, gameState);
+    
+    // Check if combat should start
+    await checkAndInitializeCombat(gameState, room);
+    
+    return gameState;
+}
+
+/**
  * Moves a character to a specific room and checks if combat should start
  * @param gameState The current game state
- * @param characterId The ID of the character to move
- * @param roomId The ID of the destination room
+ * @param character The character to move
+ * @param room The destination room
  * @returns The updated game state
  */
 export async function moveCharacterToRoom(
@@ -83,13 +113,7 @@ export async function moveCharacterToRoom(
         r.characters = r.characters.filter(char => char.id !== character.id);
     });
     
-    // Add character to new room
-    room.characters.push(character);
-    
-    // Check if combat should start
-    await checkAndInitializeCombat(gameState, room);
-    
-    return gameState;
+    return addCharacterToRoom(gameState, character, room);
 }
 
 /**
@@ -136,7 +160,8 @@ export async function endCombat(
     }
     
     // Handle combat end consequences based on reason
-    if ((reason === CombatEndReason.DEATH || CombatEndReason.BREEDING || CombatEndReason.SURRENDER || CombatEndReason.ESCAPE) && winner) {
+    console.log("COMBAT ENDED:", reason, winner);
+    if ((reason == CombatEndReason.DEATH || reason == CombatEndReason.BREEDING || reason == CombatEndReason.SURRENDER || reason == CombatEndReason.ESCAPE) && winner) {
         // Remove the defeated character from the room
         const room = gameState.activeCombat.room;
         const loser = gameState.activeCombat.characters.find(c => c.id !== winner.id);
@@ -189,9 +214,7 @@ export function generateAvailableActions(gameState: GameState): GameAction[] {
     // "ADD MONSTER TO ROOM" LOGIC IS HERE
 
     // Get all monsters that can be placed
-    const availableMonsters = gameState.characters ? 
-        Object.values(gameState.characters).filter(char => char.type === CharacterType.MONSTER) : 
-        [];
+    const availableMonsters = Object.values(gameState.monsters)
     
     // Get all empty rooms
     const emptyRooms = Object.values(gameState.dungeon.rooms)
@@ -300,7 +323,7 @@ export async function processHeroesPhase(gameState: GameState): Promise<GameStat
   
   // Process one hero's movement
   const heroIdToMove = gameState.currentWave.heroesToMove[0];
-  const hero = gameState.characters[heroIdToMove];
+  const hero = gameState.heroes[heroIdToMove];
   
   // Remove hero from the list and attempt to move
   gameState.currentWave.heroesToMove = gameState.currentWave.heroesToMove.filter(id => id !== heroIdToMove);
@@ -398,7 +421,7 @@ export async function executeActionFromUI(gameState: GameState, action: UIAction
                 const { monsterId, roomId } = gameAction;
                 
                 // Get monster and room
-                const monster = gameState.characters[monsterId];
+                const monster = gameState.monsters[monsterId];
                 const room = gameState.dungeon.rooms[roomId];
                 
                 if (!monster || !room) {

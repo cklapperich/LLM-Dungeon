@@ -9,10 +9,10 @@
  * narrative voice consistent.
  */
 
-import skillDescriptions from '../../../public/data/descriptions/skillchecks.json';
-import status from '../../../public/data/descriptions/status.json';
-import attributes from '../../../public/data/descriptions/attributes.json';
-import clothing from '../../../public/data/descriptions/clothing.json';
+import skillDescriptions from '@assets/descriptions/skillchecks.json';
+import status from '@assets/descriptions/status.json';
+import attributes from '@assets/descriptions/attributes.json';
+import clothing from '@assets/descriptions/clothing.json';
 import { IntensityType, IntensityTypes } from '../../types/constants';
 import { RollResult, SkillNames } from '../../types/skilltypes';
 

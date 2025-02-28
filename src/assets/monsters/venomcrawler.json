@@ -1,0 +1,64 @@
+{
+    "name": "Venom Crawler",
+    "type": "monster",
+    "artworkUrl": "/data/images/venom_crawler.png",
+    "might": 8,
+    "grace": 12,
+    "wit": 9,
+    "will": 7,
+    "skills": {
+        "Stealth": 4,
+        "Initiative": 3
+    },
+    "description": "A small, fast-moving spider with vibrant markings that indicate its potent venom. Though not powerful enough to take down a heroine alone, its stealthy approach and arousal-inducing venom makes it adapted to weaken targets for larger predators.",
+    "size": 1,
+    "vitality": 2,
+    "traits": [
+        {
+            "name": "Arousal Venom",
+            "description": "The Venom Crawler shoots a needle of specialized venom that causes physical arousal.",
+            "rarity": "common",
+            "skill": "Light Weapons",
+            "defenseOptions": ["Dodge"],
+            "modifier": 2,
+            "priority": false,
+            "effects": [
+                {
+                    "type": "STATUS",
+                    "params": {
+                        "type": "heat",
+                        "stacks": 1
+                    },
+                    "target": "other"
+                },
+                {
+                    "type": "STATUS",
+                    "params": {
+                        "type": "cooldown",
+                        "duration": 1,
+                        "abilityName": "Arousal Venom"
+                    },
+                    "target": "self"
+                }
+            ]
+        },
+        {
+            "name": "Quick Bite",
+            "description": "The Venom Crawler strikes with impressive speed, leaving its victim little time to react.",
+            "rarity": "common",
+            "skill": "Light Weapons",
+            "defenseOptions": ["Dodge"],
+            "modifier": 0,
+            "priority": true,
+            "effects": [
+                {
+                    "type": "WOUND",
+                    "params": {
+                        "value": 1
+                    },
+                    "target": "other"
+                }
+            ]
+        }
+    ]
+}

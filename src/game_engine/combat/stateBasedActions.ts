@@ -1,6 +1,5 @@
 import { CombatState } from '../../types/combatState';
-import { GameState} from '../../types/gamestate';
-import { updateStatusDurations, applyEndCombat } from './modifyCombatState';
+import { removeStatusesWithZeroStacks, updateStatusDurations, applyEndCombat } from './modifyCombatState';
 import { CombatEndReason } from '../../types/constants';
 import { StatusName } from '../../types/status';
 import { getStatus } from '../statusEffects';
@@ -63,7 +62,7 @@ export function processBetweenRounds(state: CombatState): CombatState {
     // Process status effects and round-based effects
     for (const char of characters) {
         updateStatusDurations(state, char);
+        removeStatusesWithZeroStacks(state, char);
     }
-
     return state;
 }

@@ -91,15 +91,14 @@ export const CombatRoom: React.FC<CombatRoomProps> = ({
                         <>
                             {/* Combat View */}
                             <CombatArea 
-                                combatState={gameState.activeCombat} 
-                                allCharacters={gameState.characters}
+                                combatState={gameState.activeCombat}
                                 debugEnabled={debugEnabled}
                             />
 
                             {/* Right Side Panel */}
                             <ActionPanel 
                                 combatState={gameState.activeCombat ?? undefined}
-                                allCharacters={gameState.characters}
+                                allCharacters={{...gameState.heroes, ...gameState.monsters}}
                                 onAction={handleAction}
                             />
                         </>

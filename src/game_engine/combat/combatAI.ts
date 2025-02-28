@@ -2,16 +2,17 @@ import { CombatState } from '../../types/combatState';
 import { Trait } from '../../types/abilities';
 import { Character, getCombinedModifiers, getAttributeValue, getSkillModifier } from '../../types/actor';
 import { getAvailableActions } from './getAvailableActions';
-import { system_actions } from './default_abilities';
+import { system_actions, default_hero_abilities} from './default_abilities';
 import { EffectType } from '../../types/constants';
-import { getSkillAttribute } from '../utils/dataLoader';
+import { getSkillAttribute } from '../../types/skilltypes';
 
 // Get an action for the AI to take, prioritizing escape if grappled
 export function getAIAction(actor: Character, state: CombatState): Trait {
     // Get all available actions and filter out disabled ones first
     const { actions, reasons } = getAvailableActions(actor, state);
     const availableActions = actions.filter(action => !(action.name in reasons));
-    
+    const {breakFree, slipFree} = default_hero_abilities
+
     // Check if grappled
     const isGrappled = actor.statuses?.some(s => s.name === 'grappled');
     
@@ -30,8 +31,8 @@ export function getAIAction(actor: Character, state: CombatState): Trait {
         }
         
         // If no break free traits, check system actions
-        const breakFree = availableActions.find(action => action.name === system_actions.breakFree.name);
-        const slipFree = availableActions.find(action => action.name === system_actions.slipFree.name);
+        const breakFree = availableActions.find(action => action.name === breakFree.name);
+        const slipFree = availableActions.find(action => action.name === slipFree.name);
         
         if (breakFree || slipFree) {
             const modifiers = getCombinedModifiers(actor.statuses);

@@ -1,6 +1,6 @@
 import { Attribute, SkillName } from './skilltypes.js';
 import { Trait } from './abilities.js';
-import { abilities } from '../game_engine/combat/default_abilities.ts';
+import { default_monster_abilities, default_hero_abilities, system_actions } from '../game_engine/combat/default_abilities.ts';
 import { copyTrait } from './abilities.js';
 import { MonsterSize, CharacterType, CharacterTypeValue, BodyPart, BodyPartType } from './constants.js';
 import { Status, ModifierResult } from './status.js';
@@ -140,13 +140,13 @@ export function saveCharacter(character: Character): string {
  */
 export function loadCharacter(json: string): Character {
     const data = JSON.parse(json);
-    
+    const default_abilities = { ...default_monster_abilities, ...default_hero_abilities };
     // Convert string traits to actual Trait instances
     if (data.traits) {
         data.traits = data.traits.map((trait: string | Trait) => {
             if (typeof trait === 'string') {
                 // Look up trait in default abilities and create a copy
-                const defaultTrait = (abilities as Record<string, Trait>)[trait];
+                const defaultTrait = (default_abilities as Record<string, Trait>)[trait];
                 if (!defaultTrait) {
                     throw new Error(`Unknown trait: ${trait}`);
                 }

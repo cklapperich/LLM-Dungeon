@@ -4,7 +4,7 @@ import { LLMLogFormatters } from '../llmLogFormatters';
 import { SpiceLevel, Length, PromptsData, SpiceLevels, Lengths } from '../../types/prompts';
 
 // Import JSON data
-import promptsData from '../../../public/data/prompts.json';
+import promptsData from '@assets/descriptions/prompts.json';
 import { StatusEvent } from '../../events/eventTypes';
 import { StatusName } from '../../types/status';
 

@@ -1,6 +1,5 @@
-import { RollResult, SKILL_CONSTANTS, OpposedCheckResult, SkillName, Skills, SkillNames} from '../../types/skilltypes.ts';
-import { marginModifiers, getSkillAttribute } from './dataLoader.ts';
-import { Character, getAttributeValue, getSkillModifier, getAttributeBonus, getSkillBonus } from '../../types/actor.ts';
+import { RollResult, SKILL_CONSTANTS, OpposedCheckResult, SkillName, Skills, SkillNames, getSkillAttribute} from '../../types/skilltypes.ts';
+import { Character, getAttributeBonus, getSkillBonus } from '../../types/actor.ts';
 import { IntensityType, IntensityTypes } from '../../types/constants';
 import { getStatusModifiers } from '../statusEffects';
 interface InitiativeResult {
@@ -9,6 +8,14 @@ interface InitiativeResult {
     margin: number;
     description: string;
 }
+
+interface MarginModifiers {
+    skills: Record<string, Record<string, string[]>>;
+    generic: Record<string, string[]>;
+}
+
+import skillChecksJson from '@assets/descriptions/skillchecks.json';
+export const marginModifiers: MarginModifiers = skillChecksJson;
 
 export function processInitiative(char1: Character, char2: Character, gameState: any = {}): InitiativeResult {
     // Make initiative checks for both characters

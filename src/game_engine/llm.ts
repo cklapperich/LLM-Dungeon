@@ -1,4 +1,4 @@
-import promptsData from '../../public/data/prompts.json';
+import promptsData from '@assets/descriptions/prompts.json';
 
 export type TaskType = 'narrate';
 const PROMPTS = promptsData.prompts;

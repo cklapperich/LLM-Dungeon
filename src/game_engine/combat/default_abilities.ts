@@ -44,42 +44,40 @@ export const grab = createTrait('Grab', {
         },
         target: 'self',
         applyOnSkillCheckFailure: true
-      }
-    ]
+      }    ]
 });
 
 // Hero-only actions
-export const hero_actions = { 
-  breakFree: createTrait('Break Free', {
-    description: 'Attempt to break free using might, freeing all limbs bound during this grapple',
-    rarity: RarityType.COMMON,
-    skill: Skills.BREAK_FREE_MIGHT,
-    defenseOptions: [Skills.GRAPPLE_MIGHT, Skills.GRAPPLE_GRACE],
-    effects: [
-      {
-        type: EffectType.BREAK_FREE,
-        params: { type: 'full' },
-        target: 'self'
-      }
-    ]
-  }),
-  slipFree: createTrait('Slip Free', {
-    description: 'Attempt to slip free using grace, freeing all limbs bound during this grapple',
-    rarity: RarityType.COMMON,
-    skill: Skills.SLIP_FREE_GRACE,
-    defenseOptions: [Skills.GRAPPLE_MIGHT, Skills.GRAPPLE_GRACE],
-    effects: [
-      {
-        type: EffectType.BREAK_FREE,
-        params: { type: 'full' },
-        target: 'self'
-      }
-    ]
-  })
-} as const;
+const breakFree = createTrait('Break Free', {
+  description: 'Attempt to break free using might, freeing all limbs bound during this grapple',
+  rarity: RarityType.COMMON,
+  skill: Skills.BREAK_FREE_MIGHT,
+  defenseOptions: [Skills.GRAPPLE_MIGHT, Skills.GRAPPLE_GRACE],
+  effects: [
+    {
+      type: EffectType.BREAK_FREE,
+      params: { type: 'full' },
+      target: 'self'
+    }
+  ]
+});
+
+const slipFree = createTrait('Slip Free', {
+  description: 'Attempt to slip free using grace, freeing all limbs bound during this grapple',
+  rarity: RarityType.COMMON,
+  skill: Skills.SLIP_FREE_GRACE,
+  defenseOptions: [Skills.GRAPPLE_MIGHT, Skills.GRAPPLE_GRACE],
+  effects: [
+    {
+      type: EffectType.BREAK_FREE,
+      params: { type: 'full' },
+      target: 'self'
+    }
+  ]
+});
 
 // System actions
-export const pass = createTrait('Pass', {
+const pass = createTrait('Pass', {
     description: 'End your turn without taking any action',
     skill: Skills.NONE,
     defenseOptions: [],
@@ -107,7 +105,6 @@ export const exitCombat = createTrait('Exit Combat', {
     ]
 });
 
-export const system_actions = { pass, exitCombat } as const;
 
 export const penetrate = createTrait('Penetrate', {
   description: 'The monster penetrates an orifice with a tongue, phallus, or other appendage.',
@@ -164,9 +161,13 @@ export const shred = createTrait('Shred', {
   ]
 });
 
-export const abilities = {
+export const default_monster_abilities = {
     slam,
     grab,
     penetrate,
     shred
 } as const;
+
+export const system_actions = { pass, exitCombat } as const;
+
+export const default_hero_abilities = {breakFree, slipFree}

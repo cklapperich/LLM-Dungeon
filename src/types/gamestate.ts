@@ -88,9 +88,6 @@ export interface GameState {
     infamy: number;
     dailyPacksRemaining: number;
     
-    // Active characters in game
-    characters: Record<string, Character>;
-    
     // Combat state (only one active at a time)
     activeCombat?: CombatState | null;
 
@@ -106,6 +103,10 @@ export interface GameState {
 
 // Helper function to create a minimal GameState for testing
 export function createTestGameState(overrides: Partial<GameState> = {}): GameState {
+    // Initialize with empty objects for heroes and monsters
+    const heroes = overrides.heroes || {};
+    const monsters = overrides.monsters || {};
+
     return {
         settings: { narrationEnabled: false },
         turnCounter: 0,
@@ -123,7 +124,8 @@ export function createTestGameState(overrides: Partial<GameState> = {}): GameSta
         },
         infamy: 0,
         dailyPacksRemaining: 0,
-        characters: {},
+        heroes,
+        monsters,
         currentPhase: 'planning',
         ...overrides
     };
@@ -175,8 +177,9 @@ export interface GameState {
     infamy: number;
     dailyPacksRemaining: number;
     
-    // Active characters in game
-    characters: Record<string, Character>;
+    // Active characters in game, separated by type
+    heroes: Record<string, Character>;
+    monsters: Record<string, Character>;
     
     // Combat state (only one active at a time)
     activeCombat?: CombatState | null;

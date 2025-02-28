@@ -25,7 +25,6 @@ export function applyGrapple(
     if (!hasStatus(target.statuses, StatusName.GRAPPLED)) {
         const grappleStatus = createStatus(StatusName.GRAPPLED);
         target.statuses.push(grappleStatus);
-        target.flags[CombatFlags.GRAPPLED] = 1;
         
         // Create and emit status event
         const statusEvent: StatusEvent = {
@@ -42,7 +41,6 @@ export function applyGrapple(
         if (!hasStatus(target.statuses, StatusName.PENETRATED)) {
             const penetratedStatus = createStatus(StatusName.PENETRATED);
             target.statuses.push(penetratedStatus);
-            target.flags[CombatFlags.PENETRATED] = 1;
             
             // Create and emit status event for new penetrated status
             const statusEvent: StatusEvent = {
@@ -385,6 +383,10 @@ export async function applyEndCombat(
 ): Promise<GameActionResult> {
     // Mark combat as complete
     state.isComplete = true;
+    
+    // Set winner and reason on the combat state
+    state.winner = winner;
+    state.endReason = reason as CombatEndReasonType;
     
     // Emit combat end event
     const combatEndEvent: CombatEvent = {

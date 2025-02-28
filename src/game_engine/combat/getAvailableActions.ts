@@ -2,7 +2,7 @@ import { Character } from '../../types/actor';
 import { CombatState } from '../../types/combatState';
 import { Trait } from '../../types/abilities';
 import { TargetType, CharacterType, BodyPartType } from '../../types/constants';
-import { system_actions, hero_actions } from './default_abilities';
+import { system_actions, default_hero_abilities } from './default_abilities';
 import { StatusName } from '../../types/status';
 
 /**
@@ -171,7 +171,7 @@ export function getAvailableActions(actor: Character, state: CombatState): {
 
     // Add hero actions if character is a hero
     if (actor.type === CharacterType.HERO) {
-        Object.values(hero_actions).forEach(action => {
+        Object.values(default_hero_abilities).forEach(action => {
             actions.push(action);
         });
     }

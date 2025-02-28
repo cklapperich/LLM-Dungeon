@@ -53,53 +53,6 @@ interface DungeonJson {
     grid: number[][]; // Raw grid from JSON uses all numbers
 }
 
-// Get all characters in a specific room
-export function getCharactersInRoom(gameState: GameState, roomId: string): Character[] {
-    const room = gameState.dungeon.rooms[roomId];
-    if (!room) {
-        throw new Error(`Room ${roomId} not found`);
-    }
-    return room.actorIds.map(id => {
-        const character = gameState.characters[id];
-        if (!character) {
-            throw new Error(`Character ${id} not found in game state`);
-        }
-        return character;
-    });
-}
-
-// Find which room a character is in
-export function findCharacterRoom(gameState: GameState, characterId: string): Room | null {
-    for (const room of Object.values(gameState.dungeon.rooms)) {
-        if (room.actorIds.includes(characterId)) {
-            return room;
-        }
-    }
-    return null;
-}
-
-// Move a character to a different room
-export function moveCharacterToRoom(gameState: GameState, characterId: string, targetRoomId: string): void {
-    // Remove from current room if in one
-    const currentRoom = findCharacterRoom(gameState, characterId);
-    if (currentRoom) {
-        currentRoom.actorIds = currentRoom.actorIds.filter(id => id !== characterId);
-    }
-
-    // Add to new room
-    const targetRoom = gameState.dungeon.rooms[targetRoomId];
-    if (!targetRoom) {
-        throw new Error(`Target room ${targetRoomId} not found`);
-    }
-    
-    // Verify character exists in game state
-    if (!gameState.characters[characterId]) {
-        throw new Error(`Character ${characterId} not found in game state`);
-    }
-
-    targetRoom.actorIds.push(characterId);
-}
-
 export function loadDungeonFromJson(json: string): DungeonLayout {
     const data = JSON.parse(json) as DungeonJson;
     const rooms: Record<string, Room> = {};
@@ -128,7 +81,7 @@ export function loadDungeonFromJson(json: string): DungeonLayout {
                 ...template,
                 id: uniqueRoomId,
                 templateId: template.templateId,
-                actorIds: [], // Initialize with empty array of actor ID
+                characters: [], // Initialize with empty array of actor ID
                 flags: {},
             };
             
