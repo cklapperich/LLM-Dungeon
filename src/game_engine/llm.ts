@@ -1,6 +1,4 @@
-import { Character } from '../types/actor.js';
-import { CombatState } from '../types/combatState.js';
-import promptsData from '../../data/prompts.json';
+import promptsData from '../../public/data/prompts.json';
 
 export type TaskType = 'narrate';
 const PROMPTS = promptsData.prompts;

@@ -1,6 +1,6 @@
 import { Attribute, SkillName, getSkillAttribute, Skills, SkillNames } from '../../types/skilltypes.ts';
 import { Character, loadCharacter } from '../../types/actor.ts';
-import skillChecksJson from '../../../data/descriptions/skillchecks.json';
+import skillChecksJson from '../../../public/data/descriptions/skillchecks.json';
 
 interface MarginModifiers {
     skills: Record<string, Record<string, string[]>>;

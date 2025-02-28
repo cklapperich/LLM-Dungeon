@@ -1,12 +1,10 @@
 import { GameState } from '../types/gamestate.js';
 import { Character } from '../types/actor.js';
-import claraJson from '../../data/monsters/clara.json';
-import greenSlimeJson from '../../data/monsters/green_slime.json';
-import profanedTempleJson from '../../data/dungeons/profaned_temple.json';
+import claraJson from '../../public/data/monsters/clara.json';
+import greenSlimeJson from '../../public/data/monsters/green_slime.json';
+import profanedTempleJson from '../../public/data/dungeons/profaned_temple.json';
 import { loadMonster } from '../game_engine/utils/dataLoader.js';
 import { loadDungeonFromJson } from '../game_engine/utils/dungeonUtils.js';
-import { generateAvailableActions } from '../game_engine/gameEngine.js';
-
 /**
  * Creates default test characters (Clara and Green Slime)
  */
@@ -35,6 +33,8 @@ export function createTestGameState(overrides: Partial<GameState> = {}): GameSta
         characters: {},
         currentPhase: 'planning',
         activeCombat: null,
+        waveCounter: 0,
+        waveHistory: [],
         ...overrides
     };
 }
