@@ -1,7 +1,7 @@
 {
     "name": "Green Slime",
     "type": "monster",
-    "artworkUrl": "/public/data/images/slime1.png",
+    "artworkUrl": "/data/images/slime1.png",
     "might": 16,
     "grace": 16,
     "wit": 16,
