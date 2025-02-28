@@ -1,13 +1,35 @@
-// core game engine
+/**
+ * The Game Engine is responsible for managing the overall game state and flow.
+ * 
+ * Key Responsibilities:
+ * - Managing the game state including rooms, characters, and game phases
+ * - Handling transitions between game phases (planning, combat, etc.)
+ * - Managing character movement between rooms
+ * - Generating available actions based on game state
+ * - Converting game actions to UI actions
+ * - Logging game events
+ * - Initializing and terminating combat at the game state level
+ * 
+ * The Game Engine works in conjunction with the Combat System but maintains a clear separation:
+ * - Combat System handles combat-specific rules and state
+ * - Game Engine manages the broader game state and consequences of combat
+ * 
+ * When combat ends, the Game Engine is responsible for:
+ * - Updating the game state based on combat results
+ * - Removing defeated characters from rooms
+ * - Transitioning to the appropriate game phase
+ * - Updating available actions
+ */
 
 import { GameState, GameRoundLog, GameAction, AddMonsterToRoomAction, CombatGameAction } from '../types/gamestate';
-import { Trait } from '../types/abilities';
 import { createNewCombat, executeCombatRound } from './combat/combatEngine';
 import { UIAction, UIActionResult, UIActionType } from '../react_ui/uiTypes';
-import { GameEvent, CombatPhaseChangedEvent, CombatStartEndEvent, MonsterAddedEvent } from '../events/eventTypes';
+import { GameEvent, CombatStartEndEvent, MonsterAddedEvent } from '../events/eventTypes';
 import { CharacterType, CombatEndReason, CombatEndReasonType, MonsterSize } from '../types/constants';
 import { Character } from '../types/actor';
 import { Room } from '../types/dungeon';
+import { attemptHeroMove} from './dungeonai';
+import { WaveCompletionReason } from '../types/gamestate';
 /**
  * Populates the game log with event information
  * @param event The game event to log
@@ -54,9 +76,7 @@ export async function moveCharacterToRoom(
     character: Character, 
     room: Room
 ): Promise<GameState> {
-    // Get character and room
-    // TODO: logic to end combat on a room end or throw an error if active combat in this room, if necessary.
-    // could check combatstate's room to see if it matches the room we're trying to move to
+    // this is already pre-guaranteed to be a legal move no need to do checks here - mostly.
 
     // Remove character from current room
     Object.values(gameState.dungeon.rooms).forEach(r => {
@@ -115,6 +135,16 @@ export async function endCombat(
         return;
     }
     
+    // Handle combat end consequences based on reason
+    if ((reason === CombatEndReason.DEATH || CombatEndReason.BREEDING || CombatEndReason.SURRENDER || CombatEndReason.ESCAPE) && winner) {
+        // Remove the defeated character from the room
+        const room = gameState.activeCombat.room;
+        const loser = gameState.activeCombat.characters.find(c => c.id !== winner.id);
+        if (loser) {
+            room.characters = room.characters.filter(c => c.id !== loser.id);
+        }
+    }
+    
     // Create combat end event
     const endEvent: CombatStartEndEvent = {
         type: 'COMBAT_STATE_CHANGE',
@@ -155,6 +185,9 @@ export function generateAvailableActions(gameState: GameState): GameAction[] {
         return actions;
     }
     
+
+    // "ADD MONSTER TO ROOM" LOGIC IS HERE
+
     // Get all monsters that can be placed
     const availableMonsters = gameState.characters ? 
         Object.values(gameState.characters).filter(char => char.type === CharacterType.MONSTER) : 
@@ -241,6 +274,90 @@ export function getUIActionsFromGameState(gameState: GameState): UIAction[] {
     return gameState.gameActions.map(action => convertGameActionToUIAction(action));
 }
 
+export async function initialize_wave(gameState:GameState){
+    if (!gameState.currentWave) {
+        // Get all heroes that are actually in rooms
+        const heroesInDungeon = findAllHeroesInDungeon(gameState);
+        
+        gameState.currentWave = {
+          waveNumber: gameState.waveCounter || 1,
+          heroesToMove: heroesInDungeon.map(hero => hero.id),
+          isComplete: false,
+          heroesDefeated: [],
+          combatsInitiated: 0
+        };
+        
+        // Increment wave counter for next wave
+        gameState.waveCounter = (gameState.waveCounter || 0) + 1;
+      }
+}
+export async function processHeroesPhase(gameState: GameState): Promise<GameState> {
+  // If no heroes left to move, end the wave
+  if (gameState.currentWave.heroesToMove.length === 0) {
+    completeWave(gameState, WaveCompletionReason.ALL_HEROES_MOVED);
+    return gameState;
+  }
+  
+  // Process one hero's movement
+  const heroIdToMove = gameState.currentWave.heroesToMove[0];
+  const hero = gameState.characters[heroIdToMove];
+  
+  // Remove hero from the list and attempt to move
+  gameState.currentWave.heroesToMove = gameState.currentWave.heroesToMove.filter(id => id !== heroIdToMove);
+  await attemptHeroMove(gameState, hero);
+  
+  // If combat started, return immediately
+  if (gameState.activeCombat) {
+    gameState.currentWave.combatsInitiated++;
+    return gameState;
+  }
+  
+  // If all heroes are defeated, end the wave
+  if (findAllHeroesInDungeon(gameState).length === 0) {
+    completeWave(gameState, WaveCompletionReason.ALL_HEROES_DEFEATED);
+    return gameState;
+  }
+  
+  return gameState;
+}
+
+// Helper function to complete a wave
+function completeWave(gameState: GameState, reason: WaveCompletionReason): void {
+  if (gameState.currentWave) {
+    gameState.currentWave.isComplete = true;
+    gameState.currentWave.completionReason = reason;
+    
+    // Store wave history
+    if (!gameState.waveHistory) gameState.waveHistory = [];
+    gameState.waveHistory.push(gameState.currentWave);
+    
+    // Clear current wave
+    delete gameState.currentWave;
+  }
+  
+  // Return to planning phase
+  gameState.currentPhase = 'planning';
+  gameState.gameActions = generateAvailableActions(gameState);
+}
+
+// Helper function to find all heroes in the dungeon
+function findAllHeroesInDungeon(gameState: GameState): Character[] {
+  const heroesInDungeon: Character[] = [];
+  
+  // Look through all rooms
+  for (const room of Object.values(gameState.dungeon.rooms)) {
+    // Find heroes in this room
+    const heroesInRoom = room.characters.filter(
+      char => char.type === CharacterType.HERO
+    );
+    
+    // Add to our list
+    heroesInDungeon.push(...heroesInRoom);
+  }
+  
+  return heroesInDungeon;
+}
+
 export async function executeActionFromUI(gameState: GameState, action: UIAction): Promise<UIActionResult> {
     let success = false;
     let message = '';
@@ -310,11 +427,20 @@ export async function executeActionFromUI(gameState: GameState, action: UIAction
                 
                 await populateGameLog(monsterAddedEvent, gameState);
                 
-                // Update available actions
-                gameState.gameActions = generateAvailableActions(gameState);
-                
-                success = true;
-                message = `${monster.name} added to ${room.name}`;
+            // Update available actions
+            gameState.gameActions = generateAvailableActions(gameState);
+            
+            // If action was successful and we're in planning phase, trigger hero movement
+            if (success && gameState.currentPhase === 'planning' && !gameState.activeCombat) {
+              // Change phase to hero movement
+              gameState.currentPhase = 'event'; // Using 'event' phase for hero movement
+              
+              // Process hero movement
+              gameState = await processHeroesPhase(gameState);
+            }
+            
+            success = true;
+            message = `${monster.name} added to ${room.name}`;
             } else {
                 throw new Error(`Unknown action type: ${action.gameAction.type}`);
             }

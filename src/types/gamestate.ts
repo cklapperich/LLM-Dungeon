@@ -110,6 +110,7 @@ export function createTestGameState(overrides: Partial<GameState> = {}): GameSta
         settings: { narrationEnabled: false },
         turnCounter: 0,
         dayCounter: 0,
+        waveCounter: 0,
         dungeon: {
             grid: [],
             rooms: {},
@@ -128,7 +129,64 @@ export function createTestGameState(overrides: Partial<GameState> = {}): GameSta
     };
 }
 
+export enum WaveCompletionReason {
+  ALL_HEROES_MOVED = 'ALL_HEROES_MOVED',
+  ALL_HEROES_DEFEATED = 'ALL_HEROES_DEFEATED',
+  HEROES_REACHED_NURSERY = 'HEROES_REACHED_NURSERY'
+}
+
+export interface WaveData {
+    waveNumber: number;
+    heroesToMove: string[];  // IDs of heroes that still need to move this wave
+    isComplete: boolean;
+    completionReason?: WaveCompletionReason;
+    heroesDefeated: string[];  // IDs of heroes defeated during this wave
+    combatsInitiated: number;  // Number of combats that occurred during this wave
+}
+
 export interface GameSettings {
     narrationEnabled: boolean;
     // Add other settings as needed
+}
+
+export interface GameState {
+    settings: GameSettings;
+
+    // Time tracking
+    turnCounter: number;
+    dayCounter: number;
+    
+    // Wave tracking
+    waveCounter: number;
+    currentWave?: WaveData;
+    waveHistory?: WaveData[];
+    
+    // Dungeon state
+    dungeon: DungeonLayout;
+    
+    // Card System
+    deck: {
+        baseMonsters: Card[];
+        traits: Card[];
+        traps: Card[];
+    };
+    
+    // Resources & Progress
+    infamy: number;
+    dailyPacksRemaining: number;
+    
+    // Active characters in game
+    characters: Record<string, Character>;
+    
+    // Combat state (only one active at a time)
+    activeCombat?: CombatState | null;
+
+    // Game phase
+    currentPhase: GamePhase;
+    
+    // Game log for all events
+    gameLog?: GameRoundLog[];
+    
+    // Available game actions
+    gameActions?: GameAction[];
 }

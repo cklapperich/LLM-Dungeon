@@ -22,7 +22,7 @@ export interface Character {
     maxConviction: number;
     conviction: number;
     description: string;
-    flags: Record<string, number>;
+    flags: Record<string, string>;
     size?: MonsterSize; // Optional size field for monsters
     initiative?: number; // Track initiative in combat
     clothing: number; // Track clothing level (0-5)

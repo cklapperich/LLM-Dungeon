@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { createTestStateWithCharactersInRoom } from '../src/testing/stateGenerators.js';
 import { createNewCombat } from '../src/game_engine/combat/combatEngine.js';
 import { CharacterType } from '../src/types/constants.js';
+import { initialize_wave, processHeroesPhase } from '../src/game_engine/gameEngine.js';
 
 describe('Game Engine Tests', () => {
   // Setup and teardown for each test
@@ -69,5 +70,36 @@ describe('Game Engine Tests', () => {
     
     // Verify combat is not complete
     expect(combatState.isComplete).toBe(false);
+  });
+
+  it('should move a hero through adjacent rooms', async () => {
+    // Create test game state with a hero in the starting room
+    const gameState = createTestStateWithCharactersInRoom();
+    
+    // Get the hero character
+    const roomId = Object.keys(gameState.dungeon.rooms)[0];
+    const room = gameState.dungeon.rooms[roomId];
+    const hero = room.characters.find(c => c.type === CharacterType.HERO);
+    
+    // Verify initial state
+    expect(hero).toBeDefined();
+    expect(room.characters).toContain(hero);
+
+    // Initialize wave data
+    await initialize_wave(gameState);
+    
+    // Process hero movement
+    const newState = await processHeroesPhase(gameState);
+    
+    // Verify hero moved to a new room
+    const newRoom = Object.values(newState.dungeon.rooms).find(r => 
+      r.characters.includes(hero!)
+    );
+    
+    expect(newRoom).toBeDefined();
+    expect(newRoom).not.toBe(room);
+    
+    // Verify hero is no longer in the original room
+    expect(room.characters).not.toContain(hero);
   });
 });

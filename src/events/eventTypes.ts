@@ -120,9 +120,17 @@ export type CombatEvent =
     | CombatPhaseChangedEvent
     | InitiativeEvent;
 
+export interface HeroMovedEvent {
+  type: 'HERO_MOVED';
+  hero: Character;
+  fromRoom: Room;
+  toRoom: Room;
+}
+
 export type DungeonEvent = 
-    | MonsterAddedEvent
-    | CombatStartEndEvent;
+  | MonsterAddedEvent
+  | CombatStartEndEvent
+  | HeroMovedEvent;
     // Add more as needed
 
 // GameEvent is a union of all event types
