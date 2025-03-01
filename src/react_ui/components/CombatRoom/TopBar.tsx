@@ -1,5 +1,4 @@
 import React from 'react';
-import { LogType } from '../../uiTypes';
 
 interface TopBarProps {
     turnCounter?: number;
@@ -18,7 +17,6 @@ interface TopBarProps {
 export const TopBar: React.FC<TopBarProps> = ({ 
     turnCounter = 0,
     dayCounter = 0,
-    infamy = 0,
     narrationEnabled = false,
     onToggleNarration,
     debugEnabled = false,
@@ -55,9 +53,6 @@ export const TopBar: React.FC<TopBarProps> = ({
                             Debug: {debugEnabled ? 'On' : 'Off'}
                         </button>
                     )}
-                    <span className="px-3 py-1 bg-slate-800 rounded shadow-lg shadow-black/25 border-[3px] border-white/50">
-                        Infamy: {infamy}
-                    </span>
                 </div>
             </div>
         </div>

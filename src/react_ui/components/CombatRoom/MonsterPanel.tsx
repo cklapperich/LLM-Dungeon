@@ -19,9 +19,6 @@ const ActionButtons: React.FC<{
     
     return (
         <>
-            <h3 className="font-bold mb-2 text-white">
-                What will {monsterName} do?
-            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 overflow-y-auto pr-2 h-[calc(100%-2rem)]">
                 {actions.map((action, i) => {
                     // Convert CombatGameAction to UIAction

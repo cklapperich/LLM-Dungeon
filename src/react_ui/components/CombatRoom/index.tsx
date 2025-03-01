@@ -75,7 +75,6 @@ export const CombatRoom: React.FC<CombatRoomProps> = ({
                 <TopBar 
                     turnCounter={gameState.turnCounter}
                     dayCounter={gameState.dayCounter}
-                    infamy={gameState.infamy}
                     narrationEnabled={gameState.settings.narrationEnabled}
                     onToggleNarration={onToggleNarration}
                     debugEnabled={debugEnabled}
