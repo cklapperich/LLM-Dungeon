@@ -7,8 +7,6 @@ interface CardProps {
     data: UICharacterCard;
 }
 
-
-// Add type annotation here
 const imageFiles: Record<string, { default: string }> = import.meta.glob(
     '@/assets/images/**/*.{png,jpg,jpeg,webp,gif}', 
     { eager: true }

@@ -3,15 +3,16 @@ import { GameState } from '../types/gamestate';
 import { UIAction } from './uiTypes';
 import CombatRoom from './components/CombatRoom';
 import CharacterSelection from './components/CharacterSelection';
-import TopBar from './components/CombatRoom/TopBar';
+import Sidebar from './components/Sidebar';
+import SettingsMenu from './components/Settings';
 import { useLoading } from './LoadingContext';
 import { addCharacterToRoom } from '../game_engine/gameEngine';
+import { saveSettings } from '../game_engine/settings';
 
 interface GameInterfaceProps {
   gameState: GameState;
   onAction: (action: UIAction) => Promise<void>;
   onNavigate: (view: string) => void;
-  onToggleNarration?: () => void;
   onStartCombat?: () => Promise<void>;
   combatStarted?: boolean;
   onStateChange?: (newState: GameState) => void;
@@ -21,7 +22,6 @@ const GameInterface: React.FC<GameInterfaceProps> = ({
   gameState,
   onAction,
   onNavigate,
-  onToggleNarration,
   onStartCombat,
   combatStarted = false,
   onStateChange
@@ -105,63 +105,84 @@ const GameInterface: React.FC<GameInterfaceProps> = ({
     }
   }, [gameState.activeCombat, internalCombatStarted]);
 
-  // Handle toggle narration
-  const handleToggleNarration = React.useCallback(() => {
-    if (onToggleNarration) {
-      onToggleNarration();
-    }
-  }, [onToggleNarration]);
+  // Narration is now handled in the Settings component
 
-  // Conditional rendering based on combat state
-  if (!isCombatStarted) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-slate-900 p-6">
-        <TopBar 
-          narrationEnabled={gameState.settings.narrationEnabled}
-          onToggleNarration={handleToggleNarration}
-          turnCounter={0}
-          dayCounter={0}
-          infamy={0}
-        />
-        <div className="bg-slate-800 p-8 rounded-lg shadow-lg max-w-lg w-full mt-4">
-          <h2 className="text-2xl font-bold mb-6 text-center text-white">Combat Setup</h2>
-          <CharacterSelection 
-            characters={gameState.monsters} 
-            selectedId={selectedMonster} 
-            onSelect={setSelectedMonster}
-            label="Select Monster" 
-          />
-          <CharacterSelection 
-            characters={gameState.heroes} 
-            selectedId={selectedHero} 
-            onSelect={setSelectedHero}
-            label="Select Hero" 
-          />
-          <button 
-            onClick={initializeCombatState}
-            disabled={!selectedHero || !selectedMonster || isLoading}
-            className={`w-full mt-6 px-6 py-3 rounded-lg text-lg font-semibold
-              ${!selectedHero || !selectedMonster || isLoading
-                ? 'bg-slate-600 text-slate-400 cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800'}`}
-          >
-            {isLoading ? 'Initializing Combat...' : 'Begin Combat'}
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Combat view
+  // Render the main interface with global sidebar
   return (
-    <CombatRoom 
-      gameState={gameState}
-      onAction={onAction}
-      onNavigate={onNavigate}
-      onToggleNarration={handleToggleNarration}
-      onStartCombat={initializeCombatState}
-      combatStarted={isCombatStarted}
-    />
+    <div className="flex h-screen bg-slate-900">
+      {/* Global Sidebar */}
+      <Sidebar onNavigate={onNavigate} />
+      
+      <div className="flex-1 flex flex-col">
+        {/* Top bar with settings icon */}
+        <div className="bg-slate-800 text-white p-4 flex justify-between items-center shadow-lg shadow-black/25">
+          <div className="flex items-center gap-4">
+            <span>Turn {gameState.turnCounter} - Day {gameState.dayCounter}</span>
+            {gameState.activeCombat && (
+              <span className="px-3 py-1 bg-slate-700 rounded shadow-inner shadow-black/25 border border-white/30">
+                Current Encounter: {gameState.activeCombat.room.id} | Round {gameState.activeCombat.round || 1}
+              </span>
+            )}
+          </div>
+          
+          {/* Settings menu */}
+          <SettingsMenu 
+            settings={gameState.settings}
+            onSettingsChange={(newSettings) => {
+              // Update game state with new settings
+              if (onStateChange) {
+                onStateChange({
+                  ...gameState,
+                  settings: newSettings
+                });
+              }
+              
+              // Save settings to localStorage
+              saveSettings(newSettings);
+            }}
+          />
+        </div>
+        
+        {/* Main content area */}
+        {!isCombatStarted ? (
+          <div className="flex-1 flex flex-col items-center justify-center p-6">
+            <div className="bg-slate-800 p-8 rounded-lg shadow-lg max-w-lg w-full">
+              <h2 className="text-2xl font-bold mb-6 text-center text-white">Combat Setup</h2>
+              <CharacterSelection 
+                characters={gameState.monsters} 
+                selectedId={selectedMonster} 
+                onSelect={setSelectedMonster}
+                label="Select Monster" 
+              />
+              <CharacterSelection 
+                characters={gameState.heroes} 
+                selectedId={selectedHero} 
+                onSelect={setSelectedHero}
+                label="Select Hero" 
+              />
+              <button 
+                onClick={initializeCombatState}
+                disabled={!selectedHero || !selectedMonster || isLoading}
+                className={`w-full mt-6 px-6 py-3 rounded-lg text-lg font-semibold
+                  ${!selectedHero || !selectedMonster || isLoading
+                    ? 'bg-slate-600 text-slate-400 cursor-not-allowed'
+                    : 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800'}`}
+              >
+                {isLoading ? 'Initializing Combat...' : 'Begin Combat'}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <CombatRoom 
+            gameState={gameState}
+            onAction={onAction}
+            onNavigate={onNavigate}
+            onStartCombat={initializeCombatState}
+            combatStarted={isCombatStarted}
+          />
+        )}
+      </div>
+    </div>
   );
 };
 

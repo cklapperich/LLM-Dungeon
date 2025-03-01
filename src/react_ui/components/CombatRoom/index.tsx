@@ -2,7 +2,6 @@ import React from 'react';
 import { GameState as BackendGameState } from '../../../types/gamestate';
 import { UIAction } from '../../uiTypes';
 import { useLoading } from '../../LoadingContext';
-import Sidebar from './Sidebar';
 import TopBar from './TopBar';
 import CombatArea from './CombatArea';
 
@@ -10,7 +9,6 @@ interface CombatRoomProps {
     gameState: BackendGameState;
     onAction: (action: UIAction) => Promise<void>;
     onNavigate: (view: string) => void;
-    onToggleNarration?: () => void;
     onStartCombat?: () => Promise<void>;
     combatStarted?: boolean;
 }
@@ -43,7 +41,6 @@ export const CombatRoom: React.FC<CombatRoomProps> = ({
     gameState,
     onAction,
     onNavigate,
-    onToggleNarration,
     onStartCombat,
     combatStarted = false
 }) => {
@@ -65,55 +62,47 @@ export const CombatRoom: React.FC<CombatRoomProps> = ({
     };
 
     return (
-        <div className="h-screen flex bg-slate-900">
-            {/* Left Sidebar Navigation */}
-            <Sidebar onNavigate={onNavigate} />
+        <div className="flex-1 flex flex-col bg-slate-900">
+            {/* Top Bar */}
+            <TopBar 
+                turnCounter={gameState.turnCounter}
+                dayCounter={gameState.dayCounter}
+                debugEnabled={debugEnabled}
+                onToggleDebug={() => setDebugEnabled(!debugEnabled)}
+                encounterInfo={gameState.activeCombat ? {
+                    roomId: gameState.activeCombat.room.id,
+                    round: gameState.activeCombat.round
+                } : undefined}
+            />
 
-            {/* Main Content */}
-            <div className="flex-1 flex flex-col">
-                {/* Top Bar */}
-                <TopBar 
-                    turnCounter={gameState.turnCounter}
-                    dayCounter={gameState.dayCounter}
-                    narrationEnabled={gameState.settings.narrationEnabled}
-                    onToggleNarration={onToggleNarration}
-                    debugEnabled={debugEnabled}
-                    onToggleDebug={() => setDebugEnabled(!debugEnabled)}
-                    encounterInfo={gameState.activeCombat ? {
-                        roomId: gameState.activeCombat.room.id,
-                        round: gameState.activeCombat.round
-                    } : undefined}
-                />
-
-                {/* Main Game Area */}
-                <div className="flex-1 flex overflow-hidden">
-                    {combatStarted ? (
-                        /* Combat View with 3-column layout */
-                        <CombatArea 
-                            combatState={gameState.activeCombat}
-                            debugEnabled={debugEnabled}
-                            onAction={handleAction}
-                        />
-                    ) : (
-                        <PreCombatUI
-                            onStartCombat={async () => {
-                                if (!onStartCombat || isLoading) return;
-                                console.log('Starting combat, setting loading state to true');
-                                setIsLoading(true);
-                                try {
-                                    await onStartCombat();
-                                    console.log('Combat started, setting loading state to false');
-                                    setIsLoading(false);
-                                } catch (error) {
-                                    // If there's an error, we should set isLoading to false
-                                    console.error('Error starting combat:', error);
-                                    setIsLoading(false);
-                                }
-                            }}
-                            isLoading={isLoading}
-                        />
-                    )}
-                </div>
+            {/* Main Game Area */}
+            <div className="flex-1 flex overflow-hidden">
+                {combatStarted ? (
+                    /* Combat View with 3-column layout */
+                    <CombatArea 
+                        combatState={gameState.activeCombat}
+                        debugEnabled={debugEnabled}
+                        onAction={handleAction}
+                    />
+                ) : (
+                    <PreCombatUI
+                        onStartCombat={async () => {
+                            if (!onStartCombat || isLoading) return;
+                            console.log('Starting combat, setting loading state to true');
+                            setIsLoading(true);
+                            try {
+                                await onStartCombat();
+                                console.log('Combat started, setting loading state to false');
+                                setIsLoading(false);
+                            } catch (error) {
+                                // If there's an error, we should set isLoading to false
+                                console.error('Error starting combat:', error);
+                                setIsLoading(false);
+                            }
+                        }}
+                        isLoading={isLoading}
+                    />
+                )}
             </div>
         </div>
     );

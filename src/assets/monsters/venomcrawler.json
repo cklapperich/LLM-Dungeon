@@ -1,7 +1,7 @@
 {
     "name": "Venom Crawler",
     "type": "monster",
-    "artworkUrl": "/data/images/venom_crawler.png",
+    "artworkUrl": "/monsters/phasespider.png",
     "might": 8,
     "grace": 12,
     "wit": 9,

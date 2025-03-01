@@ -6,6 +6,7 @@ const heroFiles = import.meta.glob('@assets/heroes/*.json', { eager: true });
 import profanedTempleJson from '@assets/dungeons/profaned_temple.json';
 import { loadDungeonFromJson } from '../game_engine/utils/dungeonUtils.js';
 import { loadMonster } from '@/game_engine/utils/dataLoader.js';
+
 // Process these files to separate heroes and monsters
 export function loadAllCharacters() {
     const heroes: Record<string, Character> = {};
@@ -25,7 +26,13 @@ export function loadAllCharacters() {
       
     return { heroes, monsters };
   }
-  
+  export interface GameSettings {
+    narrationEnabled: boolean;
+    llm: string;
+    spicy_llm: string;
+    llm_choices: string[];
+}
+
 /**
  * Creates a test game state with default values
  */
@@ -34,13 +41,10 @@ export function createTestGameState(overrides: Partial<GameState> = {}): GameSta
     const dungeon = loadDungeonFromJson(JSON.stringify(profanedTempleJson));
 
     return {
-        settings: { narrationEnabled: false },
+        settings: {llm:null, llm_choices:[], narrationEnabled:false, spicy_llm:null},
         turnCounter: 0,
         dayCounter: 0,
         dungeon,
-        deck: { baseMonsters: [], traits: [], traps: [] },
-        infamy: 0,
-        dailyPacksRemaining: 0,
         heroes: heroes,
         monsters:monsters,
         currentPhase: 'planning',
@@ -98,5 +102,5 @@ export function createTestStateWithSeparateCharacters(): GameState {
     //add the hero to a room
     rooms[0].characters.push(hero);
     rooms[1].characters.push(monster);
-    return gameState;
+    return gameState; 
 }

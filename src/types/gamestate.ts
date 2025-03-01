@@ -40,24 +40,6 @@ export interface GameLogMessage {
     type: 'narration' | 'combat';
 }
 
-export interface Card {
-    id: string;
-    name: string;
-    type: 'baseMonster' | 'trait' | 'trap';
-    rarity: typeof RarityType[keyof typeof RarityType];
-    description: string;
-    artworkUrl?: string;
-}
-
-export interface Trap {
-    id: string;
-    name: string;
-    description: string;
-    modifier: Number;
-    artworkUrl?: string;
-    effect: Trait;
-}
-
 export type GamePhase = 'combat' | 'dungeon_building' | 'planning' | 'event';
 
 export interface GameRoundLog {
@@ -74,7 +56,7 @@ export function createTestGameState(overrides: Partial<GameState> = {}): GameSta
     const monsters = overrides.monsters || {};
 
     return {
-        settings: { narrationEnabled: false, llm:null, spicy_llm:null},
+        settings: { narrationEnabled: false, llm:null, spicy_llm:null, llm_choices:[]},
         turnCounter: 0,
         dayCounter: 0,
         waveCounter: 0,
@@ -82,11 +64,6 @@ export function createTestGameState(overrides: Partial<GameState> = {}): GameSta
             grid: [],
             rooms: {},
             templates: []
-        },
-        deck: {
-            baseMonsters: [],
-            traits: [],
-            traps: []
         },
         heroes,
         monsters,
@@ -114,18 +91,13 @@ export interface GameSettings {
     narrationEnabled: boolean;
     llm: string;
     spicy_llm: string;
+    llm_choices: string[];
     // Add other settings as needed
 }
 
 export interface GameState {
     settings: GameSettings;
     dungeon: DungeonLayout;
-    // Card System
-    deck: {
-        baseMonsters: Card[];
-        traits: Card[];
-        traps: Card[];
-    };
     waveCounter: number;
     currentWave?: WaveData;
     waveHistory?: WaveData[];
@@ -143,3 +115,24 @@ export interface GameState {
     // Available game actions
     gameActions?: GameAction[];
 }
+
+
+/* HERE BE DRAGONS - UNIMPLEMENTED SPECULATION BELOWS*
+export interface Card {
+    id: string;
+    name: string;
+    type: 'baseMonster' | 'trait' | 'trap';
+    rarity: typeof RarityType[keyof typeof RarityType];
+    description: string;
+    artworkUrl?: string;
+}
+
+export interface Trap {
+    id: string;
+    name: string;
+    description: string;
+    modifier: Number;
+    artworkUrl?: string;
+    effect: Trait;
+}
+*/

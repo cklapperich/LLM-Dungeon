@@ -16,16 +16,8 @@ const GameApp = () => {
   const [combatStarted, setCombatStarted] = React.useState(false);
   const { setIsLoading } = useLoading();
 
-  // Handle toggle narration
-  const handleToggleNarration = React.useCallback(() => {
-    setGameState(prevState => ({
-      ...prevState,
-      settings: {
-        ...prevState.settings,
-        narrationEnabled: !prevState.settings.narrationEnabled
-      }
-    }));
-  }, []);
+  // This function is no longer needed as settings are now handled in the Settings component
+  // The Settings component directly updates the game state with new settings
 
   // Handle UI actions
   const handleAction = async (action: UIAction) => {
@@ -54,7 +46,6 @@ const GameApp = () => {
       gameState={gameState}
       onAction={handleAction}
       onNavigate={(view) => console.log('Navigate to:', view)}
-      onToggleNarration={handleToggleNarration}
       combatStarted={combatStarted}
       onStateChange={setGameState}
     />

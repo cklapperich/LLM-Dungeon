@@ -1,0 +1,13 @@
+{
+    "narrationEnabled": true,
+    "llm": "google/gemini-2.0-flash-001",
+    "spicy_llm": "deepseek/deepseek-r1:free",
+    "llm_choices": [
+        "google/gemini-2.0-flash-001",
+        "anthropic/claude-3.7-sonnet",
+        "deepseek/deepseek-chat:free",
+        "google/gemini-2.0-flash-lite-preview-02-05:free",
+        "gryphe/mythomax-l2-13b",
+        "deepseek/deepseek-r1:free"
+    ]
+}

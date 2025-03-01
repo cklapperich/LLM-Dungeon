@@ -4,8 +4,6 @@ interface TopBarProps {
     turnCounter?: number;
     dayCounter?: number;
     infamy?: number;
-    narrationEnabled: boolean;
-    onToggleNarration: () => void;
     debugEnabled?: boolean;
     onToggleDebug?: () => void;
     encounterInfo?: {
@@ -17,8 +15,6 @@ interface TopBarProps {
 export const TopBar: React.FC<TopBarProps> = ({ 
     turnCounter = 0,
     dayCounter = 0,
-    narrationEnabled = false,
-    onToggleNarration,
     debugEnabled = false,
     onToggleDebug,
     encounterInfo
@@ -34,26 +30,16 @@ export const TopBar: React.FC<TopBarProps> = ({
                 )}
             </div>
             <div className="flex gap-4 items-center">
-                <div className="flex gap-2">
+                {onToggleDebug && (
                     <button 
-                        onClick={onToggleNarration}
+                        onClick={onToggleDebug}
                         className={`px-3 py-1 rounded shadow-lg shadow-black/25 relative
                             border-[3px] border-white/50
                             bg-slate-800 hover:bg-slate-700 active:bg-slate-900`}
                     >
-                        Narration: {narrationEnabled ? 'On' : 'Off'}
+                        Debug: {debugEnabled ? 'On' : 'Off'}
                     </button>
-                    {onToggleDebug && (
-                        <button 
-                            onClick={onToggleDebug}
-                            className={`px-3 py-1 rounded shadow-lg shadow-black/25 relative
-                                border-[3px] border-white/50
-                                bg-slate-800 hover:bg-slate-700 active:bg-slate-900`}
-                        >
-                            Debug: {debugEnabled ? 'On' : 'Off'}
-                        </button>
-                    )}
-                </div>
+                )}
             </div>
         </div>
     );
