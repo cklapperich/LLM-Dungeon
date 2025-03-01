@@ -10,14 +10,12 @@ import MonsterPanel from './MonsterPanel';
 interface CombatAreaProps {
     combatState?: CombatState;
     debugEnabled?: boolean;
-    allCharacters: Record<string, Character>;
     onAction: (action: UIAction) => Promise<void>;
 }
 
 export const CombatArea: React.FC<CombatAreaProps> = ({ 
     combatState, 
     debugEnabled,
-    allCharacters,
     onAction
 }) => {
     const { isLoading } = useLoading();
@@ -57,8 +55,7 @@ export const CombatArea: React.FC<CombatAreaProps> = ({
             
             <div className="w-1/4 h-full">
                 <MonsterPanel 
-                    combatState={combatState} 
-                    allCharacters={allCharacters}
+                    combatState={combatState}
                     onAction={onAction}
                     debugEnabled={debugEnabled}
                 />

@@ -2,7 +2,6 @@ import React from 'react';
 import { CombatState } from '../../../types/combatState';
 import { UIAction } from '../../uiTypes';
 import { useLoading } from '../../LoadingContext';
-import { Character } from '../../../types/actor';
 import { CharacterType } from '../../../types/constants';
 import { convertGameActionToUIAction } from '../../../game_engine/gameEngine';
 import Card from '../Card';
@@ -51,14 +50,12 @@ const ActionButtons: React.FC<{
 
 interface MonsterPanelProps {
     combatState?: CombatState;
-    allCharacters: Record<string, Character>;
     onAction: (action: UIAction) => Promise<void>;
     debugEnabled?: boolean;
 }
 
 export const MonsterPanel: React.FC<MonsterPanelProps> = ({ 
     combatState,
-    allCharacters,
     onAction,
     debugEnabled
 }) => {
@@ -72,7 +69,8 @@ export const MonsterPanel: React.FC<MonsterPanelProps> = ({
 
     // Find the monster character
     const monsterCharacter = combatState.characters.find(c => c.type === CharacterType.MONSTER);
-    
+    const monsterName = monsterCharacter.name;
+
     if (!monsterCharacter) {
         return (
             <div className="h-full bg-black rounded-lg flex items-center justify-center shadow-lg shadow-black/25 border-2 border-white/40">
@@ -80,8 +78,6 @@ export const MonsterPanel: React.FC<MonsterPanelProps> = ({
             </div>
         );
     }
-
-    const monsterName = allCharacters[monsterCharacter.id]?.name || 'Monster';
 
     return (
         <CharacterPanel

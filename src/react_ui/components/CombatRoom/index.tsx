@@ -92,7 +92,6 @@ export const CombatRoom: React.FC<CombatRoomProps> = ({
                         <CombatArea 
                             combatState={gameState.activeCombat}
                             debugEnabled={debugEnabled}
-                            allCharacters={{...gameState.heroes, ...gameState.monsters}}
                             onAction={handleAction}
                         />
                     ) : (
