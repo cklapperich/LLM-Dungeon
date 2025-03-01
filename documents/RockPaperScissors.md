@@ -1,3 +1,5 @@
+TBD - add soem type of rock/paper/scissors type system to make combat more interesting simple and fun?
+
 Simplified RPS Cycle
 
 | Hero Action      | Monster Action      | Outcome                                   |

@@ -136,4 +136,3 @@ Events are processed sequentially and synchronously
 All async operations (like LLM narration) complete before the next event
 The UI receives fully processed (event, state) pairs
 The UI can animate or display events at its own pace
-Would you like me to proceed with implementing any specific part of this strategy?

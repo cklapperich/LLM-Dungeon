@@ -53,6 +53,13 @@ const breakFree = createTrait('Break Free', {
   rarity: RarityType.COMMON,
   skill: Skills.BREAK_FREE_MIGHT,
   defenseOptions: [Skills.GRAPPLE_MIGHT, Skills.GRAPPLE_GRACE],
+  requirements: {
+    statuses: [{
+      name: StatusName.GRAPPLED,
+      stacks: 1,
+      target: 'self'
+    }]
+  },
   effects: [
     {
       type: EffectType.BREAK_FREE,
@@ -67,6 +74,13 @@ const slipFree = createTrait('Slip Free', {
   rarity: RarityType.COMMON,
   skill: Skills.SLIP_FREE_GRACE,
   defenseOptions: [Skills.GRAPPLE_MIGHT, Skills.GRAPPLE_GRACE],
+  requirements: {
+    statuses: [{
+      name: StatusName.GRAPPLED,
+      stacks: 1,
+      target: 'self'
+    }]
+  },
   effects: [
     {
       type: EffectType.BREAK_FREE,

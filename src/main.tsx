@@ -8,6 +8,7 @@ import { LoadingProvider, useLoading } from './react_ui/LoadingContext'
 import './index.css'
 import { Character } from './types/actor';
 import { MiniCard } from './react_ui/components/Card';
+import TopBar from './react_ui/components/CombatRoom/TopBar';
 interface CharacterSelectionProps {
   characters: Record<string, Character>;
   selectedId: string | null;
@@ -61,8 +62,12 @@ const GameApp = () => {
     }));
   }, []);
 
+  const { setIsLoading, isLoading } = useLoading();
+
   // move the selected characters to the room by calling the gamestate.ts functions to move characters
   const initializeCombatState = React.useCallback(async () => {
+    // Prevent multiple clicks by setting loading state immediately
+    setIsLoading(true);
     try {
       console.log("Selected hero ID:", selectedHero);
       console.log("Selected monster ID:", selectedMonster);
@@ -107,10 +112,10 @@ const GameApp = () => {
       setCombatStarted(true);
     } catch (error) {
       console.error('Error initializing combat:', error);
+    } finally {
+      setIsLoading(false);
     }
-  }, [gameState, selectedHero, selectedMonster]);
-
-  const { setIsLoading } = useLoading();
+  }, [gameState, selectedHero, selectedMonster, setIsLoading]);
 
   const handleAction = async (action: UIAction) => {
     setIsLoading(true);
@@ -132,14 +137,21 @@ const GameApp = () => {
       console.error('Error executing action:', error);
     } finally {
       setIsLoading(false);
-    }
+    } 
   };
 
   return (
     <>
       {!combatStarted ? (
         <div className="flex flex-col items-center justify-center min-h-screen bg-slate-900 p-6">
-          <div className="bg-slate-800 p-8 rounded-lg shadow-lg max-w-lg w-full">
+          <TopBar 
+            narrationEnabled={gameState.settings.narrationEnabled}
+            onToggleNarration={handleToggleNarration}
+            turnCounter={0}
+            dayCounter={0}
+            infamy={0}
+          />
+          <div className="bg-slate-800 p-8 rounded-lg shadow-lg max-w-lg w-full mt-4">
             <h2 className="text-2xl font-bold mb-6 text-center text-white">Combat Setup</h2>
             <CharacterSelection 
               characters={gameState.monsters} 
@@ -155,13 +167,13 @@ const GameApp = () => {
             />
             <button 
               onClick={initializeCombatState}
-              disabled={!selectedHero || !selectedMonster}
+              disabled={!selectedHero || !selectedMonster || isLoading}
               className={`w-full mt-6 px-6 py-3 rounded-lg text-lg font-semibold
-                ${!selectedHero || !selectedMonster
+                ${!selectedHero || !selectedMonster || isLoading
                   ? 'bg-slate-600 text-slate-400 cursor-not-allowed'
                   : 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800'}`}
             >
-              Begin Combat
+              {isLoading ? 'Initializing Combat...' : 'Begin Combat'}
             </button>
           </div>
         </div>

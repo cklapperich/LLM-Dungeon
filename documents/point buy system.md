@@ -1,4 +1,5 @@
 # Ability Creation Guide
+This is a general guideline for balancing abilities **as a developer**. Actually doing a point buy is likely too rigid boring and minmaxable.
 
 Core Concepts
 
@@ -19,9 +20,6 @@ TBD; subject to balancing changes.
 
 ## Monster/Hero stats
 
-No point buy system YET.  
-Heroes heal 1 wound between fights.  
-Monsters heal 1 wound between *waves.* All status clears between waves.  
 Small monster point buy: 12/10/8/6. 2 vitality.  
 Medium Monster: 14/10/8/6 3 vitality  
 Big Monster: 16/12/10/8 \- 4 vitality  

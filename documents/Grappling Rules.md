@@ -10,26 +10,6 @@ Normal progression is grappled-\>penetrated-\>win combat
 If you use penetrate while the heroine is already penetrated, you breed & win combat. She's too exhausted to continue.
 all hero non-break free non-item actions take a -2 penalty.
 
-**Point Buy Info**  
-\- A penetration costs \-1 for each requirement it has  
-\- A grapple costs \-1 for each requirement it has  
-\- Bind and restrain limb cost 1 less on a grapple
-
-**Grab Ability Guidelines:**  
-- Grabs always start at Cooldown(1) to stop repeated attempts with the same grab.
-
-**Penetration Ability Guidelines:**   
-\- -2 hit modifier by default.
-\- Tentacles and Ovipositor penetration usually works at 0-1 clothing.   
-\- Most penetrations require require prone & 0 clothing  
-\- Slime Tentacles usually work at 0-2 clothing.  
-\- Ghosts work at 0-5 clothing.  
-\- Oral penetrations work at 0-4 clothing, generally requiring mouth \+ both arms bound.  
-\- Penetrate+Finish as one action is a Legendary, costs 4 points  
-\- Require 2 uses to win combat.
-\- Legendary: \-1 use for \-4 points  
-\- Rare: \+1 use for \-4 points
-
 **BREAK FREE / SLIP FREE**  
 Each use applies exhaustion, \-1 to breakfree/slipfree for rest of combat, max exhaustion \-4
 breaking free undoes all limbs bound since the grapple started and removes the grappled state.
@@ -55,6 +35,27 @@ If she struggles when you choose not to grapple, thats a wasted action! Almost l
 breed twice, twice the reward, lose the monster for the next wave
 A penetrate ability requires as description of the 'intense' stage for the LLM to narrate.'
 
+**Point Buy Info**  
+\- A penetration costs \-1 for each requirement it has  
+\- A grapple costs \-1 for each requirement it has  
+\- Bind and restrain limb cost 1 less on a grapple
+
+**Grab Ability Guidelines:**  
+- Grabs always start at Cooldown(1) to stop repeated attempts with the same grab.
+
+**Penetration Ability Guidelines:**   
+\- -2 hit modifier by default.
+\- Tentacles and Ovipositor penetration usually works at 0-1 clothing.   
+\- Most penetrations require require prone & 0 clothing  
+\- Slime Tentacles usually work at 0-2 clothing.  
+\- Ghosts work at 0-5 clothing.  
+\- Oral penetrations work at 0-4 clothing, generally requiring mouth \+ both arms bound.  
+\- Penetrate+Finish as one action is a Legendary, costs 4 points  
+\- Require 2 uses to win combat.
+\- Legendary: \-1 use for \-4 points  
+\- Rare: \+1 use for \-4 points
+
+# Sample grappling abilities
 
 ## Minotaur Abilities
 

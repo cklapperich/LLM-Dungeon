@@ -1,109 +1,79 @@
-# Monsters
+# Monster Creation & Progression System
 
-## Temple Serpent
+## Core Systems
 
-Can move through hidden passages
+## Monster Attributes
+- Body parts (defining primary abilities they can equip?)
+- Size class (Small/Medium/Large worth 1/2/3 points)
+- preferred biomes?
 
-Good swimmers Natural intimidation factor
+## Strategic Elements
+- Room size restrictions force diverse monster usage
+- Limited trait slots encourage careful monster planning
+- Intense capture creates risk/reward decisions
+- Customization allows creative expression while maintaining balance
+- 'trap specialist' monsters that add a trap to your deck
+- monsters that add monsterlings to your deck
+- monsters that add monsters to your deck when they breed
+- dead monsters dont go back into your deck right away? or they do but you do have to draw them again?
 
-Starting at 120lbs, 12ft
+### Monster Sizes
+Size determines base stats and slots:
+- Small
+  - Low base stats
+  - Low slots
+  - Can be placed in any room
+- Medium
+  - Medium base stats
+  - More slots
+  - Requires Medium or Large room
+- Large
+  - High base stats
+  - Most slots
+  - Requires Large room
 
-Abilities: venom bite (Grace, damage + weaken status + arousal status), slam (deal damage, might), coil (dex and might boost, always goes first), Grapple[Might], Breed
+### Trait System
+Traits can be:
+- Active abilities (Slam, Rend, etc.)
+- Passive abilities (Vitality, Speed, etc.)
+- Each trait has a limited number of upgrade slots
+- Players can rename and describe traits
+- Traits return to gene pool when monster dies
+- Cannot stack duplicate traits
 
-## Blue Slime
-Can move through hidden passages
-
-tiny
-
-Ensures you can always place something. MANY variants and upgrade paths.
-
-1 vit, Low Might, Grace, Will, Wit
-
-Abilities: Stealth[Grace], Slam[Might], Spit[Grace]
+## Progression Systems
 
 
-## Green Slime
-Can move through hidden passages
+### Monster Death
+When a monster dies:
+- Lose the base monster
+- Lose slot progression
+- All traits return to gene pool
+- Can reassign traits to other monsters
+- need to use a new base monster card to rebuild it
+- could MAYBE randomly lose traits if more challenge is needed
 
-tiny, 2 vit
-Abilities: Stealth[Grace], Slam, Breed, Grapple, Spit
+## Customization
 
-Spit dissolves armor fasteners and clothing and lowers dex
+### Monster Creation
+Players can:
+1. Choose base monster type (determines size/stats)
+2. Assign traits from their gene pool
+3. Name their creation
+4. Write custom descriptions
+5. Customize trait descriptions
 
-slam deals damage 
+### Trait Customization
+- Players can rename traits
+- Add custom descriptions
+- LLM incorporates descriptions into battle narration
+- Core mechanics remain consistent despite customization
 
-breed is mitosis, they split themselves in half, dealing 1 wound to themselves, and attempt to fill the subjects womb with 1/2 their physical mass
+## Balance Considerations
+- Room size restrictions naturally limit large monster dominance
+- Gene pool quality tiers create progression
+- Base stats should remain significant compared to traits
 
-can dissolve into water to hide very well.
+Short term: no trait upgrade system. Just pull traits from packs.
 
-weak in combat, low in all stats.
-
-Size 1
-Low Grace. 
-Low Might
-Decent Vitality
-Decent Grapple
-Low Conviction
-can breed w/o removing clothing or armor
-
-## MINOTAUR
-size 3
-Abilities: Grapple[Might] - restrains both arms, Disarm, Charge[Might] - Damage, breed(throat) - can be done regardless of armor, breed(vaginal) - requires naked heroine, Intimidate
-Trip[Might] - Knocks Prone, Tear Armor[Might] - Only when grappling, remove any armor from the target   
-
-3 vit (or 4?)
-High Strength
-Moderate Grace
-Grappling Proficient, Heavy Weapon Proficiency
-
-Throatfuck requires no armor removal, but earns only 1bp instead of 2
-
-intimidating, can encourage adventurers to take other passages instead
-
-## Crystal Guardian
-size 3
-
-99 Conviction
-5 vitality
-14 might
-6 Grace
-
-Rainbow Beam [Wit], -1 conviction
-
-Slam [Might] - 1 wound
-
-Breed
-
-Rainbow Flash - Dazed, -1 will, cant use next turn
-
-Temple Cultist: TBD, inspired by the Stewards from Monster Train
-
-## Orb Weaver
-Size: Medium
-
-Place web Trap once/day in adjacent panel only
-
-Bite [Wound, Venom], Slam [Wound], Cocoon (-1 grace -1 might, Grapple[Grace vs Might]), Breed, 
-
-## Crystal Guardian 
-
-## Shadow Hound
-Size: Medium
-Grace Moderate, Might Moderate
-
-Stealth[Grace], Pounce (Grapple[Might] - Knock Prone), Rend[Might] (+0, wound, remove 1 level of armor, including heavy), Breed, Howl, Bite[Might] (+4, wound), 
-Tear[Grace] - (Remove 1 level of light armor/clothing, cannot remove heavy. Does not wound)
-
-Hamstring[Might] - Attack a thigh or ankle, causing debilitating wound. Disable 1 leg, wound. 
-
-# TRAPS
-Costs trap points?
-
-## Purple Crystal: Emit hypnotic pulses that disadvantage on future Will checks / easier to Command or reduce conviction on protagonist
--2 will penalty, will save to avoid
-
-## Thick Semen Trap: 0tp, -1 grace if hits, grace save to avoid
-
-## Solvent trap: dissolve 1 clothing/light armor if hits, grace save to avoid
-
-## bear trap: -2 grace if hits, immobilize 1 leg, grace save to avoid
+Base Monsters can be pulled from card packs.

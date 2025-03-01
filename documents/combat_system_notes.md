@@ -1,71 +1,24 @@
 ## Attributes and Skills
 
-Characters have four attributes:
-- Might
-- Grace
-- Will
-- Wit
+# **CAN YOU SEE THE HERO'S NEXT MOVE?**
+Important - key game design decision. Could make Rockpaperscissors system more fun. you can respond to rock with a paper move if your monster actually has it!
+- you can see the hero's next move?
 
-From these we derive skills. Each skill is based on an attribute, for example:
-- Grapple[Might]
-- Light Weapons[Grace]
-- Heavy Weapons[Might]
-- Perception[Wit]
+Initiative is 2d10-grace, lowest wins, rerolled each round.
 
-Proficiency in a skill gives +4 modifier.
 
-Attribute Score meanings:
-6 or less: Crippling
-7: Poor
-8 or 9: Below average
-10: Average (most humans)
-11 or 12: Above average
-13 or 14: Exceptional
-15 or 16: Amazing
-17 or 18: Legendary
-19 or 20: Mythic
-21+: Superhuman
-
-Initiative is 3d6-grace, lowest wins, rerolled each round.
-
-## Vitality and Conviction
-
-Typical vitality values:
-- Size 1 creatures: 1-2 vitality
-- Size 2 creatures and Heroines: 3 vitality
-- Size 3 creatures: 3-5 vitality
-
-Heroines start with 3 conviction (more for high will ones).
-
-Vitality and Conviction go down when taking damage.
-
-## Infamy System
-
-Infamy may increase more/less based on how you choose to deal with heroines:
-- Kill: +3 points
-- Impregnate: +2 points
-- Corrupt: +1 point
-- Release: -1 points
-
+## Kill, Breed, Corrupt
 Killing or releasing are easiest options, reduce Vitality to 3 to do either.
 Impregnate is more difficult, takes time, heroine has chance to escape, you're doing non-combat things. Must increase Grapple state to 3.
 Corruption is most difficult, reduce Conviction to 3. Not all monsters can corrupt, not all can breed (most can).
 
 Higher infamy means better quality heroines.
 
-## Combat Structure
+Monsters level up by gaining 'perks', not leveling up or gaining stats. Heroines do just scale up statwise mostly. Can purchase perks. 
 
-Boss fight style - only ever 1 heroine / day. May have squires, servants, golems, etc [unbreedable]
+## default abilities:
 
-Which route through the dungeon you guide the hero is always a key decision. You can lure protagonists down a certain path via various methods, some may cost resources.
-
-Monsters can die but you can always make more through card packs.
-
-BACKSTORIES - GIVE GIRLS BACKSTORIES FOR FUNSIES and to make player more connected to them.
-
-Monsters level up by gaining 'perks', not leveling. Heroines do just scale up statwise mostly. Can purchase perks. 
-
-Built in default abilities: slam/bite, grapple, remove clothing (only grappled target). These are all +0 and built into all monsters.
+things like slam/bite, grapple, remove clothing (only grappled target). These are all +0 and available for free in infinite copies to assign to monsters
 
 ## PREPARATION: 
 UPGRADE MONSTERS, PLACE TRAPS, PLACE MONSTERS, Slot Traits into Monsters
@@ -182,8 +135,8 @@ Dungeon layout is fixed for now - limited control over it.
 
 ## Clothing/armor removal
 
-Simply an integer. Armor increases the integer. Abilities can decrease it.
-breed has a  max clothing level that will work.
+Simply an integer representing the hero's armor level.
+breed abilities have max clothing level that will work.
 mind control to command an adventurer to strip, acid or rending attacks, 
 adventurers can strip an article of clothing to remove a level of grapple with no check. They lose the item from inventory AND 1 clothing level,
 and lose the benefits of the armor too.

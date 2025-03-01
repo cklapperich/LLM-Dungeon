@@ -173,6 +173,12 @@ export function getAvailableActions(actor: Character, state: CombatState): {
     if (actor.type === CharacterType.HERO) {
         Object.values(default_hero_abilities).forEach(action => {
             actions.push(action);
+            
+            // Check requirements and add reason if they're not met
+            const requirementsCheck = checkRequirements(actor, action, state);
+            if (!requirementsCheck.success && requirementsCheck.reason) {
+                reasons[action.name] = requirementsCheck.reason;
+            }
         });
     }
 

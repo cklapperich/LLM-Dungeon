@@ -1,6 +1,6 @@
 import { Character } from '../../types/actor';
 import { GameActionResult } from '../../types/gamestate';
-import { CombatFlags, GrappleType, BodyPartType, CombatEndReasonType } from '../../types/constants';
+import { GrappleType, BodyPartType, CombatEndReasonType } from '../../types/constants';
 import { createStatus, hasStatus, getStatus } from '../statusEffects';
 import { StatusEvent, CombatEvent } from '../../events/eventTypes';
 import { logAndEmitCombatEvent } from './combatLogManager';
