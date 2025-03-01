@@ -87,6 +87,14 @@ export async function createNewCombat(characters:Character[], room: Room, gameSe
     const uiActions = convertToCombatUIActions(actionData);
     state.playerActions = uiActions;
 
+    // Get hero's action at combat initialization
+    const hero = state.characters
+        .find(c => c.type === CharacterType.HERO);
+    if (hero) {
+        // Pre-select hero's action for the first round
+        hero.selected_action = getAIAction(hero, state);
+    }
+
     // Emit combat start event
     const combatStartEvent: CombatPhaseChangedEvent = {
         type: 'PHASECHANGE',
@@ -188,77 +196,92 @@ export async function executeTrait(
     return state;
 }
 
-
-export async function executeCombatRound(state: CombatState, playerAction:Trait) {
-
+export async function executeCombatRound(state: CombatState, playerAction: Trait) {
     // Increment round counter
     state.round += 1;
     
-    // Get characters for this round
+    // Validate combat participants
     const characterArray = state.characters;
     if (characterArray.length !== 2) {
         throw new Error('Combat round requires exactly 2 characters');
     }
-    const characters: [Character, Character] = [characterArray[0], characterArray[1]];
     
-    // Set up turn order - this is an async function so we need to await it
-    await setupInitialTurnOrder(state);
-    let firstActor = characters[state.activeCharacterIndex];
-    let secondActor = characters[1 - state.activeCharacterIndex];
+    // Identify player (monster) and AI (hero) characters
+    const playerCharacter = characterArray.find(c => c.type === CharacterType.MONSTER);
+    const aiCharacter = characterArray.find(c => c.type === CharacterType.HERO);
     
-    // Get both actors' actions first
-    let firstAction = firstActor.type === CharacterType.MONSTER ? 
-        playerAction : getAIAction(firstActor, state);
-    let secondAction = secondActor.type === CharacterType.MONSTER ?
-        playerAction : getAIAction(secondActor, state);
-
-    // priority check
-    const priorities = [firstAction.priority, secondAction.priority]
-    if (priorities[0] && !priorities[1]) {
-        firstActor = characters[0]; secondActor = characters[1];
-        firstAction = firstAction; secondAction = secondAction;
-        }
-    else if (priorities[0] && !priorities[1]) {
-        firstActor = characters[1]; secondActor = characters[0];
-        firstAction = secondAction; secondAction = firstAction;
+    if (!playerCharacter || !aiCharacter) {
+        throw new Error('Combat requires one player character and one AI character');
     }
     
-    // Execute first actor's turn
-    await executeTrait(firstAction, firstActor, secondActor, state);
-
+    // Get actions for both participants
+    const playerActionTrait = playerAction;
+    const aiActionTrait = aiCharacter.selected_action;
+    
+    // Set up initial turn order based on initiative
+    await setupInitialTurnOrder(state);
+    
+    // Determine turn order based on priority
+    let turnOrder: [Character, Character];
+    let actionOrder: [Trait, Trait];
+    
+    // Override initiative-based order if one action has priority and the other doesn't
+    if (playerActionTrait.priority && !aiActionTrait.priority) {
+        turnOrder = [playerCharacter, aiCharacter];
+        actionOrder = [playerActionTrait, aiActionTrait];
+    } else if (!playerActionTrait.priority && aiActionTrait.priority) {
+        turnOrder = [aiCharacter, playerCharacter];
+        actionOrder = [aiActionTrait, playerActionTrait];
+    } else {
+        // Use initiative-based order (already set up in state.activeCharacterIndex)
+        const firstIndex = state.activeCharacterIndex;
+        const secondIndex = 1 - firstIndex;
+        turnOrder = [characterArray[firstIndex], characterArray[secondIndex]];
+        actionOrder = [
+            turnOrder[0] === playerCharacter ? playerActionTrait : aiActionTrait,
+            turnOrder[1] === playerCharacter ? playerActionTrait : aiActionTrait
+        ];
+    }
+    
+    // Execute first character's action
+    await executeTrait(actionOrder[0], turnOrder[0], turnOrder[1], state);
+    
     // Process any state-based actions (status effects, etc)
     await processBetweenActions(state);
     
-    if (!state.isComplete){ // cant act if ur dead/incapacitated/pumped full of semen
-        // Execute second actor's turn
-        await executeTrait(secondAction, secondActor, firstActor, state)
+    // Execute second character's action if combat isn't over
+    if (!state.isComplete) {
+        await executeTrait(actionOrder[1], turnOrder[1], turnOrder[0], state);
+        
+        // Process state-based actions again
+        await processBetweenActions(state);
     }
-
-    // Process any state-based actions (dead actors, etc)
-    await processBetweenActions(state);
     
     // Process round-based effects (like cooldowns)
     processBetweenRounds(state);
-
+    
     // Emit round end event
     const roundEndEvent: CombatEvent = {
         type: 'PHASECHANGE',
         subtype: 'ROUND_END',
-        characters: characters,
+        characters: characterArray,
         room: state.room,
     };
-
+    
     await logAndEmitCombatEvent(roundEndEvent, state);
     
-    // Update monster's actions before returning to UI
-    state.playerActions = []
-    const monster = state.characters
-        .find(c => c.type === CharacterType.MONSTER);
-    if (monster) {
-        const actionData = getAvailableCombatActions(monster, state);
+    // Update available player actions for next round
+    state.playerActions = [];
+    if (playerCharacter) {
+        const actionData = getAvailableCombatActions(playerCharacter, state);
         state.playerActions = convertToCombatUIActions(actionData);
     }
-
+    
+    // Pre-select AI action for the next round
+    if (aiCharacter) {
+        aiCharacter.selected_action = getAIAction(aiCharacter, state);
+    }
+    
     return state;
 }
 

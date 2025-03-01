@@ -12,10 +12,7 @@ export interface Character {
     type: CharacterTypeValue;
     artworkUrl?: string;  // URL for character artwork
     traits: Trait[];
-    might: number;
-    grace: number;
-    wit: number;
-    will: number;
+    attributes: Record<Attribute, number>;
     skills: Record<string, number>;
     maxVitality: number;
     vitality: number;
@@ -28,6 +25,7 @@ export interface Character {
     clothing: number; // Track clothing level (0-5)
     limbs: Partial<Record<BodyPart, number>>; // Track which limbs the character has
     statuses: Status[]; // Track active status effects
+    selected_action?: Trait; // Track the selected action for the current turn
 }
 
 export function calculateMaxVitality(might: number): number {
@@ -49,42 +47,41 @@ export function calculateMaxConviction(will: number): number {
 /**
  * Create a new character with default values
  */
-export function createCharacter(attributes: Partial<Character> = {}): Character {
-    const might = attributes.might ?? 10;
-    const will = attributes.will ?? 10;
-    const grace = attributes.grace??10;
-    const wit = attributes.wit??10;
+export function createCharacter(character: Partial<Character> = {}): Character {
+    const attributes = character.attributes ?? {
+        Might: character.attributes?.Might ?? 10,
+        Will: character.attributes?.Will ?? 10,
+        Grace: character.attributes?.Grace ?? 10,
+        Wit: character.attributes?.Wit ?? 10,
+    };
 
     return {
-        id: attributes.id ?? crypto.randomUUID(),
-        name: attributes.name ?? 'New Character',
-        type: attributes.type ?? CharacterType.MONSTER,  // Default to monster type
-        artworkUrl: attributes.artworkUrl,
-        traits: attributes.traits ?? [],
-        might,
-        grace,
-        wit,
-        will,
-        skills: attributes.skills ?? {},
-        maxVitality: attributes.maxVitality??calculateMaxVitality(might),
-        vitality: attributes.vitality??calculateMaxVitality(might),
-        maxConviction: attributes.conviction??calculateMaxConviction(will),
-        conviction: attributes.conviction??calculateMaxConviction(will),
-        description: attributes.description ?? "",
-        flags: attributes.flags ?? {},
-        clothing: attributes.clothing ?? 1, // Default clothing level is 1
-        limbs: attributes.limbs ?? {
+        id: character.id ?? crypto.randomUUID(),
+        name: character.name ?? 'New Character',
+        type: character.type ?? CharacterType.MONSTER,  // Default to monster type
+        artworkUrl: character.artworkUrl,
+        traits: character.traits ?? [],
+        attributes: attributes,
+        skills: character.skills ?? {},
+        maxVitality: character.maxVitality??calculateMaxVitality(attributes.Might),
+        vitality: character.vitality??calculateMaxVitality(attributes.Grace),
+        maxConviction: character.conviction??calculateMaxConviction(attributes.Will),
+        conviction: character.conviction??calculateMaxConviction(attributes.Will),
+        description: character.description ?? "",
+        flags: character.flags ?? {},
+        clothing: character.clothing ?? 1, // Default clothing level is 1
+        limbs: character.limbs ?? {
             [BodyPartType.ARM]: 2,
             [BodyPartType.LEG]: 2,
             [BodyPartType.MOUTH]: 1
         },
-        statuses: attributes.statuses ?? [] // Initialize empty status array
+        statuses: character.statuses ?? [] // Initialize empty status array
     };
 }
 
 
 export function getAttributeValue(character: Character, attribute: Attribute): number {
-    return character[attribute.toLowerCase() as keyof Pick<Character, 'might' | 'grace' | 'wit' | 'will'>];
+    return character.attributes[attribute];
 }
 
 export function getSkillModifier(character: Character, skillName: SkillName): number {

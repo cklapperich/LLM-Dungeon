@@ -1,6 +1,4 @@
 import { Character } from '../types/actor';
-import { GamePhase } from '../types/gamestate';
-// Log view types for the combat system
 export type LogType = 'event' | 'debug' | 'llm_context' | 'llm_narration' | 'prompt';
 import { GameState } from '../types/gamestate';
 import { 
@@ -104,10 +102,10 @@ export function characterToUICard(
                 { icon: Shield, value: character.clothing, label: 'Armor' },
             ],
             bottomStats: [
-                { icon: Sword, value: character.might, label: 'Might' },
-                { icon: Wind, value: character.grace, label: 'Grace' },
-                { icon: Brain, value: character.wit, label: 'Wit' },
-                { icon: Sparkles, value: character.will, label: 'Will' }
+                { icon: Sword, value: character.attributes.Might, label: 'Might' },
+                { icon: Wind, value: character.attributes.Grace, label: 'Grace' },
+                { icon: Brain, value: character.attributes.Wit, label: 'Wit' },
+                { icon: Sparkles, value: character.attributes.Will, label: 'Will' }
             ]
         }
     };
