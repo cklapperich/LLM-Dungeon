@@ -6,6 +6,7 @@ const heroFiles = import.meta.glob('@assets/heroes/*.json', { eager: true });
 import profanedTempleJson from '@assets/dungeons/profaned_temple.json';
 import { loadDungeonFromJson } from '../game_engine/utils/dungeonUtils.js';
 import { loadMonster } from '@/game_engine/utils/dataLoader.js';
+import {getSettings} from '../game_engine/settings.js';
 
 // Process these files to separate heroes and monsters
 export function loadAllCharacters() {
@@ -39,9 +40,10 @@ export function loadAllCharacters() {
 export function createTestGameState(overrides: Partial<GameState> = {}): GameState {
     const { heroes, monsters } = loadAllCharacters();
     const dungeon = loadDungeonFromJson(JSON.stringify(profanedTempleJson));
-
+    const settings = getSettings();
+    
     return {
-        settings: {llm:null, llm_choices:[], narrationEnabled:false, spicy_llm:null},
+        settings: settings,
         turnCounter: 0,
         dayCounter: 0,
         dungeon,

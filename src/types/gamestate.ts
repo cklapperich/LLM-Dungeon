@@ -56,7 +56,7 @@ export function createTestGameState(overrides: Partial<GameState> = {}): GameSta
     const monsters = overrides.monsters || {};
 
     return {
-        settings: { narrationEnabled: false, llm:null, spicy_llm:null, llm_choices:[]},
+        settings: { narrationEnabled: false, llm:null, spicy_llm:null, llm_choices:[], api_key:''},
         turnCounter: 0,
         dayCounter: 0,
         waveCounter: 0,
@@ -92,6 +92,7 @@ export interface GameSettings {
     llm: string;
     spicy_llm: string;
     llm_choices: string[];
+    api_key: string;
     // Add other settings as needed
 }
 

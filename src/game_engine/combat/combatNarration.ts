@@ -7,10 +7,10 @@ import { SpiceLevel, Length, PromptsData, SpiceLevels, Lengths } from '../../typ
 import promptsData from '@assets/descriptions/prompts.json';
 import { StatusEvent } from '../../events/eventTypes';
 import { StatusName } from '../../types/status';
+import { get_api_key } from '../settings';
+import { GameSettings } from '../../types/gamestate';
 
 // Type assertion to help TypeScript understand the structure
-const typedPromptsData = promptsData as PromptsData;
-
 const TASKS = promptsData.tasks;
 const PROMPTS = promptsData.prompts;
 
@@ -71,8 +71,25 @@ function getNarrationSettings(state: CombatState, isInitialNarration: boolean = 
         return { spiceLevel: SpiceLevels.SUGGESTIVE, length: Lengths.MEDIUM };
     }
 
-    // Default to NONE/SHORT for regular combat actions
+// Default to NONE/SHORT for regular combat actions
     return { spiceLevel: SpiceLevels.NONE, length: Lengths.SHORT };
+}
+
+/**
+ * Determines which LLM model to use based on spice level and length
+ * @param spiceLevel The spice level of the narration
+ * @param length The length of the narration
+ * @param settings The game settings containing model information
+ * @returns The appropriate model string to use for the narration
+ */
+function getModelForNarration(spiceLevel: SpiceLevel, length: Length, settings: GameSettings): string {
+    // Currently only using spice level to determine model
+    // Length parameter included for future extensibility
+    if (spiceLevel === SpiceLevels.EXPLICIT) {
+        return settings.spicy_llm;
+    }
+    
+    return settings.llm;
 }
 
 export async function generateInitialNarration(
@@ -86,6 +103,9 @@ export async function generateInitialNarration(
         const { spiceLevel, length } = getNarrationSettings(state, true, 0);
         const characterInfo = LLMLogFormatters.formatCharactersForLLM(characters[0], characters[1]);
         
+        // Get the appropriate model for this narration
+        const model = getModelForNarration(spiceLevel, length, state.settings);
+        
         const systemPrompt = formatSystemPrompt(
             PROMPTS.narrate.system,
             spiceLevel,
@@ -97,7 +117,7 @@ export async function generateInitialNarration(
             characterInfo
         );
 
-        return await callLLM('narrate', [systemPrompt]);
+        return await callLLM('narrate', [systemPrompt], model, get_api_key(state.settings));
     } catch (error) {
         console.error('Failed to generate initial combat narration:', error);
         const characters = state.characters;
@@ -119,6 +139,9 @@ export async function generateRoundNarration(
         const { spiceLevel, length } = getNarrationSettings(state, false, state.round - 1);
         const characterInfo = LLMLogFormatters.formatCharactersForLLM(characters[0], characters[1]);
         
+        // Get the appropriate model for this narration
+        const model = getModelForNarration(spiceLevel, length, state.settings);
+        
         const systemPrompt = formatSystemPrompt(
             PROMPTS.narrate.system,
             spiceLevel,
@@ -130,7 +153,7 @@ export async function generateRoundNarration(
             characterInfo
         );
 
-        return await callLLM('narrate', [systemPrompt]);
+        return await callLLM('narrate', [systemPrompt], model, get_api_key(state.settings));
     } catch (error) {
         console.error('Failed to generate round narration:', error);
         return `Round ${state.round} combat actions completed.`;
@@ -150,17 +173,20 @@ export async function generateAfterMathNarration(
         const { spiceLevel, length } = getNarrationSettings(state, false, state.round - 1);
         const characterInfo = LLMLogFormatters.formatCharactersForLLM(characters[0], characters[1]);
         
+        // Get the appropriate model for this narration
+        const model = getModelForNarration(spiceLevel, length, state.settings);
+        
         const systemPrompt = formatSystemPrompt(
             PROMPTS.narrate.system,
             spiceLevel,
             length,
             currentRoundLog.llmContextLog || [],
             previousNarrations,
-            TASKS.COMBAT_AFTERMATH,
+            TASKS.COMBAT_AFTERMATH, 
             characterInfo
         );
 
-        return await callLLM('narrate', [systemPrompt]);
+        return await callLLM('narrate', [systemPrompt], model, get_api_key(state.settings));
     } catch (error) {
         console.error('Failed to generate aftermath narration:', error);
         return `The combat has ended.`;

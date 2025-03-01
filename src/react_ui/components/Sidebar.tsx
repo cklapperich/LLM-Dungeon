@@ -1,16 +1,20 @@
 import React from 'react';
-import { Menu } from 'lucide-react';
+import { Menu, Settings as SettingsIcon } from 'lucide-react';
 import { navigationItems } from '../uiTypes';
+import SettingsMenu from './Settings';
+import { GameSettings } from '../../types/gamestate';
 
 interface SidebarProps {
   onNavigate: (view: string) => void;
+  settings: GameSettings;
+  onSettingsChange: (newSettings: GameSettings) => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
+const Sidebar: React.FC<SidebarProps> = ({ onNavigate, settings, onSettingsChange }) => {
   const [showSidebar, setShowSidebar] = React.useState(false);
 
   return (
-    <div className={`${showSidebar ? 'w-48' : 'w-14'} bg-slate-900 text-white transition-all shadow-lg shadow-black/25`}>
+    <div className={`${showSidebar ? 'w-48' : 'w-14'} bg-slate-900 text-white transition-all shadow-lg shadow-black/25 flex flex-col`}>
       <button 
         className="w-full p-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-900 flex items-center justify-center relative
                 border-[3px] border-white/50"
@@ -19,7 +23,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
         <Menu size={20} />
       </button>
       
-      <nav className="flex flex-col">
+      <nav className="flex flex-col flex-1">
         {navigationItems.map((item) => (
           <button
             key={item.view}
@@ -32,6 +36,14 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
           </button>
         ))}
       </nav>
+      
+      {/* Settings at the bottom of sidebar */}
+      <div className="p-4 flex justify-center">
+        <SettingsMenu 
+          settings={settings}
+          onSettingsChange={onSettingsChange}
+        />
+      </div>
     </div>
   );
 };

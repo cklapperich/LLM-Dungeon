@@ -7,7 +7,7 @@ const USERSETTINGS_KEY = 'userSettings';
  * Gets the default settings for the application
  * @returns The default settings object
  */
-export function getDefaultSettings(): GameSettings {
+function getDefaultSettings(): GameSettings {
   return defaultSettings as GameSettings;
 }
 
@@ -35,4 +35,18 @@ export function getSettings(): GameSettings {
   }
   
   return settings;
+}
+
+export function get_api_key(settings:GameSettings): string {
+
+    const settingsKey = settings.api_key;
+    if (settingsKey) {
+        return settingsKey;
+    }
+
+    const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+    if (!apiKey) {
+        throw new Error('VITE_OPENROUTER_API_KEY environment variable is required');
+    }
+    return apiKey;
 }

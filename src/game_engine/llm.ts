@@ -46,12 +46,10 @@ function cleanLLMResponse(response: string): string {
 export async function callLLM(
     taskType: TaskType,
     messages: string[],
-    model = 'anthropic/claude-3.7-sonnet' // 'meta-llama/llama-3.3-70b-instruct:free'
+    model = 'deepseek/deepseek-chat:free', // 'meta-llama/llama-3.3-70b-instruct:free',
+    apiKey:string=null,
 ): Promise<string> {
-    const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
-    if (!apiKey) {
-        throw new Error('VITE_OPENROUTER_API_KEY environment variable is required');
-    }
+
     // Get the prompts for this task type
     const { system, task } = PROMPTS[taskType];
 

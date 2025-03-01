@@ -4,7 +4,6 @@ import { UIAction } from './uiTypes';
 import CombatRoom from './components/CombatRoom';
 import CharacterSelection from './components/CharacterSelection';
 import Sidebar from './components/Sidebar';
-import SettingsMenu from './components/Settings';
 import { useLoading } from './LoadingContext';
 import { addCharacterToRoom } from '../game_engine/gameEngine';
 import { saveSettings } from '../game_engine/settings';
@@ -110,11 +109,26 @@ const GameInterface: React.FC<GameInterfaceProps> = ({
   // Render the main interface with global sidebar
   return (
     <div className="flex h-screen bg-slate-900">
-      {/* Global Sidebar */}
-      <Sidebar onNavigate={onNavigate} />
+      {/* Global Sidebar with Settings */}
+      <Sidebar 
+        onNavigate={onNavigate} 
+        settings={gameState.settings}
+        onSettingsChange={(newSettings) => {
+          // Update game state with new settings
+          if (onStateChange) {
+            onStateChange({
+              ...gameState,
+              settings: newSettings
+            });
+          }
+          
+          // Save settings to localStorage
+          saveSettings(newSettings);
+        }}
+      />
       
       <div className="flex-1 flex flex-col">
-        {/* Top bar with settings icon */}
+        {/* Top bar */}
         <div className="bg-slate-800 text-white p-4 flex justify-between items-center shadow-lg shadow-black/25">
           <div className="flex items-center gap-4">
             <span>Turn {gameState.turnCounter} - Day {gameState.dayCounter}</span>
@@ -124,23 +138,6 @@ const GameInterface: React.FC<GameInterfaceProps> = ({
               </span>
             )}
           </div>
-          
-          {/* Settings menu */}
-          <SettingsMenu 
-            settings={gameState.settings}
-            onSettingsChange={(newSettings) => {
-              // Update game state with new settings
-              if (onStateChange) {
-                onStateChange({
-                  ...gameState,
-                  settings: newSettings
-                });
-              }
-              
-              // Save settings to localStorage
-              saveSettings(newSettings);
-            }}
-          />
         </div>
         
         {/* Main content area */}
