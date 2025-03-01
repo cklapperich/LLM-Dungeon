@@ -32,6 +32,7 @@ export async function populateCombatLogs(event: CombatEvent, state: CombatState)
       debugLog: [],
       llmContextLog: [],
       llmNarrations: [],
+      prompts: [],
       round: currentRoundIndex
     };
     state.combatLog[currentRoundIndex] = roundLog;

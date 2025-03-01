@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Settings as SettingsIcon } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { navigationItems } from '../uiTypes';
 import SettingsMenu from './Settings';
 import { GameSettings } from '../../types/gamestate';
@@ -24,6 +24,16 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, settings, onSettingsChang
       </button>
       
       <nav className="flex flex-col flex-1">
+        {/* Settings at the top of navigation */}
+        <div className="flex items-center">
+          <SettingsMenu 
+            settings={settings}
+            onSettingsChange={onSettingsChange}
+          />
+          {showSidebar && <span className="ml-3">Settings</span>}
+        </div>
+        
+        {/* Navigation items */}
         {navigationItems.map((item) => (
           <button
             key={item.view}
@@ -36,14 +46,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, settings, onSettingsChang
           </button>
         ))}
       </nav>
-      
-      {/* Settings at the bottom of sidebar */}
-      <div className="p-4 flex justify-center">
-        <SettingsMenu 
-          settings={settings}
-          onSettingsChange={onSettingsChange}
-        />
-      </div>
     </div>
   );
 };

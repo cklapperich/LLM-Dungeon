@@ -4,6 +4,7 @@ import { UIAction } from './uiTypes';
 import CombatRoom from './components/CombatRoom';
 import CharacterSelection from './components/CharacterSelection';
 import Sidebar from './components/Sidebar';
+import TopBar from './components/CombatRoom/TopBar';
 import { useLoading } from './LoadingContext';
 import { addCharacterToRoom } from '../game_engine/gameEngine';
 import { saveSettings } from '../game_engine/settings';
@@ -25,10 +26,11 @@ const GameInterface: React.FC<GameInterfaceProps> = ({
   combatStarted = false,
   onStateChange
 }) => {
-  // State for character selection
+  // State for character selection and debug mode
   const [selectedHero, setSelectedHero] = React.useState<string | null>(null);
   const [selectedMonster, setSelectedMonster] = React.useState<string | null>(null);
   const [internalCombatStarted, setInternalCombatStarted] = React.useState(combatStarted);
+  const [debugEnabled, setDebugEnabled] = React.useState(false);
   const { setIsLoading, isLoading } = useLoading();
 
   // Use either the prop or internal state for combat started
@@ -129,15 +131,17 @@ const GameInterface: React.FC<GameInterfaceProps> = ({
       
       <div className="flex-1 flex flex-col">
         {/* Top bar */}
-        <div className="bg-slate-800 text-white p-4 flex justify-between items-center shadow-lg shadow-black/25">
-          <div className="flex items-center gap-4">
-            <span>Turn {gameState.turnCounter} - Day {gameState.dayCounter}</span>
-            {gameState.activeCombat && (
-              <span className="px-3 py-1 bg-slate-700 rounded shadow-inner shadow-black/25 border border-white/30">
-                Current Encounter: {gameState.activeCombat.room.id} | Round {gameState.activeCombat.round || 1}
-              </span>
-            )}
-          </div>
+        <div className="flex-shrink-0">
+          <TopBar 
+            turnCounter={gameState.turnCounter}
+            dayCounter={gameState.dayCounter}
+            debugEnabled={debugEnabled}
+            onToggleDebug={() => setDebugEnabled(!debugEnabled)}
+            encounterInfo={gameState.activeCombat ? {
+              roomId: gameState.activeCombat.room.id,
+              round: gameState.activeCombat.round
+            } : undefined}
+          />
         </div>
         
         {/* Main content area */}
@@ -176,6 +180,7 @@ const GameInterface: React.FC<GameInterfaceProps> = ({
             onNavigate={onNavigate}
             onStartCombat={initializeCombatState}
             combatStarted={isCombatStarted}
+            debugEnabled={debugEnabled}
           />
         )}
       </div>

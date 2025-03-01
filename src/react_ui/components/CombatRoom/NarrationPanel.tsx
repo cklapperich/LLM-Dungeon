@@ -34,9 +34,12 @@ export const NarrationPanel: React.FC<NarrationPanelProps> = ({
     }
 
     return (
-        <div className="h-full flex flex-col">
-            {/* Log Panel */}
-            <div ref={logContainerRef} className="flex-1 overflow-y-auto text-white bg-black rounded-lg p-4 shadow-lg shadow-black/25 border-2 border-white/40 mb-4">
+        <div className="flex flex-col h-full min-h-0">
+            {/* Log Panel - using flex-1 and min-h-0 to allow proper scrolling */}
+            <div 
+                ref={logContainerRef} 
+                className="flex-1 overflow-y-auto min-h-0 text-white bg-black rounded-lg p-4 shadow-lg shadow-black/25 border-2 border-white/40 mb-4"
+            >
                 <div className="space-y-4">
                     {(() => {
                         const logs = getAllLogsWithRounds(combatState)
@@ -70,8 +73,8 @@ export const NarrationPanel: React.FC<NarrationPanelProps> = ({
                 </div>
             </div>
 
-            {/* Log Type Selector */}
-            <div className="flex bg-black rounded-lg shadow-lg shadow-black/25 border-2 border-white/40 overflow-hidden">
+            {/* Log Type Selector - using flex-shrink-0 to prevent shrinking */}
+            <div className="flex-shrink-0 flex bg-black rounded-lg shadow-lg shadow-black/25 border-2 border-white/40 overflow-hidden">
                 <button 
                     onClick={() => setLogType('event')}
                     className={`flex-1 px-3 py-2 flex items-center justify-center gap-2 ${
@@ -88,6 +91,14 @@ export const NarrationPanel: React.FC<NarrationPanelProps> = ({
                     }`}
                 >
                     Debug
+                </button>
+                <button 
+                    onClick={() => setLogType('prompt')}
+                    className={`flex-1 px-3 py-2 flex items-center justify-center gap-2 border-l-2 border-white/50 ${
+                        logType === 'prompt' ? 'bg-slate-600' : 'bg-slate-800 hover:bg-slate-700'
+                    }`}
+                >
+                    Prompts
                 </button>
                 <button 
                     onClick={() => setLogType('llm_context')}

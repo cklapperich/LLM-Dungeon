@@ -1,36 +1,48 @@
 {
-  "grappled": [
-    "caught in a firm hold",
-    "struggling against restraint",
-    "locked in their opponent's grasp"
-  ],
-  "prone": [
-    "knocked to the ground",
-    "struggling to regain footing",
-    "forced down and vulnerable"
-  ],
-  "bound_arms": [
-    "arms firmly restrained",
-    "upper limbs held fast",
-    "hands bound and useless"
-  ],
-  "bound_legs": [
-    "legs tightly bound",
-    "lower limbs restrained",
-    "feet trapped and immobile"
-  ],
-  "penetrated": [
-    "the hero has a monster inside of them - a phallus, tentacle, or other appendage. The monster is trying to breed with them!"
-  ],
-  "ability_cooldown": [
-    "catching their breath",
-    "regaining their composure",
-    "preparing for another attempt"
-  ],
-  "heat": [
-    "flushed and aroused",
-    "breathing heavily",
-    "feeling a rush of heat",
-    "experiencing a surge of arousal"
-  ]
+  "grappled": {
+    "1": [
+      "caught in a firm hold",
+      "struggling against restraint",
+      "locked in their opponent's grasp"
+    ]
+  },
+  "prone": {
+    "1": [
+      "knocked to the ground",
+      "struggling to regain footing",
+      "forced down and vulnerable"
+    ]
+  },
+  "bound_arms": {
+    "1": [
+      "arms firmly restrained",
+      "upper limbs held fast",
+      "hands bound and useless"
+    ]
+  },
+  "bound_legs": {
+    "1": [
+      "legs tightly bound",
+      "lower limbs restrained",
+      "feet trapped and immobile"
+    ]
+  },
+  "penetrated": {
+    "1": [
+      "the hero has a monster inside of their body - a phallus, tentacle, or other appendage. The monster is trying to breed with them!"
+    ]
+  },
+  "ability_cooldown": {
+    "1": [
+      "catching their breath",
+      "regaining their composure",
+      "preparing for another attempt"
+    ]
+  },
+  "heat": {
+    "1": ["feels a bit warm. Is breathing slightly heavier"],
+    "2": ["flushed and arouseed. feeling a bit wet between the legs"],
+    "3": ["feels very hot, flushed, aroused and sweating. Slick thighs. Is breathing heavily. Wet and horny."],
+    "4": ["gushing soaking dripping wet. Slick thighs. Cant think about anything other than getting fucked. Feels like a bitch in heat"]
+  }
 }

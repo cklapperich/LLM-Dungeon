@@ -12,7 +12,8 @@ export interface CombatRoundLog {
     events: GameEvent[];          // Raw event data for structured logging
     debugLog: string[];          // Technical debug log with roll details
     llmContextLog: string[];     // Narrative descriptions for LLM context
-    llmNarrations: string[];     // Generated narrative output from LLM
+    llmNarrations: string[];     // Generated narrative output from LLM,
+    prompts: string[];        // prompt used for LLM call
     round: number;
 }
 
@@ -49,6 +50,7 @@ export function createCombatState(characters: Character[], room: Room, settings:
             debugLog: [],
             llmContextLog: [],
             llmNarrations: [],
+            prompts: [],
             round: 0
         }],
     };
@@ -114,6 +116,12 @@ export function getAllLogsWithRounds(combatState: CombatState): Array<{
             type: 'event' as const
         }));
         
-        return [...allLogs, ...debugLogs, ...contextLogs, ...narrationLogs, ...eventLogs];
+        const promptLogs = roundLog.prompts.map(prompt => ({
+            text: prompt,
+            round: roundLog.round,
+            type: 'prompt' as const
+        }));
+        
+        return [...allLogs, ...debugLogs, ...contextLogs, ...narrationLogs, ...eventLogs, ...promptLogs];
     }, [] as Array<{text: string; round: number; type: LogType}>);
 }

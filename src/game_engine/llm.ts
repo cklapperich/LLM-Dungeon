@@ -2,6 +2,7 @@ import promptsData from '@assets/descriptions/prompts.json';
 
 export type TaskType = 'narrate';
 const PROMPTS = promptsData.prompts;
+const GAME_CONTEXT = promptsData.game_context;
 
 interface ChatMessage {
     role: 'system' | 'user' | 'assistant';
@@ -36,7 +37,8 @@ export function formatSystemPrompt(
         .replace('{characterInfo}', characterInfo)
         .replace('{combatLogs}', formattedLogs)
         .replace('{previousNarration}', previousNarration.join('\n'))
-        .replace('{task}', task);
+        .replace('{task}', task)
+        .replace('{game_context}', GAME_CONTEXT);
 }
 
 function cleanLLMResponse(response: string): string {    
@@ -50,14 +52,13 @@ export async function callLLM(
     apiKey:string=null,
 ): Promise<string> {
 
-    // Get the prompts for this task type
-    const { system, task } = PROMPTS[taskType];
+    // Get the system prompt for this task type
+    const { system } = PROMPTS[taskType];
 
-    // Construct the full message array with system prompt and task
+    // Construct the full message array with system prompt
     const fullMessages: ChatMessage[] = [
         { role: 'system' as const, content: system },
-        ...messages.map(msg => ({ role: 'user' as const, content: msg })),
-        { role: 'user' as const, content: task }
+        ...messages.map(msg => ({ role: 'user' as const, content: msg }))
     ];
 
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {

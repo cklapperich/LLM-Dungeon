@@ -82,14 +82,38 @@ export class DescriptionManager {
         }
     }
 
-    static getStatusDescription(statusName: string): string {
-        try {
-            const prompts = status[statusName];
-            return prompts[Math.floor(Math.random() * prompts.length)];
-        } catch (error) {
+    static getStatusDescription(statusName: string, stacks: number): string {
+        const statusObj = status[statusName];
+        
+        if (!statusObj) {
             console.warn(`No status description found for ${statusName}`);
             return '';
         }
+        
+        // Convert stacks to string
+        let stacksStr = stacks.toString();
+        
+        // If exact stack level exists, use it
+        if (statusObj[stacksStr]) {
+            const descriptions = statusObj[stacksStr];
+            return descriptions[Math.floor(Math.random() * descriptions.length)];
+        }
+        
+        // Find the highest level that's lower than current stacks
+        const availableLevels = Object.keys(statusObj)
+            .map(key => parseInt(key))
+            .filter(level => !isNaN(level) && level <= stacks)
+            .sort((a, b) => b - a);
+        
+        if (availableLevels.length > 0) {
+            const highestLevel = availableLevels[0].toString();
+            const descriptions = statusObj[highestLevel];
+            return descriptions[Math.floor(Math.random() * descriptions.length)];
+        }
+        
+        // No appropriate level found
+        console.warn(`No appropriate level found for status ${statusName}`);
+        return '';
     }
 
     static getIntensityFromRoll(roll: RollResult): IntensityTypes {

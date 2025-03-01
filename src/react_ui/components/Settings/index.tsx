@@ -1,6 +1,7 @@
 import React from 'react';
 import { Settings as SettingsIcon } from 'lucide-react';
 import { GameSettings } from '../../../types/gamestate';
+import { saveSettings } from '../../../game_engine/settings';
 
 interface SettingsProps {
   settings: GameSettings;
@@ -15,27 +16,34 @@ const SettingsMenu: React.FC<SettingsProps> = ({ settings, onSettingsChange }) =
   
   // Handle settings changes
   const handleSettingChange = (key: keyof GameSettings, value: any) => {
-    onSettingsChange({
+    const newSettings = {
       ...settings,
       [key]: value
-    });
+    };
+    
+    // Call onSettingsChange to update the parent component
+    onSettingsChange(newSettings);
+    
+    // Save settings to localStorage
+    saveSettings(newSettings);
   };
   
   return (
-    <div className="relative">
+    <div>
       {/* Gear icon button */}
       <button 
         onClick={togglePanel}
-        className="p-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-900 rounded-full
-                  border-[3px] border-white/50 shadow-lg shadow-black/25"
+        className="p-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-900 flex items-center gap-3 relative
+                  border-[3px] border-white/50"
       >
         <SettingsIcon size={20} />
       </button>
       
-      {/* Settings panel (shown when isOpen is true) */}
+      {/* Modal backdrop (shown when isOpen is true) */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-64 bg-slate-800 rounded-lg shadow-lg z-50
-                      border-[3px] border-white/50 p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          {/* Modal content */}
+          <div className="w-96 bg-slate-800 rounded-lg shadow-lg border-[3px] border-white/50 p-6 max-h-[90vh] overflow-y-auto">
           <h3 className="text-white text-lg font-bold mb-4">Settings</h3>
           
           {/* Narration toggle */}
@@ -79,14 +87,15 @@ const SettingsMenu: React.FC<SettingsProps> = ({ settings, onSettingsChange }) =
             </select>
           </div>
           
-          {/* Close button */}
-          <button 
-            onClick={togglePanel}
-            className="w-full mt-4 p-2 bg-slate-700 hover:bg-slate-600 active:bg-slate-800 
-                      text-white rounded border border-white/30"
-          >
-            Close
-          </button>
+            {/* Close button */}
+            <button 
+              onClick={togglePanel}
+              className="w-full mt-4 p-2 bg-slate-700 hover:bg-slate-600 active:bg-slate-800 
+                        text-white rounded border border-white/30"
+            >
+              Close
+            </button>
+          </div>
         </div>
       )}
     </div>

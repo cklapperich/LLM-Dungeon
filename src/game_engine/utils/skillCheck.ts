@@ -1,7 +1,9 @@
-import { RollResult, SKILL_CONSTANTS, OpposedCheckResult, SkillName, Skills, SkillNames, getSkillAttribute} from '../../types/skilltypes.ts';
+import { RollResult, SKILL_CONSTANTS, OpposedCheckResult, SkillName, SkillNames, getSkillAttribute} from '../../types/skilltypes.ts';
 import { Character, getAttributeBonus, getSkillBonus } from '../../types/actor.ts';
 import { IntensityType, IntensityTypes } from '../../types/constants';
 import { getStatusModifiers } from '../statusEffects';
+import skillChecksJson from '@assets/descriptions/skillchecks.json';
+
 interface InitiativeResult {
     initiatives: [number, number];
     rollResults: [RollResult, RollResult];
@@ -13,8 +15,6 @@ interface MarginModifiers {
     skills: Record<string, Record<string, string[]>>;
     generic: Record<string, string[]>;
 }
-
-import skillChecksJson from '@assets/descriptions/skillchecks.json';
 export const marginModifiers: MarginModifiers = skillChecksJson;
 
 export function processInitiative(char1: Character, char2: Character, gameState: any = {}): InitiativeResult {
@@ -88,6 +88,10 @@ function roll2d10(): number {
     return Math.floor(Math.random() * 10) + 1 +
            Math.floor(Math.random() * 10) + 1
 }
+function roll1d20(): number {
+    return Math.floor(Math.random() * 20) + 1 + Math.floor(Math.random() * 20) + 1
+}
+
 /**
  * Make a skill check
  * @param character The character making the check
@@ -242,8 +246,8 @@ export function makeOpposedCheck(
     // For success ties, attacker wins (they met the target number)
     // For failure ties, defender wins
     const attackerWins = attackerResult.success ? 
-        attackerResult.margin >= defenderResult.margin : // Success ties go to attacker
-        attackerResult.margin > defenderResult.margin;   // Failure ties go to defender
+        attackerResult.margin > defenderResult.margin : // Success ties go to defender
+        attackerResult.margin >= defenderResult.margin;   // Failure ties go to attacker
     
     return {
         attacker: attackerResult,

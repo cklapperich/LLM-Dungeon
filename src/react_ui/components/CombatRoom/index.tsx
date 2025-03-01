@@ -11,6 +11,7 @@ interface CombatRoomProps {
     onNavigate: (view: string) => void;
     onStartCombat?: () => Promise<void>;
     combatStarted?: boolean;
+    debugEnabled?: boolean;
 }
 
 const PreCombatUI: React.FC<{
@@ -40,12 +41,11 @@ const PreCombatUI: React.FC<{
 export const CombatRoom: React.FC<CombatRoomProps> = ({
     gameState,
     onAction,
-    onNavigate,
     onStartCombat,
-    combatStarted = false
+    combatStarted = false,
+    debugEnabled = false
 }) => {
     const { isLoading, setIsLoading } = useLoading();
-    const [debugEnabled, setDebugEnabled] = React.useState(false);
 
     // Wrap onAction to set loading state
     const handleAction = async (action: UIAction) => {
@@ -62,21 +62,10 @@ export const CombatRoom: React.FC<CombatRoomProps> = ({
     };
 
     return (
-        <div className="flex-1 flex flex-col bg-slate-900">
-            {/* Top Bar */}
-            <TopBar 
-                turnCounter={gameState.turnCounter}
-                dayCounter={gameState.dayCounter}
-                debugEnabled={debugEnabled}
-                onToggleDebug={() => setDebugEnabled(!debugEnabled)}
-                encounterInfo={gameState.activeCombat ? {
-                    roomId: gameState.activeCombat.room.id,
-                    round: gameState.activeCombat.round
-                } : undefined}
-            />
-
-            {/* Main Game Area */}
-            <div className="flex-1 flex overflow-hidden">
+        // Set absolute height constraint on the top-level container
+        <div className="flex flex-col bg-slate-900 h-screen overflow-hidden">
+            {/* Main Game Area - takes remaining height with overflow hidden */}
+            <div className="flex-1 flex overflow-hidden min-h-0">
                 {combatStarted ? (
                     /* Combat View with 3-column layout */
                     <CombatArea 

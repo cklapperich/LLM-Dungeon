@@ -1,7 +1,7 @@
 import { CombatState } from '../../types/combatState';
 import { callLLM, formatSystemPrompt } from '../llm';
 import { LLMLogFormatters } from '../llmLogFormatters';
-import { SpiceLevel, Length, PromptsData, SpiceLevels, Lengths } from '../../types/prompts';
+import { SpiceLevel, Length, SpiceLevels, Lengths } from '../../types/prompts';
 
 // Import JSON data
 import promptsData from '@assets/descriptions/prompts.json';
@@ -116,6 +116,8 @@ export async function generateInitialNarration(
             room?.description,
             characterInfo
         );
+        // now we need to log the prompt
+        state.combatLog[state.combatLog.length-1].prompts.push(systemPrompt);
 
         return await callLLM('narrate', [systemPrompt], model, get_api_key(state.settings));
     } catch (error) {

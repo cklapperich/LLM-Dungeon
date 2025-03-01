@@ -13,8 +13,8 @@ interface CombatAreaProps {
     onAction: (action: UIAction) => Promise<void>;
 }
 
-export const CombatArea: React.FC<CombatAreaProps> = ({ 
-    combatState, 
+export const CombatArea: React.FC<CombatAreaProps> = ({
+    combatState,
     debugEnabled,
     onAction
 }) => {
@@ -22,14 +22,14 @@ export const CombatArea: React.FC<CombatAreaProps> = ({
 
     if (!combatState) {
         return (
-            <div className="flex-1 bg-black rounded-lg h-full flex flex-col items-center justify-center shadow-lg shadow-black/25 border-2 border-white/40">
+            <div className="flex-1 bg-black rounded-lg flex flex-col items-center justify-center shadow-lg shadow-black/25 border-2 border-white/40">
                 <span className="text-slate-400">No active combat</span>
             </div>
         );
     }
 
     return (
-        <div className="flex-1 bg-black rounded-lg h-full flex relative shadow-lg shadow-black/25 text-white border-2 border-white/40">
+        <div className="flex-1 bg-black rounded-lg flex relative shadow-lg shadow-black/25 text-white border-2 border-white/40 min-h-0">
             {isLoading && (
                 <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-50 rounded-lg">
                     <div className="text-white text-xl flex flex-col items-center">
@@ -39,22 +39,22 @@ export const CombatArea: React.FC<CombatAreaProps> = ({
                 </div>
             )}
             
-            {/* Three-column layout */}
-            <div className="w-1/4 h-full">
-                <HeroPanel 
-                    combatState={combatState} 
-                    debugEnabled={debugEnabled} 
+            {/* Three-column layout - each column has min-h-0 to enable proper scrolling */}
+            <div className="w-1/4 min-h-0 overflow-hidden">
+                <HeroPanel
+                    combatState={combatState}
+                    debugEnabled={debugEnabled}
                 />
             </div>
             
-            <div className="w-2/4 h-full px-2">
-                <NarrationPanel 
-                    combatState={combatState} 
+            <div className="w-2/4 px-2 min-h-0 overflow-hidden">
+                <NarrationPanel
+                    combatState={combatState}
                 />
             </div>
             
-            <div className="w-1/4 h-full">
-                <MonsterPanel 
+            <div className="w-1/4 min-h-0 overflow-hidden">
+                <MonsterPanel
                     combatState={combatState}
                     onAction={onAction}
                     debugEnabled={debugEnabled}

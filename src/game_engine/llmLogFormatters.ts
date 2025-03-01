@@ -50,8 +50,8 @@ export class LLMLogFormatters {
 
     private static formatStatus(event: StatusEvent): string {
         const statusName = event.status.name;
-        const baseDescription = DescriptionManager.getStatusDescription(statusName)
-
+        const baseDescription = DescriptionManager.getStatusDescription(statusName, event.status.stacks);
+        
         switch (event.action) {
             case 'ADDED':
                 // dont log a status if no description
@@ -254,7 +254,7 @@ export class LLMLogFormatters {
             
             // Format active statuses
             const statusDescriptions = character.statuses
-                .map(status => DescriptionManager.getStatusDescription(status.name))
+                .map(status => DescriptionManager.getStatusDescription(status.name, status.stacks))
                 .filter(Boolean);
             
             const statusSection = statusDescriptions.length > 0 

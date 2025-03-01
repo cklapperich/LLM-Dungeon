@@ -1,7 +1,7 @@
 import { Character } from '../types/actor';
 import { GamePhase } from '../types/gamestate';
 // Log view types for the combat system
-export type LogType = 'event' | 'debug' | 'llm_context' | 'llm_narration';
+export type LogType = 'event' | 'debug' | 'llm_context' | 'llm_narration' | 'prompt';
 import { GameState } from '../types/gamestate';
 import { 
     Sword, 
