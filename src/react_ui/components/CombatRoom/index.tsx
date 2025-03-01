@@ -1,11 +1,10 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { GameState as BackendGameState } from '../../../types/gamestate';
 import { UIAction } from '../../uiTypes';
 import { useLoading } from '../../LoadingContext';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
 import CombatArea from './CombatArea';
-import ActionPanel from './ActionPanel';
 
 interface CombatRoomProps {
     gameState: BackendGameState;
@@ -51,8 +50,6 @@ export const CombatRoom: React.FC<CombatRoomProps> = ({
     const { isLoading, setIsLoading } = useLoading();
     const [debugEnabled, setDebugEnabled] = React.useState(false);
 
-    // No longer using event bus for loading state
-
     // Wrap onAction to set loading state
     const handleAction = async (action: UIAction) => {
         console.log('Setting loading state to true');
@@ -83,25 +80,22 @@ export const CombatRoom: React.FC<CombatRoomProps> = ({
                     onToggleNarration={onToggleNarration}
                     debugEnabled={debugEnabled}
                     onToggleDebug={() => setDebugEnabled(!debugEnabled)}
+                    encounterInfo={gameState.activeCombat ? {
+                        roomId: gameState.activeCombat.room.id,
+                        round: gameState.activeCombat.round
+                    } : undefined}
                 />
 
                 {/* Main Game Area */}
                 <div className="flex-1 flex overflow-hidden">
                     {combatStarted ? (
-                        <>
-                            {/* Combat View */}
-                            <CombatArea 
-                                combatState={gameState.activeCombat}
-                                debugEnabled={debugEnabled}
-                            />
-
-                            {/* Right Side Panel */}
-                            <ActionPanel 
-                                combatState={gameState.activeCombat ?? undefined}
-                                allCharacters={{...gameState.heroes, ...gameState.monsters}}
-                                onAction={handleAction}
-                            />
-                        </>
+                        /* Combat View with 3-column layout */
+                        <CombatArea 
+                            combatState={gameState.activeCombat}
+                            debugEnabled={debugEnabled}
+                            allCharacters={{...gameState.heroes, ...gameState.monsters}}
+                            onAction={handleAction}
+                        />
                     ) : (
                         <PreCombatUI
                             onStartCombat={async () => {

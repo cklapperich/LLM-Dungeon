@@ -4,7 +4,7 @@ This is a general guideline for balancing abilities **as a developer**. Actually
 Core Concepts
 
 - Abilities can be used by both monsters and heroes to attack  
-- Monsters often aim to finish grapples rather than kill  
+- players often aim to finish grapples rather than kill  
 - Abilities are classified as Common, Rare, or Legendary  
 - Ability point budgets: Common (2 points), Rare (4 points), Legendary (6 points)  
 - Abilities have maximum effects/drawbacks: Default(1), Common (2), Rare (3), Legendary (4)  
@@ -12,10 +12,9 @@ Core Concepts
 
 ## \# Number of Ability Slots.
 
-Small monsters start at 2c \-\> 1r-\>1r  
-Medium Monsters: 2c/1r \-\> 1r \-\> 1L  
-Large monsters: 3c/1r/1l \-\> 1r \-\> 1L  
-Default abilities take no slots.   
+Small monsters 1c/1r
+Medium Monsters: 1c/1r/1l
+Large monsters: 2r/2l   
 TBD; subject to balancing changes.
 
 ## Monster/Hero stats

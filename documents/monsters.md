@@ -38,25 +38,9 @@ Traits can be:
 - Passive abilities (Vitality, Speed, etc.)
 - Each trait has a limited number of upgrade slots
 - Players can rename and describe traits
-- Traits return to gene pool when monster dies
 - Cannot stack duplicate traits
 
-## Progression Systems
-
-
-### Monster Death
-When a monster dies:
-- Lose the base monster
-- Lose slot progression
-- All traits return to gene pool
-- Can reassign traits to other monsters
-- need to use a new base monster card to rebuild it
-- could MAYBE randomly lose traits if more challenge is needed
-
-## Customization
-
-### Monster Creation
-Players can:
+#layers can:
 1. Choose base monster type (determines size/stats)
 2. Assign traits from their gene pool
 3. Name their creation
@@ -68,12 +52,3 @@ Players can:
 - Add custom descriptions
 - LLM incorporates descriptions into battle narration
 - Core mechanics remain consistent despite customization
-
-## Balance Considerations
-- Room size restrictions naturally limit large monster dominance
-- Gene pool quality tiers create progression
-- Base stats should remain significant compared to traits
-
-Short term: no trait upgrade system. Just pull traits from packs.
-
-Base Monsters can be pulled from card packs.

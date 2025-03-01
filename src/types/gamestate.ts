@@ -67,40 +67,6 @@ export interface GameRoundLog {
     turn: number;
 }
 
-export interface GameState {
-    settings: GameSettings;
-
-    // Time tracking
-    turnCounter: number;
-    dayCounter: number;
-    
-    // Dungeon state
-    dungeon: DungeonLayout;
-    
-    // Card System
-    deck: {
-        baseMonsters: Card[];
-        traits: Card[];
-        traps: Card[];
-    };
-    
-    // Resources & Progress
-    infamy: number;
-    dailyPacksRemaining: number;
-    
-    // Combat state (only one active at a time)
-    activeCombat?: CombatState | null;
-
-    // Game phase
-    currentPhase: GamePhase;
-    
-    // Game log for all events
-    gameLog?: GameRoundLog[];
-    
-    // Available game actions
-    gameActions?: GameAction[];
-}
-
 // Helper function to create a minimal GameState for testing
 export function createTestGameState(overrides: Partial<GameState> = {}): GameState {
     // Initialize with empty objects for heroes and monsters
@@ -108,7 +74,7 @@ export function createTestGameState(overrides: Partial<GameState> = {}): GameSta
     const monsters = overrides.monsters || {};
 
     return {
-        settings: { narrationEnabled: false },
+        settings: { narrationEnabled: false, llm:null, spicy_llm:null},
         turnCounter: 0,
         dayCounter: 0,
         waveCounter: 0,
@@ -122,8 +88,6 @@ export function createTestGameState(overrides: Partial<GameState> = {}): GameSta
             traits: [],
             traps: []
         },
-        infamy: 0,
-        dailyPacksRemaining: 0,
         heroes,
         monsters,
         currentPhase: 'planning',
@@ -148,48 +112,34 @@ export interface WaveData {
 
 export interface GameSettings {
     narrationEnabled: boolean;
+    llm: string;
+    spicy_llm: string;
     // Add other settings as needed
 }
 
 export interface GameState {
     settings: GameSettings;
-
-    // Time tracking
-    turnCounter: number;
-    dayCounter: number;
-    
-    // Wave tracking
-    waveCounter: number;
-    currentWave?: WaveData;
-    waveHistory?: WaveData[];
-    
-    // Dungeon state
     dungeon: DungeonLayout;
-    
     // Card System
     deck: {
         baseMonsters: Card[];
         traits: Card[];
         traps: Card[];
     };
-    
-    // Resources & Progress
-    infamy: number;
-    dailyPacksRemaining: number;
-    
+    waveCounter: number;
+    currentWave?: WaveData;
+    waveHistory?: WaveData[];
+    turnCounter: number;
+    dayCounter: number;
+    // Combat state (only one active at a time)
+    activeCombat?: CombatState | null;
     // Active characters in game, separated by type
     heroes: Record<string, Character>;
     monsters: Record<string, Character>;
-    
-    // Combat state (only one active at a time)
-    activeCombat?: CombatState | null;
-
     // Game phase
     currentPhase: GamePhase;
-    
     // Game log for all events
     gameLog?: GameRoundLog[];
-    
     // Available game actions
     gameActions?: GameAction[];
 }

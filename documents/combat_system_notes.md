@@ -12,10 +12,6 @@ Killing or releasing are easiest options, reduce Vitality to 3 to do either.
 Impregnate is more difficult, takes time, heroine has chance to escape, you're doing non-combat things. Must increase Grapple state to 3.
 Corruption is most difficult, reduce Conviction to 3. Not all monsters can corrupt, not all can breed (most can).
 
-Higher infamy means better quality heroines.
-
-Monsters level up by gaining 'perks', not leveling up or gaining stats. Heroines do just scale up statwise mostly. Can purchase perks. 
-
 ## default abilities:
 
 things like slam/bite, grapple, remove clothing (only grappled target). These are all +0 and available for free in infinite copies to assign to monsters

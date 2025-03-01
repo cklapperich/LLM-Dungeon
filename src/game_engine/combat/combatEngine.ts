@@ -25,7 +25,6 @@ import { applyEffect } from './effect.ts';
 import { processBetweenActions, processBetweenRounds } from './stateBasedActions.ts';
 import { getAvailableActions as getAvailableCombatActions, checkRequirements } from './getAvailableActions.ts';
 import { getAIAction } from './combatAI.ts';
-import { UIActionResult } from '../../react_ui/uiTypes.ts';
 import { CombatGameAction } from '../../types/gamestate.ts';
 import { processInitiative } from '../utils/skillCheck.ts';
 import {Room} from '../../types/dungeon.ts';

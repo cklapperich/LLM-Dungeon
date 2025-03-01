@@ -29,7 +29,7 @@ export const Card: React.FC<CardProps> = ({ data }) => {
     const imageUrl = data.artworkUrl ? getImageUrl(data.artworkUrl) : null;
 
     return (
-        <div className={`relative w-full aspect-[4/5] bg-black ${borderRadius} flex flex-col items-center justify-center shadow-lg shadow-black/25 border-2 border-white overflow-hidden`}>
+        <div className={`relative w-full h-full bg-black ${borderRadius} flex flex-col items-center justify-center shadow-lg shadow-black/25 border-2 border-white overflow-hidden`}>
             {/* Artwork Layer */}
             <div className="absolute inset-0">
                 {data.artworkUrl ? (

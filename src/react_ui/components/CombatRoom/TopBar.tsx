@@ -9,6 +9,10 @@ interface TopBarProps {
     onToggleNarration: () => void;
     debugEnabled?: boolean;
     onToggleDebug?: () => void;
+    encounterInfo?: {
+        roomId?: string;
+        round?: number;
+    };
 }
 
 export const TopBar: React.FC<TopBarProps> = ({ 
@@ -18,12 +22,18 @@ export const TopBar: React.FC<TopBarProps> = ({
     narrationEnabled = false,
     onToggleNarration,
     debugEnabled = false,
-    onToggleDebug
+    onToggleDebug,
+    encounterInfo
 }) => {
     return (
         <div className="bg-slate-800 text-white p-4 flex justify-between items-center shadow-lg shadow-black/25">
             <div className="flex items-center gap-4">
                 <span>Turn {turnCounter} - Day {dayCounter}</span>
+                {encounterInfo && encounterInfo.roomId && (
+                    <span className="px-3 py-1 bg-slate-700 rounded shadow-inner shadow-black/25 border border-white/30">
+                        Current Encounter: {encounterInfo.roomId} | Round {encounterInfo.round || 1}
+                    </span>
+                )}
             </div>
             <div className="flex gap-4 items-center">
                 <div className="flex gap-2">
