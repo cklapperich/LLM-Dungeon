@@ -15,7 +15,6 @@ import {
     EffectEvent,
     StatusEvent,
     CombatPhaseChangedEvent,
-    InitiativeEvent,
     CombatStartEndEvent
 } from '../../events/eventTypes';
 import { RollResult } from '../../types/skilltypes';
@@ -156,23 +155,6 @@ export class CombatLogFormatters {
         return `Unknown combat state change: ${event.subtype}`;
     }
 
-    private static formatInitiative(event: InitiativeEvent): string {
-        if (this.mode === FormatMode.DEBUG) {
-            return `INITIATIVE:\n` +
-                   `${event.characters[0].name}: ${this.formatRollResult(event.results[0], FormatMode.DEBUG)}\n` +
-                   `${event.characters[1].name}: ${this.formatRollResult(event.results[1], FormatMode.DEBUG)}\n` +
-                   `First: ${event.first_actor.name}`;
-        }
-
-        const [char1, char2] = event.characters;
-        const [result1, result2] = event.results;
-        
-        return `Initiative rolls:` +
-               `\n${char1.name}: ${this.formatRollResult(result1)}` +
-               `\n${char2.name}: ${this.formatRollResult(result2)}` +
-               `\n${event.first_actor.name} acts first`;
-    }
-
     private static formatAbility(event: AbilityEvent): string {
         if (this.mode === FormatMode.DEBUG) {
             return `ABILITY: ${event.actor.name} -> ${event.ability.name}\n` +
@@ -212,8 +194,6 @@ export class CombatLogFormatters {
                 return this.formatCombatPhaseChange(event);
             case 'COMBAT_STATE_CHANGE':
                 return this.formatCombatStateChange(event);
-            case 'INITIATIVE':
-                return this.formatInitiative(event);
             case 'MONSTER_ADDED':
                 return `Monster ${event.monster.name} added to ${event.room.name || 'the room'}`;
             default:
