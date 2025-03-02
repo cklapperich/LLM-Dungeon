@@ -158,7 +158,6 @@ export class LLMLogFormatters {
                 return null;
         }
     }
-
     private static formatCombatPhaseChange(event: CombatPhaseChangedEvent): string {
         if (event.subtype === 'START') {
             // character vitality and clothing descriptions should be handled by
@@ -170,32 +169,33 @@ export class LLMLogFormatters {
             
             // Determine the loser from the event characters
             const loser = event.characters?.find(c => c.id !== winner.id);
+            if (!loser) return '';
             
             const vitalityDesc = DescriptionManager.getVitalityDescription(winner.vitality);
-            const clothingDesc = DescriptionManager.getArmorDescription(winner.armor);
             
-            // Check for specific combat end reasons
-            if (event.reason === CombatEndReason.DEATH && loser) {
-                return `${loser.name} is dead. ${winner.name} stands triumphant, ${vitalityDesc}`;
-            } else if (event.reason === CombatEndReason.BREEDING && loser) {
-                return `${winner.name} has bred with ${loser.name} and stands triumphant, ${vitalityDesc}`;
-            } else if (event.reason === CombatEndReason.ESCAPE && loser) {
-                return `${loser.name} has escaped. ${winner.name} remains, ${vitalityDesc}`;
-            } else if (event.reason === CombatEndReason.SURRENDER && loser) {
-                return `${loser.name} has surrendered. ${winner.name} stands triumphant, ${vitalityDesc}`;
+            // First handle the case where a monster lost
+            if (loser.type === 'monster' && event.reason === CombatEndReason.DEATH) {
+                return `${loser.name} has retreated from battle. ${winner.name} remains, ${vitalityDesc}.`;
             }
             
-            // Default message for other reasons
-            let result = `${winner.name} stands triumphant, ${vitalityDesc}`;
-
-        return result;
-    } else if (event.subtype === 'ROUND_END') {
-        // Skip round end messages
+            // For other cases, use the original logic
+            if (event.reason === CombatEndReason.DEATH) {
+                // Heroes can still die
+                return `${loser.name} is dead. ${winner.name} stands triumphant, ${vitalityDesc}.`;
+            } else if (event.reason === CombatEndReason.BREEDING && loser) {
+                return `${winner.name} has bred with ${loser.name} and stands triumphant, ${vitalityDesc}.`;
+            } else if (event.reason === CombatEndReason.ESCAPE && loser) {
+                return `${loser.name} has escaped. ${winner.name} remains, ${vitalityDesc}.`;
+            } else if (event.reason === CombatEndReason.SURRENDER && loser) {
+                return `${loser.name} has surrendered. ${winner.name} stands triumphant, ${vitalityDesc}.`;
+            }
+        } else if (event.subtype === 'ROUND_END') {
+            // Skip round end messages
+            return '';
+        }
+        
         return '';
     }
-    
-    return '';
-}
 
 
     static formatEvent(event: GameEvent): string {

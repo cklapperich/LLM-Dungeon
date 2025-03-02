@@ -379,6 +379,7 @@ export function applyWound(
 export async function applyEndCombat(
     state: CombatState,
     winner: Character,
+    loser: Character,
     reason: CombatEndReasonType | string
 ): Promise<GameActionResult> {
     // Mark combat as complete
@@ -393,6 +394,7 @@ export async function applyEndCombat(
         type: 'PHASECHANGE',
         subtype: 'END' as const,
         winner,
+        loser,
         reason,
         room: state.room
     };

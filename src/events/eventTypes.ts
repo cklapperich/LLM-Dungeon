@@ -84,6 +84,7 @@ export interface CombatPhaseChangedEvent {
     room: Room;
     characters?: Character[];
     winner?: Character;
+    loser?: Character;
     reason?: CombatEndReasonType | string;
 }
 
