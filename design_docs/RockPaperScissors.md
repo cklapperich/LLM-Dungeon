@@ -1,6 +1,5 @@
-TBD - add soem type of rock/paper/scissors type system to make combat more interesting simple and fun?
 
-Simplified RPS Cycle
+THIS MIGHT BE TOO COMPLICATED
 
 | Hero Action      | Monster Action      | Outcome                                   |
 |------------------|---------------------|-------------------------------------------|
@@ -12,10 +11,16 @@ Simplified RPS Cycle
 
 priority beats defensive stance - comes out first.
 
+## Player Goal based RPS
 corruption -> low will
 grappling --> low might usually, low grace sometimes?
 wounding --> low might, usually? low grace sometimes
 
+## Attribute-based RPS
 grace based abilities --> warriors, mages
 might based abilities--> mages
 will based abilities --> warriors
+
+## Better system?
+? attack > grapple/breakfree > defend > attack ?
+This works for both players.

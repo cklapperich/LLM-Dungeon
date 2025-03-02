@@ -1,11 +1,30 @@
 ## Attributes and Skills
 
-# **CAN YOU SEE THE HERO'S NEXT MOVE?**
-Important - key game design decision. Could make Rockpaperscissors system more fun. you can respond to rock with a paper move if your monster actually has it!
-- you can see the hero's next move?
+# **Todo: add a run away action for heroes and monsters**
 
-Initiative is 2d10-grace, lowest wins, rerolled each round.
+Heroes and monsters should be able to run away/slip past
+For heroes its a way to advance further into the dungeon. 
+For critters its a way to avoid finishing blows from a hero and preserve the monster
+It needs a chance of failure either way. 
+Could be stealth-based for heroes. 
+could be grace-based for both.
+for heroes isnt this just an auto-win button though? they should maybe only be able to use it after X rounds, have taken X damage in total
+or taken X damage this round or below X% of heatlh.
+maybe only rogues and mages can use it - for mages it could be a 2-turn chargegup, rogues could have to be in battle for X turns to use it or deal x damage to use it?
 
+# **ORTHOGONAL DESIGN GOOD. LINEAR DESIGN BAD** 
+
+## Synergy Systems - how to make monster abilities FUN and UNIQUE
+
+- Room-based synergies (monsters perform differently based on room type)
+- Adjacent room synergies (monsters interact with nearby monsters)
+- Status effect synergies (monsters that capitalize on specific status effects)
+- attribute-based synergies (wit/will/grace/might)
+- goal based synergies (kill/corrupt/breed)
+- bodypart-based synergies? (all my monsters have tails?)
+
+# Initiative
+Just a skillcheck. Initiative is 2d10-grace, lowest wins, rerolled each round.
 
 ## Kill, Breed, Corrupt
 Killing or releasing are easiest options, reduce Vitality to 3 to do either.
