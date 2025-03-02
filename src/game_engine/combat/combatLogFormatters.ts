@@ -126,7 +126,7 @@ export class CombatLogFormatters {
             return `Combat phase started in ${event.room.name || 'the room'}\nParticipants: ${participants}`;
         } else if (event.subtype === 'END') {
             return `Combat phase ended - ${event.winner?.name || 'No winner'} ${event.reason ? `(${event.reason})` : ''}`;
-        } else if (event.subtype === 'TURN') {
+        } else if (event.subtype === 'ROUND_START') {
             // Assuming the first character in the array is the active one for the turn
             const activeCharacter = event.characters?.[0];
             if (!activeCharacter) return 'Turn phase';

@@ -14,10 +14,14 @@ export interface Character {
     traits: Trait[];
     attributes: Record<Attribute, number>;
     skills: Record<string, number>;
-    maxVitality: number;
-    vitality: number;
-    maxConviction: number;
-    conviction: number;
+    vitality: {
+        max: number,
+        current: number
+    }
+    conviction: {
+        max: number,
+        current: number
+    }
     description: string;
     flags: Record<string, string>;
     size?: MonsterSize; // Optional size field for monsters
@@ -58,6 +62,10 @@ export function createCharacter(character: Partial<Character> = {}): Character {
         Wit: character.attributes?.Wit ?? 10,
     };
 
+    // Calculate max values based on attributes
+    const maxVitalityValue = calculateMaxVitality(attributes.Might);
+    const maxConvictionValue = calculateMaxConviction(attributes.Will);
+
     return {
         id: character.id ?? crypto.randomUUID(),
         name: character.name ?? 'New Character',
@@ -66,10 +74,14 @@ export function createCharacter(character: Partial<Character> = {}): Character {
         traits: character.traits ?? [],
         attributes: attributes,
         skills: character.skills ?? {},
-        maxVitality: character.maxVitality??calculateMaxVitality(attributes.Might),
-        vitality: character.vitality??calculateMaxVitality(attributes.Grace),
-        maxConviction: character.conviction??calculateMaxConviction(attributes.Will),
-        conviction: character.conviction??calculateMaxConviction(attributes.Will),
+        vitality: character.vitality ?? {
+            max: maxVitalityValue,
+            current: maxVitalityValue
+        },
+        conviction: character.conviction ?? {
+            max: maxConvictionValue,
+            current: maxConvictionValue
+        },
         description: character.description ?? "",
         flags: character.flags ?? {},
         armor: character.armor ?? {max:1, current:1},

@@ -1,22 +1,53 @@
 {
-  "full": [
-    "in perfect condition",
-    "completely unharmed",
-    "at their peak"
-  ],
-  "high": [
-    "showing minor signs of wear",
-    "slightly winded",
-    "mostly fresh"
-  ],
-  "medium": [
-    "noticeably wounded",
-    "showing clear signs of injury",
-    "visibly struggling"
-  ],
-  "low": [
-    "severely wounded",
-    "barely standing",
-    "gravely injured"
+  "states": {
+    "full": "in peak physical condition",
+    "high": "slightly winded",
+    "medium": "visibly wounded",
+    "low": "critically injured",
+    "depleted": "on the verge of collapse"
+  },
+  "descriptions": {
+    "full": [
+      "in perfect condition",
+      "completely unharmed",
+      "at their peak",
+      "showing no signs of fatigue",
+      "ready for anything"
+    ],
+    "high": [
+      "showing minor signs of wear",
+      "slightly winded",
+      "mostly fresh",
+      "with a few scrapes",
+      "breathing a bit heavily"
+    ],
+    "medium": [
+      "noticeably wounded",
+      "showing clear signs of injury",
+      "visibly struggling",
+      "grimacing through pain",
+      "slowed by various injuries"
+    ],
+    "low": [
+      "severely wounded",
+      "barely standing",
+      "gravely injured",
+      "fighting through tremendous pain",
+      "desperately clinging to consciousness"
+    ],
+    "depleted": [
+      "on the brink of death",
+      "with life quickly fading",
+      "moments from collapsing",
+      "with glazed, unfocused eyes",
+      "unable to continue much longer"
+    ]
+  },
+  "thresholds": [
+    {"state": "full", "threshold": 100},
+    {"state": "high", "threshold": 75},
+    {"state": "medium", "threshold": 50},
+    {"state": "low", "threshold": 25},
+    {"state": "depleted", "threshold": 1}
   ]
 }

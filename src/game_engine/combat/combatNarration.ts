@@ -60,8 +60,7 @@ function getNarrationSettings(state: CombatState, isInitialNarration: boolean = 
                 statusName === StatusName.BOUND_ARM ||
                 statusName === StatusName.BOUND_LEG ||
                 statusName === StatusName.BOUND_MOUTH ||
-                statusName === StatusName.BOUND_TAIL ||
-                statusName === StatusName.BOUND_MONSTER_PART
+                statusName === StatusName.BOUND_TAIL
             );
         }
         return false;
@@ -71,7 +70,7 @@ function getNarrationSettings(state: CombatState, isInitialNarration: boolean = 
         return { spiceLevel: SpiceLevels.SUGGESTIVE, length: Lengths.MEDIUM };
     }
 
-// Default to NONE/SHORT for regular combat actions
+    // Default to NONE/SHORT for regular combat actions
     return { spiceLevel: SpiceLevels.NONE, length: Lengths.SHORT };
 }
 
@@ -93,7 +92,8 @@ function getModelForNarration(spiceLevel: SpiceLevel, length: Length, settings: 
 }
 
 export async function generateInitialNarration(
-    state: CombatState
+    state: CombatState,
+    structuredLogs: string
 ): Promise<string> {
     try {
         const characters = state.characters;
@@ -103,6 +103,10 @@ export async function generateInitialNarration(
         const { spiceLevel, length } = getNarrationSettings(state, true, 0);
         const characterInfo = LLMLogFormatters.formatCharactersForLLM(characters[0], characters[1]);
         
+        // Generate structured logs if not provided
+        const formattedLogs = structuredLogs || 
+            LLMLogFormatters.formatEventsForSingleRound(currentRoundLog.events || []);
+        
         // Get the appropriate model for this narration
         const model = getModelForNarration(spiceLevel, length, state.settings);
         
@@ -110,14 +114,17 @@ export async function generateInitialNarration(
             PROMPTS.narrate.system,
             spiceLevel,
             length,
-            currentRoundLog.llmContextLog || [],
+            formattedLogs,  // Use the new structured logs
             [], // No previous narrations for initial
             TASKS.INITIAL_COMBAT,
             room?.description,
             characterInfo
         );
-        // now we need to log the prompt
-        state.combatLog[state.combatLog.length-1].prompts.push(systemPrompt);
+        
+        // Log the prompt
+        if (state.combatLog.length > 0) {
+            state.combatLog[state.combatLog.length-1].prompts.push(systemPrompt);
+        }
 
         return await callLLM('narrate', [systemPrompt], model, get_api_key(state.settings));
     } catch (error) {
@@ -128,7 +135,8 @@ export async function generateInitialNarration(
 }
 
 export async function generateRoundNarration(
-    state: CombatState
+    state: CombatState,
+    structuredLogs?: string
 ): Promise<string> {
     try {
         const characters = state.characters;
@@ -141,6 +149,10 @@ export async function generateRoundNarration(
         const { spiceLevel, length } = getNarrationSettings(state, false, state.round - 1);
         const characterInfo = LLMLogFormatters.formatCharactersForLLM(characters[0], characters[1]);
         
+        // Generate structured logs if not provided
+        const formattedLogs = structuredLogs ||
+            LLMLogFormatters.formatEventsForSingleRound(currentRoundLog.events || []);
+        
         // Get the appropriate model for this narration
         const model = getModelForNarration(spiceLevel, length, state.settings);
         
@@ -148,13 +160,18 @@ export async function generateRoundNarration(
             PROMPTS.narrate.system,
             spiceLevel,
             length,
-            currentRoundLog.llmContextLog || [],
+            formattedLogs,  // Use the new structured logs
             previousNarrations,
             TASKS.CONTINUE_COMBAT,
             null, // No room description needed for round narration
             characterInfo
         );
-        state.combatLog[state.combatLog.length-1].prompts.push(systemPrompt);
+        
+        // Log the prompt
+        if (state.combatLog.length > 0) {
+            state.combatLog[state.combatLog.length-1].prompts.push(systemPrompt);
+        }
+        
         return await callLLM('narrate', [systemPrompt], model, get_api_key(state.settings));
     } catch (error) {
         console.error('Failed to generate round narration:', error);
@@ -163,7 +180,8 @@ export async function generateRoundNarration(
 }
 
 export async function generateAfterMathNarration(
-    state: CombatState
+    state: CombatState,
+    structuredLogs?: string
 ): Promise<string> {
     try {
         const characters = state.characters;
@@ -175,6 +193,10 @@ export async function generateAfterMathNarration(
         const { spiceLevel, length } = getNarrationSettings(state, false, state.round - 1);
         const characterInfo = LLMLogFormatters.formatCharactersForLLM(characters[0], characters[1]);
         
+        // Generate structured logs if not provided
+        const formattedLogs = structuredLogs ||
+            LLMLogFormatters.formatEventsForSingleRound(currentRoundLog.events || []);
+        
         // Get the appropriate model for this narration
         const model = getModelForNarration(spiceLevel, length, state.settings);
         
@@ -182,12 +204,18 @@ export async function generateAfterMathNarration(
             PROMPTS.narrate.system,
             spiceLevel,
             length,
-            currentRoundLog.llmContextLog || [],
+            formattedLogs,  // Use the new structured logs
             previousNarrations,
             TASKS.COMBAT_AFTERMATH, 
+            null, // Room description
             characterInfo
         );
-        state.combatLog[state.combatLog.length-1].prompts.push(systemPrompt);
+        
+        // Log the prompt
+        if (state.combatLog.length > 0) {
+            state.combatLog[state.combatLog.length-1].prompts.push(systemPrompt);
+        }
+        
         return await callLLM('narrate', [systemPrompt], model, get_api_key(state.settings));
     } catch (error) {
         console.error('Failed to generate aftermath narration:', error);

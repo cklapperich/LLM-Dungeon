@@ -30,7 +30,7 @@ export async function populateCombatLogs(event: CombatEvent, state: CombatState)
     roundLog = {
       events: [],
       debugLog: [],
-      llmContextLog: [],
+      llmContextLog: [], // Keep for backward compatibility if needed
       llmNarrations: [],
       prompts: [],
       round: currentRoundIndex
@@ -46,31 +46,32 @@ export async function populateCombatLogs(event: CombatEvent, state: CombatState)
   const debugLog = CombatLogFormatters.formatEvent(event);
   roundLog.debugLog.push(debugLog);
   
-  // Generate and add LLM context log
-  const llmContextLog = LLMLogFormatters.formatEvent(event);
-  if (llmContextLog) {
-    roundLog.llmContextLog.push(llmContextLog);
-  }
-  
-  // Check if we should generate a narration for this event
-  if (!narrationEnabled) {
-    return;
-  }
-
-  // Only handle PHASECHANGE events for narration
-  if (event.type === EventType.PHASECHANGE) {
+  // Check if this is an event that should trigger narration
+  if (narrationEnabled && event.type === EventType.PHASECHANGE) {
     try {
       switch (event.subtype) {
         case PhaseChangeSubtype.START:
-          const narration = await generateInitialNarration(state);
+          // For combat start, use the dedicated combat start formatter
+          const structuredStartLogs = LLMLogFormatters.formatCombatStartEvent(event);
+          const narration = await generateInitialNarration(state, structuredStartLogs);
+          roundLog.llmContextLog.push(structuredStartLogs);
           if (narration) roundLog.llmNarrations.push(narration);
           break;
+          
         case PhaseChangeSubtype.ROUND_END:
-          const roundNarration = await generateRoundNarration(state);
+          // For round end, format all events from the current round
+          const structuredRoundLogs = LLMLogFormatters.formatEventsForSingleRound(roundLog.events);
+          const roundNarration = await generateRoundNarration(state, structuredRoundLogs);
+          roundLog.llmContextLog.push(structuredRoundLogs);
           if (roundNarration) roundLog.llmNarrations.push(roundNarration);
           break;
+          
         case PhaseChangeSubtype.END:
-          const aftermathNarration = await generateAfterMathNarration(state);
+          // For combat end, use the dedicated combat end formatter for the end event
+          // and format the other events separately
+          const combatEndLog = LLMLogFormatters.formatCombatEndEvent(event);
+          const aftermathNarration = await generateAfterMathNarration(state, combatEndLog);
+          roundLog.llmContextLog.push(combatEndLog);
           if (aftermathNarration) roundLog.llmNarrations.push(aftermathNarration);
           break;
       }
@@ -79,7 +80,6 @@ export async function populateCombatLogs(event: CombatEvent, state: CombatState)
     }
   }
 }
-
 /**
  * Logs an event and emits it to both the combat event bus and UI event bus
  * @param event The game event to emit

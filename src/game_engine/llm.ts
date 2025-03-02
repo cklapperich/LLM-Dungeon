@@ -13,18 +13,22 @@ export function formatSystemPrompt(
     prompt: string,
     spiceLevel: string,  // Still takes enum key
     length: string,      // Still takes enum key
-    combatLogs: string[],
+    formattedRoundLog:string,
     previousNarration: string[] = [],
     task: string,
     roomDescription?: string,
     characterInfo?: string
 ): string {
-    // Format sections using LLMLogFormatters
-    const narrationSettings = LLMLogFormatters.formatNarrationSettings(spiceLevel, length);
-    const roomSection = LLMLogFormatters.formatRoomDescription(roomDescription);
-    const formattedLogs = LLMLogFormatters.formatCombatLogs(combatLogs);
-    const formattedTask = LLMLogFormatters.formatTask(task);
-    const formattedPreviousNarration = LLMLogFormatters.formatPreviousNarration(previousNarration);
+    // Format sections using LLMLogFormatters.formatSectionWithHeader directly
+    const spiceLevelDescription = promptsData.spiceLevels[spiceLevel];
+    const lengthDescription = promptsData.lengths[length];
+    const narrationSettingsContent = `SPICE LEVEL: ${spiceLevelDescription}\nLENGTH: ${lengthDescription}`;
+    const narrationSettings = LLMLogFormatters.formatSectionWithHeader('Narration Settings', narrationSettingsContent);
+    
+    const roomSection = LLMLogFormatters.formatSectionWithHeader('Room Description', roomDescription || '');
+    const formattedLogs = LLMLogFormatters.formatSectionWithHeader('Recent Combat Actions', formattedRoundLog);
+    const formattedTask = LLMLogFormatters.formatSectionWithHeader('TASK', task);
+    const formattedPreviousNarration = LLMLogFormatters.formatSectionWithHeader('The Story So Far: ', previousNarration);
 
     // Replace placeholders in the prompt template with descriptive strings
     return prompt

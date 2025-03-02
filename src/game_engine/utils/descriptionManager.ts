@@ -1,18 +1,9 @@
-/**
- * DescriptionManager
- * 
- * PURPOSE:
- * Created to ensure consistent narrative theming and vocabulary throughout the game.
- * This component maps mechanical values (like health percentages or skill check margins)
- * to appropriate descriptive text, maintaining the game's tone while adding variety
- * through randomization. This prevents repetitive descriptions while keeping the
- * narrative voice consistent.
- */
-
 import skillDescriptions from '@assets/descriptions/skillchecks.json';
 import status from '@assets/descriptions/status.json';
 import attributes from '@assets/descriptions/attributes.json';
 import armorDescriptions from '@assets/descriptions/clothing.json';
+import vitalityDescriptions from '@assets/descriptions/vitality.json';
+import convictionDescriptions from '@assets/descriptions/conviction.json';
 import { IntensityType, IntensityTypes } from '../../types/constants';
 import { RollResult, SkillNames } from '../../types/skilltypes';
 
@@ -30,7 +21,7 @@ export class DescriptionManager {
         }
     }
 
-     /**
+    /**
      * Gets a description of a character's armor based on type and damage state
      * @param armor Object containing current and max armor values
      * @returns A description of the character's armor
@@ -87,24 +78,72 @@ export class DescriptionManager {
         }
     }
 
-    static getVitalityDescription(value: number): string {
-        try {
-            const prompts = attributes.vitality[value.toString()];
-            return prompts ? prompts[Math.floor(Math.random() * prompts.length)] : '';
-        } catch (error) {
-            console.warn(`No vitality description found for value ${value}`);
-            return '';
+    /**
+     * Gets a description of a character's vitality based on current and maximum values
+     * @param vitality Object containing current and max vitality values
+     * @returns A description of the character's vitality state
+     */
+    static getVitalityDescription(vitality: { current: number, max: number }): string {
+        const { current, max } = vitality;
+        
+        // Validate inputs
+        if (current < 0 || max <= 0 || current > max) {
+            console.error(`Invalid vitality: current=${current}, max=${max}`);
+            return "in an unknown state"; // Fallback
         }
+        
+        // Handle special case where vitality is depleted
+        if (current === 0) {
+            return vitalityDescriptions.descriptions.depleted[
+                Math.floor(Math.random() * vitalityDescriptions.descriptions.depleted.length)
+            ];
+        }
+        
+        // Calculate percentage of remaining vitality
+        const vitalityPercentage = (current / max) * 100;
+        
+        // Find the appropriate state based on thresholds
+        const vitalityState = vitalityDescriptions.thresholds.find(
+            t => vitalityPercentage >= t.threshold
+        )?.state || "depleted";
+        
+        // Get a random description for this state
+        const descriptions = vitalityDescriptions.descriptions[vitalityState];
+        return descriptions[Math.floor(Math.random() * descriptions.length)];
     }
 
-    static getCorruptionDescription(value: number): string {
-        try {
-            const prompts = attributes.corruption[value.toString()];
-            return prompts ? prompts[Math.floor(Math.random() * prompts.length)] : '';
-        } catch (error) {
-            console.warn(`No corruption description found for value ${value}`);
-            return '';
+    /**
+     * Gets a description of a character's conviction level (mental resistance to influence)
+     * @param conviction Object containing current and max conviction values
+     * @returns A description of the character's mental state and resistance to influence
+     */
+    static getConvictionDescription(conviction: { current: number, max: number }): string {
+        const { current, max } = conviction;
+        
+        // Validate inputs
+        if (current < 0 || max <= 0 || current > max) {
+            console.error(`Invalid conviction: current=${current}, max=${max}`);
+            return "in an indescribable mental state"; // Fallback
         }
+        
+        // Handle special case where conviction is completely eroded
+        if (current === 0) {
+            return convictionDescriptions.descriptions.broken[
+                Math.floor(Math.random() * convictionDescriptions.descriptions.broken.length)
+            ];
+        }
+        
+        // Calculate percentage of remaining conviction
+        const convictionPercentage = (current / max) * 100;
+        
+        // Find the appropriate state based on thresholds
+        const convictionState = convictionDescriptions.thresholds.find(
+            t => convictionPercentage >= t.threshold
+        )?.state || "broken";
+        
+        // Get a random description for this state
+        const descriptions = convictionDescriptions.descriptions[convictionState];
+        return descriptions[Math.floor(Math.random() * descriptions.length)];
     }
 
     static getStatusDescription(statusName: string, stacks: number): string {
@@ -141,7 +180,6 @@ export class DescriptionManager {
         return '';
     }
 
-
     /**
      * Determines intensity level from a margin value (for opposed checks)
      * @param margin The margin value (attacker.margin - defender.margin)
@@ -174,5 +212,30 @@ export class DescriptionManager {
     static getSkillDescriptionFromMargin(skillName: string, margin: number): string {
         const intensity = this.getIntensityFromMargin(margin);
         return this.getSkillDescription(skillName, intensity);
+    }
+
+    /**
+     * Ensures all descriptions have proper punctuation and formatting
+     * @param text The description text to standardize
+     * @returns The standardized text
+     */
+    static standardizePunctuation(text: string): string {
+        if (!text) return '';
+        
+        // Trim whitespace
+        let standardized = text.trim();
+        
+        // Ensure first letter is capitalized
+        if (standardized.length > 0) {
+            standardized = standardized.charAt(0).toUpperCase() + standardized.slice(1);
+        }
+        
+        // Ensure the text ends with proper punctuation
+        const lastChar = standardized.charAt(standardized.length - 1);
+        if (!['.', '!', '?', '...'].includes(lastChar) && standardized.length > 0) {
+            standardized += '.';
+        }
+        
+        return standardized;
     }
 }

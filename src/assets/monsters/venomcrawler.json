@@ -12,13 +12,31 @@
         "Stealth": 4,
         "Initiative": 3
     },
+    "vitality": {
+        "max": 3,
+        "current": 3
+    },
+    "conviction": {
+        "max": 2,
+        "current": 2
+    },
     "description": "A small, fast-moving spider with vibrant markings that indicate its potent venom. Though not powerful enough to take down a heroine alone, its stealthy approach and arousal-inducing venom makes it adapted to weaken targets for larger predators.",
     "size": 1,
-    "vitality": 2,
+    "armor": {
+        "max": 1,
+        "current": 1
+    },
+    "limbs": {
+        "arm": 2,
+        "leg": 2,
+        "mouth": 1
+    },
+    "statuses": [],
+    "flags": {},
     "traits": [
         {
             "name": "Arousal Venom",
-            "description": "The Venom Crawler shoots a needle of specialized venom that causes physical arousal",
+            "description": "A projectile needle of specialized venom that causes physical arousal",
             "rarity": "common",
             "skill": "Light Weapons",
             "defenseOptions": ["Dodge"],

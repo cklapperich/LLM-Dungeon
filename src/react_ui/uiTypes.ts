@@ -97,8 +97,8 @@ export function characterToUICard(
         artworkUrl: character.artworkUrl,
         stats: {
             topStats: [
-                { icon: Heart, value: character.vitality, label: 'Vitality' },
-                { icon: Flame, value: character.conviction, label: 'Conviction' },
+                { icon: Heart, value: character.vitality.current, label: 'Vitality' },
+                { icon: Flame, value: character.conviction.current, label: 'Conviction' },
                 { icon: Shield, value: character.armor.current, label: 'Armor' },
             ],
             bottomStats: [

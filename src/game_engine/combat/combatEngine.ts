@@ -113,6 +113,7 @@ export async function createNewCombat(characters:Character[], room: Room, gameSe
     const combatStartEvent: CombatPhaseChangedEvent = {
         type: 'PHASECHANGE',
         subtype: 'START',
+        round:0,
         characters: state.characters,
         room: room
     };
@@ -212,9 +213,6 @@ export async function executeTrait(
 }
 
 export async function executeCombatRound(state: CombatState, playerAction: Trait) {
-    // Increment round counter
-    state.round += 1;
-    
     // Validate combat participants
     const characterArray = state.characters;
     if (characterArray.length !== 2) {
@@ -224,10 +222,25 @@ export async function executeCombatRound(state: CombatState, playerAction: Trait
     // Identify player (monster) and AI (hero) characters
     const playerCharacter = characterArray.find(c => c.type === CharacterType.MONSTER);
     const aiCharacter = characterArray.find(c => c.type === CharacterType.HERO);
-    
+
+
+
     if (!playerCharacter || !aiCharacter) {
         throw new Error('Combat requires one player character and one AI character');
     }
+    // Increment round counter
+    state.round += 1;
+
+    // Emit round start event
+    const roundStartEvent: CombatEvent = {
+        type: 'PHASECHANGE',
+        subtype: 'ROUND_START',
+        round:1,
+        characters: characterArray,
+        room: state.room
+    };
+    
+    await logAndEmitCombatEvent(roundStartEvent, state);
     
     // Get actions for both participants
     const playerActionTrait = playerAction;
@@ -279,6 +292,7 @@ export async function executeCombatRound(state: CombatState, playerAction: Trait
     const roundEndEvent: CombatEvent = {
         type: 'PHASECHANGE',
         subtype: 'ROUND_END',
+        round: 1,
         characters: characterArray,
         room: state.room,
     };

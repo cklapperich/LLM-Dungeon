@@ -368,7 +368,7 @@ export function applyWound(
 ): GameActionResult {
     const { amount } = params;
 
-    target.vitality = Math.max(0, target.vitality - amount);
+    target.vitality.current = Math.max(0, target.vitality.current - amount);
 
     return {
         success: true,
@@ -393,6 +393,7 @@ export async function applyEndCombat(
     const combatEndEvent: CombatEvent = {
         type: 'PHASECHANGE',
         subtype: 'END' as const,
+        round: state.round,
         winner,
         loser,
         reason,

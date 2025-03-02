@@ -1,0 +1,53 @@
+{
+    "states": {
+      "resolute": "unwavering in resolve",
+      "determined": "mentally focused",
+      "wavering": "with faltering conviction",
+      "vulnerable": "psychologically vulnerable",
+      "broken": "with shattered will"
+    },
+    "descriptions": {
+      "resolute": [
+        "with iron-clad will",
+        "showing unshakable determination",
+        "mentally fortified against influence",
+        "with unwavering resolve",
+        "psychologically impenetrable"
+      ],
+      "determined": [
+        "maintaining mental focus despite pressure",
+        "with clear, determined eyes",
+        "standing firm against mental intrusion",
+        "resisting outside influence",
+        "clinging to their sense of self"
+      ],
+      "wavering": [
+        "with momentary lapses in conviction",
+        "visibly struggling against mental pressure",
+        "thoughts beginning to blur",
+        "doubting their own judgment",
+        "with occasional moments of confusion"
+      ],
+      "vulnerable": [
+        "showing signs of mental capitulation",
+        "thoughts easily redirected",
+        "with glazed, suggestible eyes",
+        "struggling to maintain independent thought",
+        "mental defenses critically compromised"
+      ],
+      "broken": [
+        "completely susceptible to suggestion",
+        "mentally subdued",
+        "with vacant, compliant eyes",
+        "devoid of resistance",
+        "willpower completely eroded"
+      ]
+    },
+    "thresholds": [
+      {"state": "resolute", "threshold": 100},
+      {"state": "determined", "threshold": 75},
+      {"state": "wavering", "threshold": 50},
+      {"state": "vulnerable", "threshold": 25},
+      {"state": "broken", "threshold": 1}
+    ]
+  }

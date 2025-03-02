@@ -5,8 +5,8 @@ const monsterFiles = import.meta.glob('@assets/monsters/*.json', { eager: true }
 const heroFiles = import.meta.glob('@assets/heroes/*.json', { eager: true });
 import profanedTempleJson from '@assets/dungeons/profaned_temple.json';
 import { loadDungeonFromJson } from '../game_engine/utils/dungeonUtils.js';
-import { loadMonster } from '@/game_engine/utils/dataLoader.js';
 import {getSettings} from '../game_engine/settings.js';
+import { loadCharacter } from '../types/actor.js';
 
 // Process these files to separate heroes and monsters
 export function loadAllCharacters() {
@@ -14,13 +14,13 @@ export function loadAllCharacters() {
     const monsters: Record<string, Character> = {};
     
     Object.values(monsterFiles).forEach((module: any) => {
-      const character = loadMonster(module.default);
+      const character = loadCharacter(JSON.stringify(module.default))
       character.type = 'monster'
       monsters[character.id] = character;
     });
     
     Object.values(heroFiles).forEach((module: any) => {
-        const character = loadMonster(module.default);
+        const character = loadCharacter(JSON.stringify(module.default))
         character.type = 'hero'
         heroes[character.id] = character;
       });

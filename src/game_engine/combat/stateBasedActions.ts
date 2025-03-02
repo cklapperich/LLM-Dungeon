@@ -36,7 +36,7 @@ export async function processBetweenActions(state: CombatState): Promise<CombatS
     
     // Update status durations and check for defeat
     for (const char of characters) {
-        if (char.vitality <= 0) {
+        if (char.vitality.current <= 0) {
             const winner = characters.find(c => c !== char);
             const loser = char;
             if (winner) {

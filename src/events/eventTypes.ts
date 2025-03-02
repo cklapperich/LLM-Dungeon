@@ -80,9 +80,10 @@ export interface StatusEvent {
 
 export interface CombatPhaseChangedEvent {
     type: 'PHASECHANGE';
-    subtype: 'START' | 'END' | 'TURN' | 'ROUND_END';
+    subtype: 'START' | 'END' | 'ROUND_START' | 'ROUND_END';
     room: Room;
     characters?: Character[];
+    round: number;
     winner?: Character;
     loser?: Character;
     reason?: CombatEndReasonType | string;

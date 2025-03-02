@@ -13,7 +13,7 @@ Future refactor should:
 */
 
 const message_default = 'MESSAGE STRING NOT SUPPORTED';
-
+import { safeScriptHandler } from './jsonScriptManager.ts';
 import { EffectType, GrappleType, CombatEndReason } from '../../types/constants.js';
 import { Character } from '../../types/actor.js';
 import { applyWound, applyGrapple, applyStatus, modifyClothing, applyEndCombat } from './modifyCombatState.ts';
@@ -33,35 +33,8 @@ export interface Effect {
 export type EffectHandler = (effect: Effect, source: Character, target: Character, state: CombatState) => Promise<{ success: boolean; message: string }> | { success: boolean; message: string };
 
 export const effectHandlers: Record<typeof EffectType[keyof typeof EffectType], EffectHandler> = {
-    [EffectType.SCRIPT]: async (effect, source, target, state) => {
-        try {
-            // Create helper functions
-            const getStatus = (character, statusName) => {
-                const status = character.statuses.find(s => s.name === statusName);
-                return status ? status.stacks : 0;
-            };
-            
-            const hasFlag = (character, flagName) => !!character.flags[flagName];
-            
-            const random = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-            
-            const randomChoice = (array) => array[Math.floor(Math.random() * array.length)];
-            
-            // Execute the script
-            eval(effect.params.script);
-            
-            return {
-                success: true,
-                message: message_default
-            };
-        } catch (error) {
-            console.error('Script error:', error);
-            return {
-                success: false,
-                message: `Script error: ${error.message}`
-            };
-        }
-    },
+    [EffectType.SCRIPT]: safeScriptHandler,
+    
     [EffectType.ADVANCE_TURN]: (effect, source, target, state) => {
 
         // Move to next character
