@@ -75,6 +75,7 @@ export const effectHandlers: Record<typeof EffectType[keyof typeof EffectType], 
     },
     [EffectType.END_COMBAT]: async (effect, source, target, state) => {
         const winner = effect.params.winner;
+        const loser = state.characters.find(c => c !== winner);
         if (!winner) {
             return {
                 success: false,
@@ -85,6 +86,7 @@ export const effectHandlers: Record<typeof EffectType[keyof typeof EffectType], 
         const result = await applyEndCombat(
             state,
             winner,
+            loser,
             effect.params.reason
         );
 
