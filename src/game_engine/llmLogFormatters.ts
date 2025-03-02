@@ -5,6 +5,7 @@
  * Transforms game events into natural language narratives suitable for LLM processing.
  * Focuses on descriptive text without numerical values to maintain narrative immersion.
  * Uses DescriptionManager to ensure consistent vocabulary and theming.
+ * Handles all section formatting with headers to ensure consistency.
  */
 
 import { 
@@ -13,28 +14,119 @@ import {
     AbilityEvent,
     StatusEvent,
     CombatPhaseChangedEvent,
-    InitiativeEvent,
-    CombatStartEndEvent
 } from '../events/eventTypes';
 import { Character } from '../types/actor';
 import { DescriptionManager } from './utils/descriptionManager';
 import { CharacterType, CombatEndReason} from '../types/constants';
+import promptsData from '@assets/descriptions/prompts.json';
 
 export class LLMLogFormatters {
-    private static formatSkillCheck(event: SkillCheckEvent): string {
-        const intensity = DescriptionManager.getIntensityFromRoll(event.result);
-        const description = DescriptionManager.getSkillDescription(event.skill, intensity);
+    /**
+     * Formats a section with a header, only including the header if content exists
+     * @param title The section title
+     * @param content The section content
+     * @returns Formatted section with header, or empty string if content is empty
+     */
+    static formatSectionWithHeader(title: string, content: string | string[]): string {
+        // If content is an array, join it with newlines
+        const contentStr = Array.isArray(content) ? content.join('\n') : content;
         
-        if (event.is_opposed && event.opposed_result) {
-            const opposedIntensity = DescriptionManager.getIntensityFromRoll(event.opposed_result);
-            const opposedDescription = DescriptionManager.getSkillDescription(event.skill, opposedIntensity);
-            
-            return event.result.success
-                ? `${event.actor.name}: ${description}`
-                : `${event.actor.name}: ${description}`;
+        // Only include the section if content exists and is not just whitespace
+        if (contentStr && contentStr.trim()) {
+            return `=== ${title} ===\n${contentStr}`;
         }
- 
-        return `${event.actor.name}: ${description}`;
+        
+        // Return empty string if no content
+        return '';
+    }
+    
+    /**
+     * Formats room description with header
+     */
+    static formatRoomDescription(description?: string): string {
+        return this.formatSectionWithHeader('Room Description', description || '');
+    }
+    
+    /**
+     * Formats combat logs with header
+     */
+    static formatCombatLogs(logs: string[]): string {
+        return this.formatSectionWithHeader('Recent Combat Actions', logs);
+    }
+    
+    /**
+     * Formats narration settings section
+     */
+    static formatNarrationSettings(spiceLevel: string, length: string): string {
+        const spiceLevelDescription = promptsData.spiceLevels[spiceLevel];
+        const lengthDescription = promptsData.lengths[length];
+        
+        const content = `SPICE LEVEL: ${spiceLevelDescription}\nLENGTH: ${lengthDescription}`;
+        return this.formatSectionWithHeader('Narration Settings', content);
+    }
+    
+    /**
+     * Formats task section
+     */
+    static formatTask(task: string): string {
+        return this.formatSectionWithHeader('TASK', task);
+    }
+    
+    /**
+     * Formats previous narration section
+     */
+    static formatPreviousNarration(narration: string[]): string {
+        return this.formatSectionWithHeader('The Story So Far: ', narration);
+    }
+    private static formatSkillCheck(event: SkillCheckEvent): string {
+        // Handle non-opposed skill checks
+        if (!event.is_opposed || !event.opposed_result || !event.target) {
+            // Use the intensity directly from the roll result
+            const description = DescriptionManager.getSkillDescription(event.skill, event.result.intensity);
+            return `${event.actor.name}: ${description}`;
+        }
+        
+        // From here on, we're dealing with opposed skill checks (including initiative)
+        
+        // Randomly choose between describing from winner's or loser's perspective
+        const randomChoice = Math.random() > 0.5;
+        
+        if (event.opposed_margin === undefined) {
+            // If no margin is provided, just use the actor's perspective
+            const description = DescriptionManager.getSkillDescription(event.skill, event.result.intensity);
+            return `${event.actor.name}: ${description}`;
+        }
+        
+        // Determine winner and loser
+        const isActorWinner = event.opposed_margin > 0;
+        const winner = isActorWinner ? event.actor : event.target;
+        const loser = isActorWinner ? event.target : event.actor;
+        
+        // Choose perspective based on random choice
+        let character, description;
+        if (randomChoice) {
+            // Winner's perspective with positive margin
+            character = winner;
+            description = DescriptionManager.getSkillDescriptionFromMargin(
+                event.skill, 
+                Math.abs(event.opposed_margin)
+            );
+        } else {
+            // Loser's perspective with negative margin
+            character = loser;
+            description = DescriptionManager.getSkillDescriptionFromMargin(
+                event.skill, 
+                -Math.abs(event.opposed_margin)
+            );
+        }
+        
+        // Special handling for initiative checks - add "moves first" for the winner
+        if (event.skill === 'Initiative') {
+            return `${winner.name} moves first. ${character.name}: ${description}`;
+        }
+        
+        // Regular opposed skill check
+        return `${character.name}: ${description}`;
     }
 
     private static formatAbility(event: AbilityEvent): string {
@@ -80,7 +172,7 @@ export class LLMLogFormatters {
             const loser = event.characters?.find(c => c.id !== winner.id);
             
             const vitalityDesc = DescriptionManager.getVitalityDescription(winner.vitality);
-            const clothingDesc = DescriptionManager.getClothingDescription(winner.clothing);
+            const clothingDesc = DescriptionManager.getArmorDescription(winner.armor);
             
             // Check for specific combat end reasons
             if (event.reason === CombatEndReason.DEATH && loser) {
@@ -95,9 +187,7 @@ export class LLMLogFormatters {
             
             // Default message for other reasons
             let result = `${winner.name} stands triumphant, ${vitalityDesc}`;
-            if (winner.type !== CharacterType.MONSTER) {
-                result += ` and ${clothingDesc}`;
-            }
+
         return result;
     } else if (event.subtype === 'ROUND_END') {
         // Skip round end messages
@@ -107,57 +197,6 @@ export class LLMLogFormatters {
     return '';
 }
 
-    private static formatCombatStateChange(event: CombatStartEndEvent): string {
-        if (event.subtype === 'START') {
-            return event.characters?.map(c => {
-                const vitalityDesc = DescriptionManager.getVitalityDescription(c.vitality);
-                const clothingDesc = c.type !== CharacterType.MONSTER ? 
-                    ` and ${DescriptionManager.getClothingDescription(c.clothing)}` : '';
-                return `${c.name} appears ${vitalityDesc}${clothingDesc}`;
-            }).join('. ') || '';
-        } else if (event.subtype === 'END') {
-            const winner = event.winner;
-            if (!winner) return '';
-            
-            // Determine the loser from the event characters
-            const loser = event.characters?.find(c => c.id !== winner.id);
-            
-            const vitalityDesc = DescriptionManager.getVitalityDescription(winner.vitality);
-            const clothingDesc = DescriptionManager.getClothingDescription(winner.clothing);
-            
-            // Check for specific combat end reasons
-            if (event.reason === CombatEndReason.DEATH && loser) {
-                return `${loser.name} is dead. ${winner.name} stands triumphant, ${vitalityDesc}`;
-            } else if (event.reason === CombatEndReason.BREEDING && loser) {
-                return `${winner.name} has bred with ${loser.name} and stands triumphant, ${vitalityDesc}`;
-            } else if (event.reason === CombatEndReason.ESCAPE && loser) {
-                return `${loser.name} has escaped. ${winner.name} remains, ${vitalityDesc}`;
-            } else if (event.reason === CombatEndReason.SURRENDER && loser) {
-                return `${loser.name} has surrendered. ${winner.name} stands triumphant, ${vitalityDesc}`;
-            }
-            
-            // Default message for other reasons
-            let result = `${winner.name} stands triumphant, ${vitalityDesc}`;
-            if (winner.type !== CharacterType.MONSTER) {
-                result += ` and ${clothingDesc}`;
-            }
-            return result;
-        }
-        
-        return '';
-    }
-
-    private static formatInitiative(event: InitiativeEvent): string {
-        const [result1, result2] = event.results;
-        const intensity1 = DescriptionManager.getIntensityFromRoll(result1);
-        const intensity2 = DescriptionManager.getIntensityFromRoll(result2);
-        const desc1 = DescriptionManager.getSkillDescription('Initiative', intensity1);
-        const desc2 = DescriptionManager.getSkillDescription('Initiative', intensity2);
-        
-        return `${event.characters[0].name}: ${desc1}. ` +
-               `${event.characters[1].name}: ${desc2}. ` +
-               `${event.first_actor.name} moves first`;
-    }
 
     static formatEvent(event: GameEvent): string {
         if (!event) {
@@ -186,8 +225,6 @@ export class LLMLogFormatters {
                     return this.formatStatus(gameEvent as StatusEvent);
                 case 'PHASECHANGE':
                     return this.formatCombatPhaseChange(gameEvent as CombatPhaseChangedEvent);
-                case 'INITIATIVE':
-                    return this.formatInitiative(gameEvent as InitiativeEvent);
                 default:
                     console.error('Unknown event type:', event.type, event);
                     return '';
@@ -250,7 +287,7 @@ export class LLMLogFormatters {
             
             // Only include clothing description for heroes, not monsters
             const appearanceSection = isHero ? 
-                `Appearance: ${DescriptionManager.getClothingDescription(character.clothing)}` : '';
+                `Appearance: ${DescriptionManager.getArmorDescription(character.armor)}` : '';
             
             // Format active statuses
             const statusDescriptions = character.statuses
@@ -260,13 +297,27 @@ export class LLMLogFormatters {
             const statusSection = statusDescriptions.length > 0 
                 ? `\nCondition: ${statusDescriptions.join(', ')}`
                 : '';
-                
-            return `=== ${type}: ${character.name} ===
-Vitality: ${vitalityDesc}
+            
+            const content = `Vitality: ${vitalityDesc}
 ${appearanceSection}${statusSection}
 ${character.description ? `\n${character.description}` : ''}`;
+            
+            return this.formatSectionWithHeader(`${type}: ${character.name}`, content);
         };
 
-        return `${formatCharacter(hero, true)}\n\n${formatCharacter(monster, false)}`;
+        const heroSection = formatCharacter(hero, true);
+        const monsterSection = formatCharacter(monster, false);
+        
+        // Only include sections if they have content
+        const sections = [heroSection, monsterSection].filter(Boolean);
+        return sections.join('\n\n');
+    }
+    
+    /**
+     * Formats the complete character information section with header
+     */
+    static formatCharacterInfoSection(hero: Character, monster: Character): string {
+        const characterInfo = this.formatCharactersForLLM(hero, monster);
+        return characterInfo ? this.formatSectionWithHeader('Character Information', characterInfo) : '';
     }
 }

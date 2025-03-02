@@ -22,7 +22,10 @@ export interface Character {
     flags: Record<string, string>;
     size?: MonsterSize; // Optional size field for monsters
     initiative?: number; // Track initiative in combat
-    clothing: number; // Track clothing level (0-5)
+    armor: {
+        max:number,
+        current: number
+    }
     limbs: Partial<Record<BodyPart, number>>; // Track which limbs the character has
     statuses: Status[]; // Track active status effects
     selected_action?: Trait; // Track the selected action for the current turn
@@ -69,7 +72,7 @@ export function createCharacter(character: Partial<Character> = {}): Character {
         conviction: character.conviction??calculateMaxConviction(attributes.Will),
         description: character.description ?? "",
         flags: character.flags ?? {},
-        clothing: character.clothing ?? 1, // Default clothing level is 1
+        armor: character.armor ?? {max:1, current:1},
         limbs: character.limbs ?? {
             [BodyPartType.ARM]: 2,
             [BodyPartType.LEG]: 2,

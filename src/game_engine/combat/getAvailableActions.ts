@@ -97,11 +97,11 @@ export function checkRequirements(
             state.characters.find(c => c.type !== actor.type) :
             actor;
         
-        const clothingLevel = target?.clothing || 0;
+        const clothingLevel = target.armor.current;
         if (clothingLevel > ability.requirements.clothing.maxLevel) {
             return {
                 success: false,
-                reason: `Requires clothing level ${ability.requirements.clothing.maxLevel} or less`
+                reason: `Requires armor level ${ability.requirements.clothing.maxLevel} or less`
             };
         }
     }

@@ -1,4 +1,5 @@
 import promptsData from '@assets/descriptions/prompts.json';
+import { LLMLogFormatters } from './llmLogFormatters';
 
 export type TaskType = 'narrate';
 const PROMPTS = promptsData.prompts;
@@ -8,47 +9,38 @@ interface ChatMessage {
     role: 'system' | 'user' | 'assistant';
     content: string;
 }
-
-// Format the system prompt with all required information
 export function formatSystemPrompt(
     prompt: string,
-    spiceLevel: string,
-    length: string,
+    spiceLevel: string,  // Still takes enum key
+    length: string,      // Still takes enum key
     combatLogs: string[],
     previousNarration: string[] = [],
     task: string,
     roomDescription?: string,
     characterInfo?: string
 ): string {
-    // Build room description section
-    const roomSection = roomDescription 
-        ? `=== Room Description ===\n${roomDescription}`
-        : '';
-    
-    // Format combat logs
-    const formattedLogs = combatLogs.length > 0 
-        ? `=== Recent Combat Actions ===\n${combatLogs.join('\n')}`
-        : '';
+    // Format sections using LLMLogFormatters
+    const narrationSettings = LLMLogFormatters.formatNarrationSettings(spiceLevel, length);
+    const roomSection = LLMLogFormatters.formatRoomDescription(roomDescription);
+    const formattedLogs = LLMLogFormatters.formatCombatLogs(combatLogs);
+    const formattedTask = LLMLogFormatters.formatTask(task);
+    const formattedPreviousNarration = LLMLogFormatters.formatPreviousNarration(previousNarration);
 
+    // Replace placeholders in the prompt template with descriptive strings
     return prompt
-        .replace('{spiceLevel}', spiceLevel)
-        .replace('{length}', length)
+        .replace('{narrationSettings}', narrationSettings)
         .replace('{roomDescription}', roomSection)
-        .replace('{characterInfo}', characterInfo)
+        .replace('{characterInfo}', characterInfo || '')
         .replace('{combatLogs}', formattedLogs)
-        .replace('{previousNarration}', previousNarration.join('\n'))
-        .replace('{task}', task)
+        .replace('{previousNarration}', formattedPreviousNarration)
+        .replace('{task}', formattedTask)
         .replace('{game_context}', GAME_CONTEXT);
-}
-
-function cleanLLMResponse(response: string): string {    
-    return response;
 }
 
 export async function callLLM(
     taskType: TaskType,
     messages: string[],
-    model = 'deepseek/deepseek-chat:free', // 'meta-llama/llama-3.3-70b-instruct:free',
+    model = 'deepseek/deepseek-chat:free',
     apiKey:string=null,
 ): Promise<string> {
 
@@ -80,5 +72,5 @@ export async function callLLM(
     }
 
     const data = await response.json();
-    return cleanLLMResponse(data.choices[0].message.content);
+    return data.choices[0].message.content;
 }

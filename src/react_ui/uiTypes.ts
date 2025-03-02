@@ -99,7 +99,7 @@ export function characterToUICard(
             topStats: [
                 { icon: Heart, value: character.vitality, label: 'Vitality' },
                 { icon: Flame, value: character.conviction, label: 'Conviction' },
-                { icon: Shield, value: character.clothing, label: 'Armor' },
+                { icon: Shield, value: character.armor.current, label: 'Armor' },
             ],
             bottomStats: [
                 { icon: Sword, value: character.attributes.Might, label: 'Might' },

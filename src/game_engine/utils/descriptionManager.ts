@@ -12,7 +12,7 @@
 import skillDescriptions from '@assets/descriptions/skillchecks.json';
 import status from '@assets/descriptions/status.json';
 import attributes from '@assets/descriptions/attributes.json';
-import clothing from '@assets/descriptions/clothing.json';
+import armorDescriptions from '@assets/descriptions/clothing.json';
 import { IntensityType, IntensityTypes } from '../../types/constants';
 import { RollResult, SkillNames } from '../../types/skilltypes';
 
@@ -30,14 +30,39 @@ export class DescriptionManager {
         }
     }
 
-    static getClothingDescription(level: number): string {
-        try {
-            const prompts = clothing[level.toString()];
-            return prompts[Math.floor(Math.random() * prompts.length)];
-        } catch (error) {
-            console.warn(`No clothing description found for level ${level}`);
-            return '';
+     /**
+     * Gets a description of a character's armor based on type and damage state
+     * @param armor Object containing current and max armor values
+     * @returns A description of the character's armor
+     */
+    static getArmorDescription(armor: { current: number, max: number }): string {
+        const { current, max } = armor;
+        
+        // Quick validation - just the essential checks
+        if (current < 0 || max < 0 || current > max || !armorDescriptions.armorTypes[max.toString()]) {
+            console.error(`Invalid armor: current=${current}, max=${max}`);
+            return "wearing damaged armor"; // Fallback description instead of throwing
         }
+        
+        // Handle special cases first
+        if (max === 0) {
+            return armorDescriptions.armorTypes["0"]; // Unarmored
+        }
+        
+        if (current === 0) {
+            return `${armorDescriptions.armorTypes[max.toString()]} ${armorDescriptions.damageStates.destroyed}`;
+        }
+        
+        // Normal case - find damage state based on percentage
+        const damagePercentage = (current / max) * 100;
+        
+        // Find first threshold that applies
+        const damageState = armorDescriptions.damageThresholds.find(
+            t => damagePercentage >= t.threshold
+        )?.state || "destroyed";
+        
+        // Combine armor type with damage state
+        return `${armorDescriptions.armorTypes[max.toString()]} ${armorDescriptions.damageStates[damageState]}`;
     }
 
     static getAttributeDescription(value: number): string {
@@ -116,7 +141,13 @@ export class DescriptionManager {
         return '';
     }
 
-    static getIntensityFromRoll(roll: RollResult): IntensityTypes {
+
+    /**
+     * Determines intensity level from a margin value (for opposed checks)
+     * @param margin The margin value (attacker.margin - defender.margin)
+     * @returns The appropriate intensity level
+     */
+    static getIntensityFromMargin(margin: number): IntensityTypes {
         const { MARGIN_THRESHOLDS } = {
             MARGIN_THRESHOLDS: {
                 SOLID_SUCCESS: 4,
@@ -125,15 +156,23 @@ export class DescriptionManager {
             }
         };
 
-        // Check for critical success/failure first based on roll
-        if (roll.isCriticalSuccess) return IntensityType.CRITICAL_SUCCESS;
-        if (roll.isCriticalFailure) return IntensityType.CRITICAL_FAILURE;
-
-        // Then check margins for regular success/failure
-        if (roll.margin >= MARGIN_THRESHOLDS.SOLID_SUCCESS) return IntensityType.SOLID_SUCCESS;
-        if (roll.margin >= MARGIN_THRESHOLDS.MINIMAL_SUCCESS) return IntensityType.MINIMAL_SUCCESS;
-        if (roll.margin > MARGIN_THRESHOLDS.SOLID_FAILURE) return IntensityType.SOLID_FAILURE;
+        // For margins, we don't have critical success/failure info
+        // so we just use the margin thresholds
+        if (margin >= MARGIN_THRESHOLDS.SOLID_SUCCESS) return IntensityType.SOLID_SUCCESS;
+        if (margin >= MARGIN_THRESHOLDS.MINIMAL_SUCCESS) return IntensityType.MINIMAL_SUCCESS;
+        if (margin > MARGIN_THRESHOLDS.SOLID_FAILURE) return IntensityType.SOLID_FAILURE;
 
         return IntensityType.MINIMAL_FAILURE;
+    }
+
+    /**
+     * Gets a skill description directly from a skill name and margin
+     * @param skillName The name of the skill
+     * @param margin The margin value
+     * @returns A description of the skill check result
+     */
+    static getSkillDescriptionFromMargin(skillName: string, margin: number): string {
+        const intensity = this.getIntensityFromMargin(margin);
+        return this.getSkillDescription(skillName, intensity);
     }
 }

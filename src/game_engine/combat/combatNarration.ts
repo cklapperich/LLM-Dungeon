@@ -154,7 +154,7 @@ export async function generateRoundNarration(
             null, // No room description needed for round narration
             characterInfo
         );
-
+        state.combatLog[state.combatLog.length-1].prompts.push(systemPrompt);
         return await callLLM('narrate', [systemPrompt], model, get_api_key(state.settings));
     } catch (error) {
         console.error('Failed to generate round narration:', error);
@@ -187,7 +187,7 @@ export async function generateAfterMathNarration(
             TASKS.COMBAT_AFTERMATH, 
             characterInfo
         );
-
+        state.combatLog[state.combatLog.length-1].prompts.push(systemPrompt);
         return await callLLM('narrate', [systemPrompt], model, get_api_key(state.settings));
     } catch (error) {
         console.error('Failed to generate aftermath narration:', error);

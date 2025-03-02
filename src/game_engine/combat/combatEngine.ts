@@ -17,7 +17,7 @@
 import { makeSkillCheck, makeOpposedCheck } from '../utils/skillCheck.ts';
 import { logAndEmitCombatEvent as logAndEmitCombatEvent } from './combatLogManager.ts';
 import { Character } from '../../types/actor.ts';
-import { Skills } from '../../types/skilltypes.ts';
+import { Skills, SkillNames } from '../../types/skilltypes.ts';
 import { Trait } from '../../types/abilities.ts';
 import { CharacterType, CombatEndReasonType } from '../../types/constants.ts';
 import { CombatState, createCombatState } from '../../types/combatState.ts';
@@ -26,7 +26,6 @@ import { processBetweenActions, processBetweenRounds } from './stateBasedActions
 import { getAvailableActions as getAvailableCombatActions, checkRequirements } from './getAvailableActions.ts';
 import { getAIAction } from './combatAI.ts';
 import { CombatGameAction } from '../../types/gamestate.ts';
-import { processInitiative } from '../utils/skillCheck.ts';
 import {Room} from '../../types/dungeon.ts';
 
 import {
@@ -34,7 +33,6 @@ import {
     AbilityEvent,
     EffectEvent,
     CombatEvent,
-    InitiativeEvent,
     CombatPhaseChangedEvent
 } from '../../events/eventTypes.ts';
 import { GameSettings } from '../../types/gamestate.ts';
@@ -43,12 +41,23 @@ export async function setupInitialTurnOrder(
     state: CombatState,
 ): Promise<void> {
     const characters = state.characters;
-    // Roll initial initiative
-    const initiativeResult = processInitiative(characters[0], characters[1], state);
-    const [init1, init2] = initiativeResult.initiatives;
+    const [char1, char2] = characters;
+    
+    // Use makeOpposedCheck for initiative
+    const initiativeResult = makeOpposedCheck(
+        char1, 
+        SkillNames.INITIATIVE, 
+        char2, 
+        SkillNames.INITIATIVE, 
+        0, 
+        state
+    );
+    
+    // Extract roll values
+    const init1 = initiativeResult.attacker.roll;
+    const init2 = initiativeResult.defender.roll;
     
     // Store actual initiative values
-    const [char1, char2] = characters;
     char1.initiative = init1;
     char2.initiative = init2;
     
@@ -56,12 +65,17 @@ export async function setupInitialTurnOrder(
     const firstActor = init1 <= init2 ? char1 : char2;
     state.activeCharacterIndex = characters.indexOf(firstActor);
 
-    // Create and push initiative event
-    const initiativeEvent: InitiativeEvent = {
-        type: 'INITIATIVE',
-        characters: [char1, char2],
-        results: initiativeResult.rollResults,
-        first_actor: firstActor
+    // Create and push skill check event for initiative
+    // Make the winner the actor for better description
+    const initiativeEvent: SkillCheckEvent = {
+        type: 'SKILL_CHECK',
+        actor: firstActor,
+        target: firstActor === char1 ? char2 : char1,
+        skill: SkillNames.INITIATIVE,
+        result: firstActor === char1 ? initiativeResult.attacker : initiativeResult.defender,
+        is_opposed: true,
+        opposed_result: firstActor === char1 ? initiativeResult.defender : initiativeResult.attacker,
+        opposed_margin: firstActor === char1 ? initiativeResult.margin : -initiativeResult.margin
     };
     await logAndEmitCombatEvent(initiativeEvent, state);
 }
@@ -169,7 +183,8 @@ export async function executeTrait(
             skill: trait.skill,
             result: skillCheckResult,
             is_opposed: !!target,
-            opposed_result: target ? skillCheck.defender : undefined
+            opposed_result: target ? skillCheck.defender : undefined,
+            opposed_margin: target ? skillCheck.margin : undefined
         };
         await logAndEmitCombatEvent(skillCheckEvent, state);
 

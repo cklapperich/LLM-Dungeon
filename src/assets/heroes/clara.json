@@ -1,20 +1,26 @@
 {
     "name": "Clara",
     "type": "hero",
-    "artworkUrl": "heroes/rogue1.jpeg",
-    "might": 8,
-    "grace": 14,
-    "wit": 12,
-    "will": 6,
+    "artworkUrl": "heroes/rogue1.jpeg", 
+    "attributes":{
+        "Might": 8,
+        "Grace": 14,
+        "Wit": 12,
+        "Will": 6
+    },
     "skills": {
         "Stealth": 2
     },
-    "description": "",
+    "armor":{
+        "max":3,
+        "current":3
+    },
+    "description": "A novice adventurer with a keen eye and a quick wit. Wearing armor composed of scraps of metal ,leather and cloth apdding. She wields a short sword conned from a merchant. Though smart and quick, she can be overconfident and foolish. Petite, but muscular, a small but hard body, her attacks are quick vicious and accurate. She's here for the treasure, not to rescue the victims.",
     "size": 1,
     "traits": [
         {
             "name": "Stab",
-            "description": "A skillfull rapier thrust",
+            "description": "A skillfull slash or stab with her weapon",
             "rarity": "common",
             "skill": "Light Weapons",
             "defenseOptions": ["Dodge","Block"],

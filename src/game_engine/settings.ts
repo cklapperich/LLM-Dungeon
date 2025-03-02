@@ -14,20 +14,20 @@ function getDefaultSettings(): GameSettings {
 export function saveSettings(settings: GameSettings): void {
   try {
     localStorage.setItem(USERSETTINGS_KEY, JSON.stringify(settings));
-    console.log('Settings saved successfully');
     } catch (error) {
        console.warn('Failed to save settings:', error);
     }
 }
 
 export function getSettings(): GameSettings {
-  // Start with default settings
-  const settings = { ...getDefaultSettings() };
-  
+  // Start with default setting
+  const settings = getDefaultSettings();
   try {
     const savedSettings = localStorage.getItem(USERSETTINGS_KEY);
     if (savedSettings) {
       const userSettings = JSON.parse(savedSettings);
+      // keep the llm_choices from default settings, dont let users load/save it
+      userSettings.llm_choices = settings.llm_choices;
       Object.assign(settings, userSettings);
     }
   } catch (error) {

@@ -60,6 +60,7 @@ export interface RollResult {
 export interface OpposedCheckResult {
     attacker: RollResult;
     defender: RollResult;
+    margin: number;
     attackerWins: boolean;
 }
 

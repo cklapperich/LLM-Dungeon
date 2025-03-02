@@ -2,10 +2,12 @@
     "name": "Venom Crawler",
     "type": "monster",
     "artworkUrl": "/monsters/phasespider.png",
-    "might": 8,
-    "grace": 12,
-    "wit": 9,
-    "will": 7,
+    "attributes":{
+        "Might": 8,
+        "Grace": 12,
+        "Wit": 9,
+        "Will": 7
+    },
     "skills": {
         "Stealth": 4,
         "Initiative": 3
@@ -16,7 +18,7 @@
     "traits": [
         {
             "name": "Arousal Venom",
-            "description": "The Venom Crawler shoots a needle of specialized venom that causes physical arousal.",
+            "description": "The Venom Crawler shoots a needle of specialized venom that causes physical arousal",
             "rarity": "common",
             "skill": "Light Weapons",
             "defenseOptions": ["Dodge"],
@@ -44,7 +46,7 @@
         },
         {
             "name": "Quick Bite",
-            "description": "The Venom Crawler strikes with impressive speed, leaving its victim little time to react.",
+            "description": "The Venom Crawler strikes with impressive speed, leaving its victim little time to react",
             "rarity": "common",
             "skill": "Light Weapons",
             "defenseOptions": ["Dodge"],

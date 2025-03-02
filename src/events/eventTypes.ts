@@ -4,8 +4,7 @@ export const EventType = {
   ABILITY: 'ABILITY' as const,
   EFFECT: 'EFFECT' as const,
   STATUS: 'STATUS' as const,
-  PHASECHANGE: 'PHASECHANGE' as const,
-  INITIATIVE: 'INITIATIVE' as const
+  PHASECHANGE: 'PHASECHANGE' as const
 };
 
 export const PhaseChangeSubtype = {
@@ -33,8 +32,7 @@ export type CombatEventType =
     | 'ABILITY'
     | 'EFFECT'
     | 'STATUS'
-    | 'PHASECHANGE'
-    | 'INITIATIVE';
+    | 'PHASECHANGE';
 
 // Define the event type literals for dungeon events
 export type DungeonEventType = 
@@ -51,6 +49,7 @@ export interface SkillCheckEvent {
     result: RollResult;
     is_opposed?: boolean;
     opposed_result?: RollResult;
+    opposed_margin?: number; // Combined margin for opposed checks (attacker.margin - defender.margin)
 }
 
 export interface AbilityEvent {
@@ -88,12 +87,6 @@ export interface CombatPhaseChangedEvent {
     reason?: CombatEndReasonType | string;
 }
 
-export interface InitiativeEvent {
-    type: 'INITIATIVE';
-    characters: [Character, Character];
-    results: [RollResult, RollResult];
-    first_actor: Character;
-}
 
 // Core dungeon event interfaces
 export interface MonsterAddedEvent {
@@ -117,8 +110,7 @@ export type CombatEvent =
     | AbilityEvent
     | EffectEvent
     | StatusEvent
-    | CombatPhaseChangedEvent
-    | InitiativeEvent;
+    | CombatPhaseChangedEvent;
 
 export interface HeroMovedEvent {
   type: 'HERO_MOVED';

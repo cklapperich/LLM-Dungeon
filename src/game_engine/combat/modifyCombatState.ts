@@ -349,8 +349,8 @@ export function modifyClothing(
 ): GameActionResult {
     const { amount } = params;
     
-    // Clothing can't go below 0 or above 5
-    target.clothing = Math.max(0, Math.min(5, target.clothing + amount));
+    // Clothing can't go below 0 or above their max
+    target.armor.current = Math.max(0, Math.min(target.armor.max, target.armor.current + amount));
 
     return {
         success: true,

@@ -2,13 +2,11 @@
     "name": "Green Slime",
     "type": "monster",
     "artworkUrl": "monsters/slime1.png",
-    "might": 16,
-    "grace": 16,
-    "wit": 16,
-    "will": 16,
-    "skills": {
-        "Stealth": 2,
-        "Strong Grapple": 2
+    "attributes":{
+        "Might": 8,
+        "Grace": 6,
+        "Wit": 4,
+        "Will": 4
     },
     "description": "A small, gelatinous creature that can dissolve into water and slip through tight spaces. Remarkably adaptable, it can learn any ability. It's stats are typically low - but this one seems unbelievably strong! Slimes reproduce via mitosis: it partially invades a victim's womb, then splits in two - one half says in the womb, the other half. stays outside where it was.",
     "size": 1,
@@ -19,7 +17,7 @@
         "shred",
         {
             "name": "Bludgeon",
-            "description": "A more skillful attack, reaching out with a tentacle to strike.",
+            "description": "A more skillful attack, reaching out with a tentacle to strike",
             "rarity": "common",
             "skill": "Grace",
             "defenseOptions": ["Dodge", "Block"],

@@ -27,12 +27,6 @@ export function loadAllCharacters() {
       
     return { heroes, monsters };
   }
-  export interface GameSettings {
-    narrationEnabled: boolean;
-    llm: string;
-    spicy_llm: string;
-    llm_choices: string[];
-}
 
 /**
  * Creates a test game state with default values

@@ -4,12 +4,6 @@ import { IntensityType, IntensityTypes } from '../../types/constants';
 import { getStatusModifiers } from '../statusEffects';
 import skillChecksJson from '@assets/descriptions/skillchecks.json';
 
-interface InitiativeResult {
-    initiatives: [number, number];
-    rollResults: [RollResult, RollResult];
-    margin: number;
-    description: string;
-}
 
 interface MarginModifiers {
     skills: Record<string, Record<string, string[]>>;
@@ -17,25 +11,6 @@ interface MarginModifiers {
 }
 export const marginModifiers: MarginModifiers = skillChecksJson;
 
-export function processInitiative(char1: Character, char2: Character, gameState: any = {}): InitiativeResult {
-    // Make initiative checks for both characters
-    const check1 = makeSkillCheck(char1, SkillNames.INITIATIVE, 0, gameState);
-    const check2 = makeSkillCheck(char2, SkillNames.INITIATIVE, 0, gameState);
-
-    // Calculate margin between initiatives
-    const margin = Math.abs(check1.margin - check2.margin);
-    const intensity = getIntensityLevel(null, margin);
-
-    // Get description from initiative category
-    const description = getSkillDescription(SkillNames.INITIATIVE, intensity);
-
-    return {
-        initiatives: [check1.roll, check2.roll],
-        rollResults: [check1, check2],
-        margin,
-        description
-    };
-}
 
 /**
  * Get the intensity level based on margin of success/failure
@@ -236,10 +211,10 @@ export function makeOpposedCheck(
     
     // If one succeeds and one fails, success wins
     if (attackerResult.success && !defenderResult.success) {
-        return { attacker: attackerResult, defender: defenderResult, attackerWins: true };
+        return { attacker: attackerResult, defender: defenderResult, attackerWins: true, margin: attackerResult.margin - defenderResult.margin };
     }
     if (!attackerResult.success && defenderResult.success) {
-        return { attacker: attackerResult, defender: defenderResult, attackerWins: false };
+        return { attacker: attackerResult, defender: defenderResult, attackerWins: false, margin: attackerResult.margin - defenderResult.margin };
     }
     
     // If both succeed or both fail, compare margins
@@ -252,6 +227,7 @@ export function makeOpposedCheck(
     return {
         attacker: attackerResult,
         defender: defenderResult,
+        margin: attackerResult.margin - defenderResult.margin,
         attackerWins
     };
 }
