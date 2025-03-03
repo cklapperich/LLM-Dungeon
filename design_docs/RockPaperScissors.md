@@ -22,5 +22,5 @@ might based abilities--> mages
 will based abilities --> warriors
 
 ## Better system?
-? attack > grapple/breakfree > defend > attack ?
-This works for both players.
+
+grapple > escape combat > defend/self-target > attack > grapple/resist

@@ -29,7 +29,7 @@ but what abilities do heroes have? generally just attack, inflict a status, resi
 - **Overexertion**: Take 1 wound. All ability effects apply twice die if target defends sucessfully
 
 ## Combo Abilities
-- **Follow Through** (Rare): If your previous action inflicted a status effect, this attack gets +2 hit
+- **Follow Through** (Rare): If your previous action inflicted a status effect, this attack gets some bonus or extra effect
 - **Chain Reaction** (Legendary): If you've inflicted 2+ different status effects on target, this attack deals 2 wounds and clears all statuses
 
 ## **Deathrattle / Battlecry** (Monster): When defeated, inflict 1 corruption or wound on your killer
@@ -41,6 +41,12 @@ but what abilities do heroes have? generally just attack, inflict a status, resi
 - generate trap card when played
 - generate monster card when die / when played
 - cause light/darkness when played in room/when die
+
+## Psionic
+monster can always see next player action
+
+## Ambush 
+- Get a free round if you pass a stealth check! may require certain room environment types or conditions.
 
 ## Abilities
 
