@@ -25,16 +25,18 @@
     "limbs": {
         "arm": 2,
         "leg": 2,
-        "mouth": 1
+        "mouth": 1,
+        "tentacle": 2
     },
     "statuses": [],
     "skills": {},
     "flags": {},
     "traits": [
-        "slam",
-        "grab",
-        "penetrate",
-        "shred",
+        "core.slam",
+        "core.grab",
+        "core.penetrate",
+        "core.shred",
+        "tentacles.bind_limb",
         {
             "name": "Bludgeon",
             "description": "A more skillful attack, reaching out with a tentacle to strike",

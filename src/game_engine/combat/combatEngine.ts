@@ -15,12 +15,13 @@
  * 4. Maintain a clear boundary between game rules and state management
  */
 import { makeSkillCheck, makeOpposedCheck } from '../utils/skillCheck.ts';
-import { logAndEmitCombatEvent as logAndEmitCombatEvent } from './combatLogManager.ts';
+import { logAndEmitCombatEvent } from './combatLogManager.ts';
 import { Character } from '../../types/actor.ts';
 import { Skills, SkillNames } from '../../types/skilltypes.ts';
 import { Trait } from '../../types/abilities.ts';
 import { CharacterType, CombatEndReasonType } from '../../types/constants.ts';
 import { CombatState, createCombatState } from '../../types/combatState.ts';
+import { executeTrait } from './traitExecutor.ts';
 import { applyEffect } from './effect.ts';
 import { processBetweenActions, processBetweenRounds } from './stateBasedActions.ts';
 import { getAvailableActions as getAvailableCombatActions, checkRequirements } from './getAvailableActions.ts';
@@ -123,94 +124,7 @@ export async function createNewCombat(characters:Character[], room: Room, gameSe
     return state;
 }
 
-// Execute a trait
-export async function executeTrait(
-    trait: Trait, 
-    actor: Character, 
-    target: Character | undefined, 
-    state: CombatState
-): Promise<CombatState> {    
-    // Check requirements before proceeding
-    const requirementsCheck = checkRequirements(actor, trait, state);
-    
-    // Emit ability event with success/failure info
-    const abilityEvent: AbilityEvent = {
-        type: 'ABILITY',
-        actor,
-        ability: trait,
-        target,
-        success: requirementsCheck.success,
-        failureReason: !requirementsCheck.success ? requirementsCheck.reason : undefined
-    };
-    await logAndEmitCombatEvent(abilityEvent, state);
-    
-    // If requirements aren't met, exit early without applying effects
-    if (!requirementsCheck.success) {
-        return state;
-    }
-    
-    let skillCheckResult = null;
-    if (trait.skill!==Skills.NONE){
-        // Perform skill check
-        // Get modifier from trait
-        const modifier = trait.modifier ?? 0;
-        let skillCheck;
-        if (target && target !== actor) {
-            // Perform opposed skill check
-            skillCheck = makeOpposedCheck(
-                actor, 
-                trait.skill,
-                target,
-                undefined, // Let the system determine the opposing skill
-                modifier
-            );
-        } else {
-            // Perform regular skill check
-            skillCheck = makeSkillCheck(
-                actor, 
-                trait.skill,
-                modifier
-            );
-        }
-
-        // For opposed checks, we need to access the attacker's result
-        skillCheckResult = target ? skillCheck.attacker : skillCheck;
-        
-        // Emit skill check event
-        const skillCheckEvent: SkillCheckEvent = {
-            type: 'SKILL_CHECK',
-            actor,
-            target,
-            skill: trait.skill,
-            result: skillCheckResult,
-            is_opposed: !!target,
-            opposed_result: target ? skillCheck.defender : undefined,
-            opposed_margin: target ? skillCheck.margin : undefined
-        };
-        await logAndEmitCombatEvent(skillCheckEvent, state);
-
-    }
-    // Apply effects that should happen regardless of success/failure
-    for (const effect of trait.effects) {
-        // if apply on failure, or apply on success and the check was successful, or no skill check, apply effect
-        if (effect.applyOnSkillCheckFailure || trait.skill==Skills.NONE || skillCheckResult.success) {
-            // Use effect's target to determine who to apply it to
-            const effectTarget = effect.target === 'other' ? target : actor;
-            const effectResult = await applyEffect(effect, actor, effectTarget, state);
-            
-            // Emit effect event
-            const effectEvent: EffectEvent = {
-                type: 'EFFECT',
-                effect,
-                source: actor,
-                target: effectTarget,
-                success: effectResult.success
-            };
-            await logAndEmitCombatEvent(effectEvent, state);
-        }
-    }
-    return state;
-}
+// executeTrait function has been moved to traitExecutor.ts
 
 export async function executeCombatRound(state: CombatState, playerAction: Trait) {
     // Validate combat participants

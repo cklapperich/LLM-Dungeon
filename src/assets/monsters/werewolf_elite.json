@@ -1,0 +1,76 @@
+{
+    "name": "Werewolf Elite",
+    "type": "monster",
+    "artworkUrl": "monsters/werewolf.png",
+    "attributes": {
+        "Might": 16,
+        "Grace": 16,
+        "Wit": 8,
+        "Will": 6
+    },
+    "vitality": {
+        "max": 16,
+        "current": 16
+    },
+    "conviction": {
+        "max": 3,
+        "current": 3
+    },
+    "description": "A towering seven-foot werewolf with rippling muscles and razor-sharp claws. Its powerful frame moves with terrifying speed and agility, while its eyes burn with predatory intelligence. Known for its vicious attacks and overwhelming strength, this elite hunter possesses a knotted phallus and renders its prey helpless with lightning-fast strikes before claiming them completely.",
+    "size": 2,
+    "armor": {
+        "max": 0,
+        "current": 0
+    },
+    "limbs": {
+        "arm": 2,
+        "leg": 2,
+        "mouth": 1,
+        "claw": 2
+    },
+    "statuses": [],
+    "skills": {},
+    "flags": {},
+    "traits": [
+        "core.grab",
+        "core.penetrate",
+        "core.shred",
+        "core.clamp",
+        "claws.rend",
+        "core.dodge_stance",
+        {
+            "name": "Howl",
+            "description": "The werewolf releases a bone-chilling howl that echoes through the darkness, channeling primal fury to enhance its already formidable abilities",
+            "rarity": "rare",
+            "skill": "Will",
+            "defenseOptions": [],
+            "modifier": 0,
+            "passive": true,
+            "passive_event_type": {
+                "type": "PHASECHANGE",
+                "subtype": "START"
+            },
+            "requirements": {
+                "parts": {
+                    "mouth": 1
+                }
+            },
+            "effects": [
+                {
+                    "type": "STATUS",
+                    "params": {
+                        "type": "stat_boost",
+                        "attributes": {
+                            "Might": 2,
+                            "Grace": 2,
+                            "Wit": 2,
+                            "Will": 2
+                        },
+                        "duration": 2
+                    },
+                    "target": "self"
+                }
+            ]
+        }
+    ]
+}

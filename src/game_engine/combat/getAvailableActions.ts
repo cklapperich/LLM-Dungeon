@@ -106,6 +106,62 @@ export function checkRequirements(
         }
     }
     
+    // Check room attribute requirements
+    if (ability.requirements?.room_attributes && ability.requirements.room_attributes.length > 0) {
+        for (const attrReq of ability.requirements.room_attributes) {
+            // First check if the room has attributes defined
+            if (!state.room.attributes) {
+                return {
+                    success: false,
+                    reason: `Room attributes not defined`
+                };
+            }
+            
+            const attrValue = state.room.attributes[attrReq.attribute];
+            
+            // If the attribute doesn't exist and we're checking for equality, fail
+            if (attrValue === undefined) {
+                if (attrReq.comparison === 'eq') {
+                    return {
+                        success: false,
+                        reason: `Requires room with ${attrReq.attribute} = ${attrReq.value}`
+                    };
+                }
+                continue; // Skip other comparisons if attribute doesn't exist
+            }
+            
+            // Compare the attribute value based on the comparison type
+            let requirementMet = false;
+            switch (attrReq.comparison) {
+                case 'eq':
+                    requirementMet = attrValue === attrReq.value;
+                    break;
+                case 'neq':
+                    requirementMet = attrValue !== attrReq.value;
+                    break;
+                case 'lt':
+                    requirementMet = attrValue < attrReq.value;
+                    break;
+                case 'lte':
+                    requirementMet = attrValue <= attrReq.value;
+                    break;
+                case 'gt':
+                    requirementMet = attrValue > attrReq.value;
+                    break;
+                case 'gte':
+                    requirementMet = attrValue >= attrReq.value;
+                    break;
+            }
+            
+            if (!requirementMet) {
+                return {
+                    success: false,
+                    reason: `Requires room with ${attrReq.attribute} ${attrReq.comparison} ${attrReq.value}`
+                };
+            }
+        }
+    }
+    
     // All requirements passed
     return { success: true };
 }
@@ -157,15 +213,20 @@ export function getAvailableActions(actor: Character, state: CombatState): {
         return { actions, reasons };
     }
 
-    // Add all traits from the actor first
+    // Add all non-passive traits from the actor first
     actor.traits.forEach(trait => {
+        // Skip passive abilities - they shouldn't be available as actions
+        if (trait.passive) {
+            return;
+        }
+        
         // Check requirements and add reason if they're not met
         const requirementsCheck = checkRequirements(actor, trait, state);
         if (!requirementsCheck.success && requirementsCheck.reason) {
             reasons[trait.name] = requirementsCheck.reason;
         }
         
-        // Always add the action to the list
+        // Add the action to the list
         actions.push(trait);
     });
 
@@ -186,8 +247,12 @@ export function getAvailableActions(actor: Character, state: CombatState): {
         actions.push(system_actions.exitCombat);
     }
 
-    // if every action has a reason or if length is 0, push the system action 'pass'
-    if ((actions.length === 0) || actions.every(action => reasons[action.name])) {
+    // Always add the pass action for monsters
+    if (actor.type === CharacterType.MONSTER) {
+        actions.push(system_actions.pass);
+    }
+    // For heroes, add pass only if no other actions are available or all have reasons
+    else if ((actions.length === 0) || actions.every(action => reasons[action.name])) {
         actions.push(system_actions.pass);
     }
 

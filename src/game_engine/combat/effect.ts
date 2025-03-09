@@ -22,6 +22,7 @@ import { CombatState } from '../../types/combatState.ts';
 
 import { StatusName } from '../../types/status';
 import { getStatus } from '../statusEffects';
+import { checkRequirements } from './getAvailableActions.ts';
 
 export interface Effect {
     type: typeof EffectType[keyof typeof EffectType];
@@ -48,7 +49,6 @@ export const effectHandlers: Record<typeof EffectType[keyof typeof EffectType], 
     },
     [EffectType.END_COMBAT]: async (effect, source, target, state) => {
         const winner = effect.params.winner;
-        const loser = state.characters.find(c => c !== winner);
         if (!winner) {
             return {
                 success: false,
@@ -59,7 +59,6 @@ export const effectHandlers: Record<typeof EffectType[keyof typeof EffectType], 
         const result = await applyEndCombat(
             state,
             winner,
-            loser,
             effect.params.reason
         );
 
@@ -159,7 +158,7 @@ export const effectHandlers: Record<typeof EffectType[keyof typeof EffectType], 
             success: true,
             message: message_default
         };
-    }
+    },
 };
 
 export async function applyEffect(effect: Effect, source: Character, target: Character, state: CombatState): Promise<{ success: boolean; message: string }> {

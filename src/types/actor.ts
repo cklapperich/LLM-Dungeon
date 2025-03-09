@@ -2,6 +2,7 @@ import { Attribute, SkillName } from './skilltypes.js';
 import { Trait } from './abilities.js';
 import { default_monster_abilities, default_hero_abilities, system_actions } from '../game_engine/combat/default_abilities.ts';
 import { copyTrait } from './abilities.js';
+import { loadAbility } from '../game_engine/abilityManager';
 import { MonsterSize, CharacterType, CharacterTypeValue, BodyPart, BodyPartType } from './constants.js';
 import { Status, ModifierResult } from './status.js';
 import { getStatusModifiers } from '../game_engine/statusEffects.js';
@@ -33,6 +34,7 @@ export interface Character {
     limbs: Partial<Record<BodyPart, number>>; // Track which limbs the character has
     statuses: Status[]; // Track active status effects
     selected_action?: Trait; // Track the selected action for the current turn
+    passives:Trait[];
 }
 
 export function calculateMaxVitality(might: number): number {
@@ -90,7 +92,8 @@ export function createCharacter(character: Partial<Character> = {}): Character {
             [BodyPartType.LEG]: 2,
             [BodyPartType.MOUTH]: 1
         },
-        statuses: character.statuses ?? [] // Initialize empty status array
+        statuses: character.statuses ?? [], // Initialize empty status array
+        passives:[]
     };
 }
 
@@ -157,12 +160,20 @@ export function loadCharacter(json: string): Character {
     if (data.traits) {
         data.traits = data.traits.map((trait: string | Trait) => {
             if (typeof trait === 'string') {
-                // Look up trait in default abilities and create a copy
+                // First try to load from default abilities
                 const defaultTrait = (default_abilities as Record<string, Trait>)[trait];
-                if (!defaultTrait) {
-                    throw new Error(`Unknown trait: ${trait}`);
+                if (defaultTrait) {
+                    return copyTrait(defaultTrait);
                 }
-                return copyTrait(defaultTrait);
+                
+                // If not found in default abilities, try to load from ability registry
+                const registryTrait = loadAbility(trait);
+                if (registryTrait) {
+                    return registryTrait;
+                }
+                
+                // If still not found, throw an error
+                throw new Error(`Unknown trait: ${trait}`);
             }
             return trait;
         });

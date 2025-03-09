@@ -1,0 +1,82 @@
+    [
+  {
+    "id": "multi.wing_claw_slash",
+    "name": "Wing-Claw Slash",
+    "description": "A devastating attack that combines the power of wings and claws, striking with both simultaneously",
+    "rarity": "rare",
+    "skill": "Light Weapons",
+    "defenseOptions": ["Dodge"],
+    "requirements": {
+      "parts": {
+        "wing": 1,
+        "claw": 1
+      }
+    },
+    "effects": [
+      {
+        "type": "WOUND",
+        "params": {
+          "value": 2
+        },
+        "target": "other"
+      },
+      {
+        "type": "STATUS",
+        "params": {
+          "type": "ability_cooldown",
+          "abilityName": "Wing-Claw Slash",
+          "duration": 2
+        },
+        "target": "self",
+        "applyOnSkillCheckFailure": true
+      }
+    ]
+  },
+  {
+    "id": "multi.venom_tentacle_wrap",
+    "name": "Venomous Embrace",
+    "description": "Wraps the target in tentacles while simultaneously injecting venom, causing both restraint and arousal",
+    "rarity": "rare",
+    "skill": "Grapple",
+    "defenseOptions": ["Break Free", "Slip Free"],
+    "requirements": {
+      "parts": {
+        "tentacle": 1,
+        "venom_injector": 1
+      },
+      "statuses": [{
+        "name": "grappled",
+        "stacks": 1,
+        "target": "other"
+      }]
+    },
+    "effects": [
+      {
+        "type": "STATUS",
+        "params": {
+          "type": "bound_limb",
+          "duration": 2
+        },
+        "target": "other"
+      },
+      {
+        "type": "STATUS",
+        "params": {
+          "type": "heat",
+          "stacks": 1
+        },
+        "target": "other"
+      },
+      {
+        "type": "STATUS",
+        "params": {
+          "type": "ability_cooldown",
+          "abilityName": "Venomous Embrace",
+          "duration": 3
+        },
+        "target": "self",
+        "applyOnSkillCheckFailure": true
+      }
+    ]
+  }
+]

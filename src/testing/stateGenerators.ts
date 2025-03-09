@@ -5,8 +5,9 @@ const monsterFiles = import.meta.glob('@assets/monsters/*.json', { eager: true }
 const heroFiles = import.meta.glob('@assets/heroes/*.json', { eager: true });
 import profanedTempleJson from '@assets/dungeons/profaned_temple.json';
 import { loadDungeonFromJson } from '../game_engine/utils/dungeonUtils.js';
-import {getSettings} from '../game_engine/settings.js';
+import { getSettings } from '../game_engine/settings.js';
 import { loadCharacter } from '../types/actor.js';
+import { initializeAbilities } from '../game_engine/abilityManager.js';
 
 // Process these files to separate heroes and monsters
 export function loadAllCharacters() {
@@ -31,7 +32,10 @@ export function loadAllCharacters() {
 /**
  * Creates a test game state with default values
  */
-export function createTestGameState(overrides: Partial<GameState> = {}): GameState {
+export async function createTestGameState(overrides: Partial<GameState> = {}): Promise<GameState> {
+    // Initialize abilities from JSON files
+    await initializeAbilities();
+    
     const { heroes, monsters } = loadAllCharacters();
     const dungeon = loadDungeonFromJson(JSON.stringify(profanedTempleJson));
     const settings = getSettings();
@@ -42,7 +46,7 @@ export function createTestGameState(overrides: Partial<GameState> = {}): GameSta
         dayCounter: 0,
         dungeon,
         heroes: heroes,
-        monsters:monsters,
+        monsters: monsters,
         currentPhase: 'planning',
         activeCombat: null,
         waveCounter: 0,
@@ -56,8 +60,8 @@ export function createTestGameState(overrides: Partial<GameState> = {}): GameSta
  * This is the main function to use for testing scenarios that need
  * a dungeon with characters in it
  */
-export function createTestStateWithCharactersInRoom(): GameState {
-    const gameState = createTestGameState();
+export async function createTestStateWithCharactersInRoom(): Promise<GameState> {
+    const gameState = await createTestGameState();
     const hero_values = Object.values(gameState.heroes)    
     const hero = hero_values[0];
     // Get the first room from the dungeon
@@ -75,9 +79,9 @@ export function createTestStateWithCharactersInRoom(): GameState {
  * Creates a test game state with a hero in one room and a monster in another
  * This is useful for testing combat initialization by moving characters
  */
-export function createTestStateWithSeparateCharacters(): GameState {
+export async function createTestStateWithSeparateCharacters(): Promise<GameState> {
     // Create characters
-    const gameState = createTestGameState();
+    const gameState = await createTestGameState();
     const hero_values = Object.values(gameState.heroes)    
     const hero = hero_values[0];
     const monster_values = Object.values(gameState.monsters)    

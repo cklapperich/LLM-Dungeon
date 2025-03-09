@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { CombatState } from '../../../types/combatState';
 import { UIAction } from '../../uiTypes';
 import { useLoading } from '../../LoadingContext';
@@ -7,6 +7,9 @@ import { convertGameActionToUIAction } from '../../../game_engine/gameEngine';
 import Card from '../Card';
 import { characterToUICard } from '../../uiTypes';
 import CharacterPanel from './CharacterPanel';
+import { AbilityModal, getTraitFromAction } from '../Card/abilityCard';
+import LongPressButton from '../LongPressButton';
+import { Trait } from '../../../types/abilities';
 
 // Action Buttons component for the bottom half
 const ActionButtons: React.FC<{
@@ -15,6 +18,7 @@ const ActionButtons: React.FC<{
     monsterName: string;
 }> = ({ actions, onAction, monsterName }) => {
     const { isLoading } = useLoading();
+    const [modalTrait, setModalTrait] = useState<Trait | null>(null);
     
     return (
         <>
@@ -22,28 +26,57 @@ const ActionButtons: React.FC<{
                 {actions.map((action, i) => {
                     // Convert CombatGameAction to UIAction
                     const uiAction = convertGameActionToUIAction(action);
+                    
+                    // Extract trait from the action
+                    const trait = getTraitFromAction(action);
+                    
+                    // Handle long press to show ability card
+                    const handleLongPress = () => {
+                        if (trait) {
+                            setModalTrait(trait);
+                        }
+                    };
+                    
+                    // Handle click to execute action
+                    const handleClick = async () => {
+                        await onAction(uiAction);
+                    };
+                    
                     return (
-                        <button
-                            key={i}
-                            onClick={async () => await onAction(uiAction)}
-                            disabled={uiAction.disabled || isLoading}
-                            className={`w-full px-4 py-3 rounded flex flex-col items-center justify-center text-center
-                                border-[3px] border-white/50 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_2px_4px_rgba(0,0,0,0.2)]
-                                bg-slate-800
-                                ${uiAction.disabled || isLoading
-                                    ? 'opacity-50 text-slate-400 cursor-not-allowed' 
-                                    : 'text-white hover:bg-slate-700 active:bg-slate-900'}`}
-                        >
-                            <div className="w-full">
-                                <div className="font-medium">{uiAction.name}</div>
-                                {uiAction.disabled && uiAction.disabledReason && (
-                                    <div className="text-sm mt-1 text-slate-300">{uiAction.disabledReason}</div>
-                                )}
-                            </div>
-                        </button>
+                        <div key={i}>
+                            <LongPressButton
+                                onClick={handleClick}
+                                onLongPress={handleLongPress}
+                                disabled={uiAction.disabled || isLoading}
+                                className={`w-full px-4 py-3 rounded flex flex-col items-center justify-center text-center
+                                    border-[3px] border-white/50 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_2px_4px_rgba(0,0,0,0.2)]
+                                    bg-slate-800
+                                    ${uiAction.disabled || isLoading
+                                        ? 'opacity-50 text-slate-400 cursor-not-allowed' 
+                                        : 'text-white hover:bg-slate-700 active:bg-slate-900'}`}
+                            >
+                                <div className="w-full">
+                                    <div className="font-medium">{uiAction.name}</div>
+                                    {uiAction.disabled && uiAction.disabledReason && (
+                                        <div className="text-sm mt-1 text-slate-300">{uiAction.disabledReason}</div>
+                                    )}
+                                </div>
+                            </LongPressButton>
+                        </div>
                     );
                 })}
             </div>
+            
+            {/* Ability Modal */}
+            {modalTrait && (
+                <AbilityModal
+                    trait={modalTrait}
+                    isOpen={modalTrait !== null}
+                    onClose={() => setModalTrait(null)}
+                >
+                    <div></div>
+                </AbilityModal>
+            )}
         </>
     );
 };

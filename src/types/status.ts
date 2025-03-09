@@ -23,8 +23,12 @@ export enum StatusName {
   BOUND_MONSTER_PART = 'bound_monster_part',
   PENETRATED = 'penetrated',
   INSEMINATED = 'inseminated',
-  ABILITY_COOLDOWN = 'cooldown',
-  EXHAUSTION = 'exhaustion'
+  ABILITY_COOLDOWN = 'ability_cooldown',
+  EXHAUSTION = 'exhaustion',
+  AMBUSHED = 'ambushed',
+  // New status types
+  SKILL_BOOST = 'skill_boost',
+  STAT_BOOST = 'stat_boost'
 }
 
 export interface ModifierResult {

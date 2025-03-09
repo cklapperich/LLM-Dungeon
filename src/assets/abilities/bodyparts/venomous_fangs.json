@@ -1,0 +1,105 @@
+[
+  {
+    "id": "venomous_fangs.venom_bite",
+    "name": "Venom Bite",
+    "description": "Apply Heat status to increase arousal",
+    "rarity": "common",
+    "skill": "Light Weapons",
+    "defenseOptions": ["Dodge"],
+    "requirements": {
+      "parts": {
+        "venom_injector": 1
+      }
+    },
+    "effects": [
+      {
+        "type": "STATUS",
+        "params": {
+          "type": "heat",
+          "stacks": 1
+        },
+        "target": "other"
+      },
+      {
+        "type": "STATUS",
+        "params": {
+          "type": "ability_cooldown",
+          "abilityName": "Venom Bite",
+          "duration": 2
+        },
+        "target": "self",
+        "applyOnSkillCheckFailure": true
+      }
+    ]
+  },
+  {
+    "id": "venomous_fangs.paralyzing_toxin",
+    "name": "Paralyzing Toxin",
+    "description": "Reduces hero Grace for 2 rounds",
+    "rarity": "rare",
+    "skill": "Light Weapons",
+    "defenseOptions": ["Dodge"],
+    "requirements": {
+      "parts": {
+        "venom_injector": 1
+      }
+    },
+    "effects": [
+      {
+        "type": "STATUS",
+        "params": {
+          "type": "weakened",
+          "attribute": "Grace",
+          "value": -2,
+          "duration": 2
+        },
+        "target": "other"
+      },
+      {
+        "type": "STATUS",
+        "params": {
+          "type": "ability_cooldown",
+          "abilityName": "Paralyzing Toxin",
+          "duration": 3
+        },
+        "target": "self",
+        "applyOnSkillCheckFailure": true
+      }
+    ]
+  },
+  {
+    "id": "venomous_fangs.weakening_poison",
+    "name": "Weakening Poison",
+    "description": "Reduces hero Might for 2 rounds",
+    "rarity": "rare",
+    "skill": "Light Weapons",
+    "defenseOptions": ["Dodge"],
+    "requirements": {
+      "parts": {
+        "venom_injector": 1
+      }
+    },
+    "effects": [
+      {
+        "type": "STATUS",
+        "params": {
+          "type": "weakened",
+          "attribute": "Might",
+          "value": -2,
+          "duration": 2
+        },
+        "target": "other"
+      },
+      {
+        "type": "STATUS",
+        "params": {
+          "type": "ability_cooldown",
+          "abilityName": "Weakening Poison",
+          "duration": 3
+        },
+        "target": "self",
+        "applyOnSkillCheckFailure": true
+      }
+    ]
+  }
+]

@@ -109,6 +109,38 @@ export const EventContext = {
 
 export type EventContextType = typeof EventContext[keyof typeof EventContext];
 
+export const LightLevel = {
+    DARK: 1,
+    DIM: 2,
+    BRIGHT: 3
+} as const;
+
+export type LightLevelType = typeof LightLevel[keyof typeof LightLevel];
+
+export const MoistureLevel = {
+    DRY: 1,
+    DAMP: 2,
+    FLOODED: 3
+} as const;
+
+export type MoistureLevelType = typeof MoistureLevel[keyof typeof MoistureLevel];
+
+export const CeilingHeight = {
+    LOW: 1,
+    NORMAL: 2,
+    HIGH: 3
+} as const;
+
+export type CeilingHeightType = typeof CeilingHeight[keyof typeof CeilingHeight];
+
+export const RoomAttribute = {
+    LIGHT_LEVEL: 'light_level',
+    MOISTURE: 'moisture',
+    CEILING_HEIGHT: 'ceiling_height'
+} as const;
+
+export type RoomAttributeType = typeof RoomAttribute[keyof typeof RoomAttribute];
+
 export const CombatEndReason = {
     DEATH: 'death',
     BREEDING: 'breeding',

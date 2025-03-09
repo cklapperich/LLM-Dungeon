@@ -379,7 +379,6 @@ export function applyWound(
 export async function applyEndCombat(
     state: CombatState,
     winner: Character,
-    loser: Character,
     reason: CombatEndReasonType | string
 ): Promise<GameActionResult> {
     // Mark combat as complete
@@ -395,9 +394,9 @@ export async function applyEndCombat(
         subtype: 'END' as const,
         round: state.round,
         winner,
-        loser,
         reason,
-        room: state.room
+        room: state.room,
+        characters: state.characters // Include all characters for proper logging
     };
     await logAndEmitCombatEvent(combatEndEvent, state);
     

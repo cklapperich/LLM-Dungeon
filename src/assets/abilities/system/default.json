@@ -1,0 +1,32 @@
+[
+  {
+    "id": "system.pass",
+    "name": "Pass",
+    "description": "End your turn without taking any action",
+    "skill": "None",
+    "defenseOptions": [],
+    "effects": [
+      {
+        "type": "ADVANCE_TURN",
+        "params": {},
+        "target": "self"
+      }
+    ]
+  },
+  {
+    "id": "system.exit_combat",
+    "name": "Exit Combat",
+    "description": "Exit combat (only available when combat is complete)",
+    "skill": "None",
+    "defenseOptions": [],
+    "effects": [
+      {
+        "type": "END_COMBAT",
+        "params": {
+          "outcome": "exit"
+        },
+        "target": "self"
+      }
+    ]
+  }
+]

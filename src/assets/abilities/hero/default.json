@@ -1,0 +1,46 @@
+[
+  {
+    "id": "hero.break_free",
+    "name": "Break Free",
+    "description": "Attempt to break free using might, freeing all limbs bound during this grapple",
+    "rarity": "common",
+    "skill": "Break Free Might",
+    "defenseOptions": ["Grapple Might", "Grapple Grace"],
+    "requirements": {
+      "statuses": [{
+        "name": "grappled",
+        "stacks": 1,
+        "target": "self"
+      }]
+    },
+    "effects": [
+      {
+        "type": "BREAK_FREE",
+        "params": { "type": "full" },
+        "target": "self"
+      }
+    ]
+  },
+  {
+    "id": "hero.slip_free",
+    "name": "Slip Free",
+    "description": "Attempt to slip free using grace, freeing all limbs bound during this grapple",
+    "rarity": "common",
+    "skill": "Slip Free Grace",
+    "defenseOptions": ["Grapple Might", "Grapple Grace"],
+    "requirements": {
+      "statuses": [{
+        "name": "grappled",
+        "stacks": 1,
+        "target": "self"
+      }]
+    },
+    "effects": [
+      {
+        "type": "BREAK_FREE",
+        "params": { "type": "full" },
+        "target": "self"
+      }
+    ]
+  }
+]

@@ -12,7 +12,8 @@ export interface CombatRoundLog {
     events: GameEvent[];          // Raw event data for structured logging
     debugLog: string[];          // Technical debug log with roll details
     llmContextLog: string[];     // Narrative descriptions for LLM context
-    llmNarrations: string[];     // Generated narrative output from LLM,
+    llmNarrations: string[];     // Generated narrative output from LLM (now contains annotated narrations)
+    annotatedNarrations?: string[]; // Deprecated: Now using llmNarrations directly
     prompts: string[];        // prompt used for LLM call
     round: number;
 }

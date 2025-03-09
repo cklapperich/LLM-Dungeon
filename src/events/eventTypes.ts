@@ -50,6 +50,7 @@ export interface SkillCheckEvent {
     is_opposed?: boolean;
     opposed_result?: RollResult;
     opposed_margin?: number; // Combined margin for opposed checks (attacker.margin - defender.margin)
+    opposed_skill?: SkillName; // The skill used by the defender
 }
 
 export interface AbilityEvent {
@@ -85,7 +86,6 @@ export interface CombatPhaseChangedEvent {
     characters?: Character[];
     round: number;
     winner?: Character;
-    loser?: Character;
     reason?: CombatEndReasonType | string;
 }
 

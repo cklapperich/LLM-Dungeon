@@ -55,13 +55,22 @@ export class CombatLogFormatters {
 
     private static formatSkillCheck(event: SkillCheckEvent): string {
         if (this.mode === FormatMode.DEBUG) {
-            return `SKILL_CHECK: ${event.actor.name} -> ${event.skill}\n${this.formatRollResult(event.result, FormatMode.DEBUG)}`;
+            let log = `SKILL_CHECK: ${event.actor.name} -> ${event.skill}\n${this.formatRollResult(event.result, FormatMode.DEBUG)}`;
+            
+            // Add more detailed information for opposed checks in DEBUG mode
+            if (event.is_opposed && event.opposed_result) {
+                log += `\nDEFENSIVE_CHECK: ${event.target?.name} -> ${event.opposed_skill || 'Defense'}\n${this.formatRollResult(event.opposed_result, FormatMode.DEBUG)}`;
+                log += `\nOPPOSED_RESULT: ${event.opposed_margin! >= 0 ? 'Attacker wins' : 'Defender wins'} by ${Math.abs(event.opposed_margin || 0)}`;
+            }
+            
+            return log;
         }
 
         let log = `${event.actor.name} rolled ${event.skill}: ${this.formatRollResult(event.result)}`;
         
         if (event.is_opposed && event.opposed_result) {
-            log += `\nOpposed by ${event.target?.name}: ${this.formatRollResult(event.opposed_result)}`;
+            log += `\n${event.target?.name} defended with ${event.opposed_skill || 'Defense'}: ${this.formatRollResult(event.opposed_result)}`;
+            log += `\nResult: ${event.opposed_margin! >= 0 ? `${event.actor.name}'s attack succeeds` : `${event.target?.name}'s defense succeeds`} by ${Math.abs(event.opposed_margin || 0)}`;
         }
 
         return log;
@@ -205,6 +214,6 @@ export class CombatLogFormatters {
     }
 
     static formatEvents(events: GameEvent[]): string[] {
-        return events.map(event => this.formatEvent(event));
+        return events.map((event, index) => `${index + 1}. ${this.formatEvent(event)}`);
     }
 }

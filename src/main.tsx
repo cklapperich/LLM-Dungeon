@@ -8,19 +8,34 @@ import { LoadingProvider, useLoading } from './react_ui/LoadingContext'
 import './index.css'
 
 const GameApp = () => {
-  // Initialize test game state
-  const [gameState, setGameState] = React.useState(() => {
-    return createTestStateWithCharactersInRoom();
-  });
-  
-  const [combatStarted, setCombatStarted] = React.useState(false);
+  // Initialize loading state
   const { setIsLoading } = useLoading();
-
-  // This function is no longer needed as settings are now handled in the Settings component
-  // The Settings component directly updates the game state with new settings
+  
+  // Initialize game state
+  const [gameState, setGameState] = React.useState(null);
+  const [combatStarted, setCombatStarted] = React.useState(false);
+  
+  // Load game state asynchronously
+  React.useEffect(() => {
+    const loadGameState = async () => {
+      setIsLoading(true);
+      try {
+        const initialState = await createTestStateWithCharactersInRoom();
+        setGameState(initialState);
+      } catch (error) {
+        console.error('Error loading game state:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadGameState();
+  }, [setIsLoading]);
 
   // Handle UI actions
   const handleAction = async (action: UIAction) => {
+    if (!gameState) return;
+    
     setIsLoading(true);
     try {
       const result = await executeActionFromUI(gameState, action);
@@ -40,6 +55,13 @@ const GameApp = () => {
       setIsLoading(false);
     } 
   };
+
+  // Show loading state if game state is not loaded yet
+  if (!gameState) {
+    return <div className="flex h-screen items-center justify-center bg-slate-900 text-white">
+      <p className="text-xl">Loading game...</p>
+    </div>;
+  }
 
   return (
     <GameInterface 

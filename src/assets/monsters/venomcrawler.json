@@ -29,39 +29,15 @@
     "limbs": {
         "arm": 2,
         "leg": 2,
-        "mouth": 1
+        "mouth": 1,
+        "wing": 1,
+        "venom_injector": 1
     },
     "statuses": [],
     "flags": {},
     "traits": [
-        {
-            "name": "Arousal Venom",
-            "description": "A projectile needle of specialized venom that causes physical arousal",
-            "rarity": "common",
-            "skill": "Light Weapons",
-            "defenseOptions": ["Dodge"],
-            "modifier": 2,
-            "priority": false,
-            "effects": [
-                {
-                    "type": "STATUS",
-                    "params": {
-                        "type": "heat",
-                        "stacks": 1
-                    },
-                    "target": "other"
-                },
-                {
-                    "type": "STATUS",
-                    "params": {
-                        "type": "cooldown",
-                        "duration": 1,
-                        "abilityName": "Arousal Venom"
-                    },
-                    "target": "self"
-                }
-            ]
-        },
+        "wings.ceiling_drop",
+        "venomous_fangs.venom_bite",
         {
             "name": "Quick Bite",
             "description": "The Venom Crawler strikes with impressive speed, leaving its victim little time to react",

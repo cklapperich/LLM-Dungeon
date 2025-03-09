@@ -1,0 +1,83 @@
+[
+  {
+    "id": "wings.ceiling_drop",
+    "name": "Ceiling Drop",
+    "description": "Lurking in the shadows above, the monster drops silently from the ceiling to catch its prey unaware",
+    "rarity": "common",
+    "skill": "Stealth",
+    "defenseOptions": ["Perception"],
+    "passive": true,
+    "passive_event_type": {
+      "type": "PHASECHANGE",
+      "subtype": "START"
+    },
+    "requirements": {
+      "parts": {
+        "wing": 1
+      },
+      "room_attributes": [
+        {
+          "attribute": "light_level",
+          "value": 2,
+          "comparison": "lte"
+        }
+      ]
+    },
+    "effects": [
+      {
+        "type": "STATUS",
+        "params": {
+          "type": "ambushed",
+          "duration": 1
+        },
+        "target": "other"
+      }
+    ]
+  },
+  {
+    "id": "wings.aerial_dodge",
+    "name": "Aerial Dodge",
+    "description": "Auto-succeed on one dodge per combat if airborne",
+    "rarity": "common",
+    "skill": "Dodge",
+    "defenseOptions": [],
+    "requirements": {
+      "parts": {
+        "wing": 1
+      }
+    },
+    "effects": [
+      {
+        "type": "STATUS",
+        "params": {
+          "type": "auto_dodge",
+          "duration": 1
+        },
+        "target": "self"
+      }
+    ]
+  },
+  {
+    "id": "wings.dust_cloud",
+    "name": "Dust Cloud",
+    "description": "Heroes must pass Wit check or miss next attack",
+    "rarity": "common",
+    "skill": "Grace",
+    "defenseOptions": ["Wit"],
+    "requirements": {
+      "parts": {
+        "wing": 1
+      }
+    },
+    "effects": [
+      {
+        "type": "STATUS",
+        "params": {
+          "type": "blinded",
+          "duration": 1
+        },
+        "target": "other"
+      }
+    ]
+  }
+]

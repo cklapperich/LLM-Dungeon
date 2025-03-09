@@ -62,6 +62,7 @@ export interface OpposedCheckResult {
     defender: RollResult;
     margin: number;
     attackerWins: boolean;
+    defenderSkill: SkillName; // The skill used by the defender
 }
 
 /**

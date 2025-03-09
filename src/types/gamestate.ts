@@ -91,6 +91,7 @@ export interface GameSettings {
     narrationEnabled: boolean;
     llm: string;
     spicy_llm: string;
+    annotation_llm?: string; // New setting for annotation LLM
     llm_choices: string[];
     api_key: string;
     // Add other settings as needed

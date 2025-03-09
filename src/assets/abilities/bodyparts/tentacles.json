@@ -1,0 +1,83 @@
+[
+  {
+    "id": "tentacles.bind_limb",
+    "name": "Bind Limb",
+    "description": "Restrain one limb on a successful grapple",
+    "rarity": "common",
+    "skill": "Grapple",
+    "defenseOptions": ["Break Free", "Slip Free"],
+    "requirements": {
+      "parts": {
+        "tentacle": 1
+      },
+      "statuses": [{
+        "name": "grappled",
+        "stacks": 1,
+        "target": "other"
+      }]
+    },
+    "effects": [
+      {
+        "type": "STATUS",
+        "params": {
+          "type": "bound_limb",
+          "duration": 3
+        },
+        "target": "other"
+      }
+    ]
+  },
+  {
+    "id": "tentacles.squeeze",
+    "name": "Squeeze",
+    "description": "Against a grappled target, apply -1 Might per round",
+    "rarity": "common",
+    "skill": "Grapple",
+    "defenseOptions": ["Break Free"],
+    "requirements": {
+      "parts": {
+        "tentacle": 1
+      },
+      "statuses": [{
+        "name": "grappled",
+        "stacks": 1,
+        "target": "other"
+      }]
+    },
+    "effects": [
+      {
+        "type": "STATUS",
+        "params": {
+          "type": "weakened",
+          "duration": 2,
+          "attribute": "Might",
+          "value": -1
+        },
+        "target": "other"
+      }
+    ]
+  },
+  {
+    "id": "tentacles.slither_past",
+    "name": "Slither Past",
+    "description": "Can end combat and force hero to next room",
+    "rarity": "rare",
+    "skill": "Grace",
+    "defenseOptions": ["Perception"],
+    "requirements": {
+      "parts": {
+        "tentacle": 2
+      }
+    },
+    "effects": [
+      {
+        "type": "END_COMBAT",
+        "params": {
+          "outcome": "escape",
+          "nextRoom": true
+        },
+        "target": "self"
+      }
+    ]
+  }
+]

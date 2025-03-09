@@ -209,25 +209,29 @@ export function makeOpposedCheck(
     const defenderSkill = getBestDefensiveSkill(defender, defenseOptionsArray, gameState);
     const defenderResult = makeSkillCheck(defender, defenderSkill, 0, gameState);
     
-    // If one succeeds and one fails, success wins
-    if (attackerResult.success && !defenderResult.success) {
-        return { attacker: attackerResult, defender: defenderResult, attackerWins: true, margin: attackerResult.margin - defenderResult.margin };
-    }
-    if (!attackerResult.success && defenderResult.success) {
-        return { attacker: attackerResult, defender: defenderResult, attackerWins: false, margin: attackerResult.margin - defenderResult.margin };
-    }
+    // Calculate the margin between attacker and defender
+    const margin = attackerResult.margin - defenderResult.margin;
     
-    // If both succeed or both fail, compare margins
-    // For success ties, attacker wins (they met the target number)
-    // For failure ties, defender wins
-    const attackerWins = attackerResult.success ? 
-        attackerResult.margin > defenderResult.margin : // Success ties go to defender
-        attackerResult.margin >= defenderResult.margin;   // Failure ties go to attacker
+    // If one succeeds and one fails, success wins
+    let attackerWins = false;
+    if (attackerResult.success && !defenderResult.success) {
+        attackerWins = true;
+    } else if (!attackerResult.success && defenderResult.success) {
+        attackerWins = false;
+    } else {
+        // If both succeed or both fail, compare margins
+        // For success ties, attacker wins (they met the target number)
+        // For failure ties, defender wins
+        attackerWins = attackerResult.success ? 
+            attackerResult.margin > defenderResult.margin : // Success ties go to defender
+            attackerResult.margin >= defenderResult.margin;   // Failure ties go to attacker
+    }
     
     return {
         attacker: attackerResult,
         defender: defenderResult,
-        margin: attackerResult.margin - defenderResult.margin,
-        attackerWins
+        margin,
+        attackerWins,
+        defenderSkill
     };
 }

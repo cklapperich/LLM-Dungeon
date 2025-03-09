@@ -1,0 +1,157 @@
+[
+  {
+    "id": "claws.rend",
+    "name": "Rend",
+    "description": "The werewolf tears viciously with its claws, shredding through clothing and flesh in a devastating attack",
+    "rarity": "common",
+    "skill": "Light Weapons",
+    "defenseOptions": ["Dodge"],
+    "modifier": -2,
+    "requirements": {
+      "parts": {
+        "claw": 1
+      }
+    },
+    "effects": [
+      {
+        "type": "WOUND",
+        "params": { "value": 1 },
+        "target": "other"
+      },
+      {
+        "type": "MODIFY_CLOTHING",
+        "params": { "amount": -2 },
+        "target": "other"
+      },
+      {
+        "type": "STATUS",
+        "params": {
+          "type": "ability_cooldown",
+          "abilityName": "Rend",
+          "duration": 2
+        },
+        "target": "self",
+        "applyOnSkillCheckFailure": true
+      }
+    ]
+  },
+  {
+    "id": "claws.rend_armor",
+    "name": "Rend Armor",
+    "description": "Reduce clothing/armor level by 1 with sharp claws",
+    "rarity": "common",
+    "skill": "Light Weapons",
+    "defenseOptions": ["Dodge"],
+    "requirements": {
+      "parts": {
+        "claw": 1
+      }
+    },
+    "effects": [
+      {
+        "type": "MODIFY_CLOTHING",
+        "params": { "amount": -1 },
+        "target": "other"
+      },
+      {
+        "type": "STATUS",
+        "params": {
+          "type": "ability_cooldown",
+          "abilityName": "Rend Armor",
+          "duration": 2
+        },
+        "target": "self",
+        "applyOnSkillCheckFailure": true
+      }
+    ]
+  },
+  {
+    "id": "claws.threatening_display",
+    "name": "Threatening Display",
+    "description": "Force Will check or hero loses next action",
+    "rarity": "common",
+    "skill": "Will",
+    "defenseOptions": ["Will"],
+    "requirements": {
+      "parts": {
+        "claw": 1
+      }
+    },
+    "effects": [
+      {
+        "type": "STATUS",
+        "params": {
+          "type": "stunned",
+          "duration": 1
+        },
+        "target": "other"
+      },
+      {
+        "type": "STATUS",
+        "params": {
+          "type": "ability_cooldown",
+          "abilityName": "Threatening Display",
+          "duration": 3
+        },
+        "target": "self",
+        "applyOnSkillCheckFailure": true
+      }
+    ]
+  },
+  {
+    "id": "claws.quick_slash",
+    "name": "Quick Slash",
+    "description": "Always acts first in combat round",
+    "rarity": "common",
+    "skill": "Light Weapons",
+    "defenseOptions": ["Dodge"],
+    "priority": true,
+    "requirements": {
+      "parts": {
+        "claw": 1
+      }
+    },
+    "effects": [
+      {
+        "type": "WOUND",
+        "params": {
+          "value": 1
+        },
+        "target": "other"
+      }
+    ]
+  },
+  {
+    "id": "claws.wing_claw_slash_ref",
+    "name": "Wing-Claw Slash",
+    "description": "A devastating attack that combines the power of wings and claws, striking with both simultaneously",
+    "rarity": "rare",
+    "skill": "Light Weapons",
+    "defenseOptions": ["Dodge"],
+    "requirements": {
+      "parts": {
+        "wing": 1,
+        "claw": 1
+      }
+    },
+    "effects": [
+      {
+        "type": "WOUND",
+        "params": {
+          "value": 2
+        },
+        "target": "other"
+      },
+      {
+        "type": "STATUS",
+        "params": {
+          "type": "ability_cooldown",
+          "abilityName": "Wing-Claw Slash",
+          "duration": 2
+        },
+        "target": "self",
+        "applyOnSkillCheckFailure": true
+      }
+    ]
+  }
+]

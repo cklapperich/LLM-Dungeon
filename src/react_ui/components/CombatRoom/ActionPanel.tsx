@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Book } from 'lucide-react';
 import { CombatState, getAllLogsWithRounds } from '../../../types/combatState';
 import { UIAction, LogType } from '../../uiTypes';
@@ -6,6 +6,9 @@ import { useLoading } from '../../LoadingContext';
 import { Character } from '../../../types/actor';
 import { CharacterType } from '../../../types/constants';
 import { convertGameActionToUIAction } from '../../../game_engine/gameEngine';
+import { AbilityModal, getTraitFromAction } from '../Card/abilityCard';
+import LongPressButton from '../LongPressButton';
+import { Trait } from '../../../types/abilities';
 
 // Helper function to get the monster character ID from combat state
 function getMonsterCharacterId(combatState: CombatState, allCharacters: Record<string, Character>): string {
@@ -27,6 +30,7 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
     const { isLoading } = useLoading();
     const [logType, setLogType] = React.useState<LogType>('llm_narration');
     const logContainerRef = useRef<HTMLDivElement>(null);
+    const [modalTrait, setModalTrait] = useState<Trait | null>(null);
 
     useEffect(() => {
         const scrollToBottom = () => {
@@ -54,27 +58,46 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
                     {(combatState?.playerActions || []).map((action, i) => {
                         // Convert CombatGameAction to UIAction
                         const uiAction = convertGameActionToUIAction(action);
+                        
+                        // Extract trait from the action
+                        const trait = getTraitFromAction(action);
+                        
+                        // Handle long press to show ability card
+                        const handleLongPress = () => {
+                            if (trait) {
+                                setModalTrait(trait);
+                            }
+                        };
+                        
+                        // Handle click to execute action
+                        const handleClick = async () => {
+                            await onAction(uiAction);
+                        };
+                        
+                        // Return the LongPressButton
                         return (
-                        <button
-                            key={i}
-                            onClick={async () => await onAction(uiAction)}
-                            disabled={uiAction.disabled || isLoading}
-                            className={`w-full px-4 py-3 rounded flex flex-col items-center justify-center text-center
-                                border-[3px] border-white/50 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_2px_4px_rgba(0,0,0,0.2)]
-                                bg-slate-800
-                                ${uiAction.disabled || isLoading
-                                    ? 'opacity-50 text-slate-400 cursor-not-allowed' 
-                                    : 'text-white hover:bg-slate-700 active:bg-slate-900'}`}
-                        >
-                            <div className="w-full">
-                                <div className="font-medium">{uiAction.name}</div>
-                                {uiAction.disabled && uiAction.disabledReason && (
-                                    <div className="text-sm mt-1 text-slate-300">{uiAction.disabledReason}</div>
-                                )}
+                            <div key={i}>
+                                <LongPressButton
+                                    onClick={handleClick}
+                                    onLongPress={handleLongPress}
+                                    disabled={uiAction.disabled || isLoading}
+                                    className={`w-full px-4 py-3 rounded flex flex-col items-center justify-center text-center
+                                        border-[3px] border-white/50 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_2px_4px_rgba(0,0,0,0.2)]
+                                        bg-slate-800
+                                        ${uiAction.disabled || isLoading
+                                            ? 'opacity-50 text-slate-400 cursor-not-allowed' 
+                                            : 'text-white hover:bg-slate-700 active:bg-slate-900'}`}
+                                >
+                                    <div className="w-full">
+                                        <div className="font-medium">{uiAction.name}</div>
+                                        {uiAction.disabled && uiAction.disabledReason && (
+                                            <div className="text-sm mt-1 text-slate-300">{uiAction.disabledReason}</div>
+                                        )}
+                                    </div>
+                                </LongPressButton>
                             </div>
-                        </button>
                         );
-                     })}
+                    })}
                 </div>
             </div>
 
@@ -153,6 +176,17 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
                     })()}
                 </div>
             </div>
+            
+            {/* Ability Modal */}
+            {modalTrait && (
+                <AbilityModal
+                    trait={modalTrait}
+                    isOpen={modalTrait !== null}
+                    onClose={() => setModalTrait(null)}
+                >
+                    <div></div>
+                </AbilityModal>
+            )}
         </div>
     );
 };

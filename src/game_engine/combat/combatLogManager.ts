@@ -4,13 +4,15 @@
  * PURPOSE:
  * Centralizes log generation and event emission for the combat system.
  * Ensures that logs are properly populated before events are emitted.
+ * Handles passive ability triggering based on emitted events.
  */
 
 import { CombatEvent, EventType, PhaseChangeSubtype } from '../../events/eventTypes';
 import { CombatLogFormatters, FormatMode } from './combatLogFormatters';
 import { LLMLogFormatters } from '../llmLogFormatters';
-import { generateInitialNarration, generateRoundNarration, generateAfterMathNarration } from './combatNarration';
+import { generateInitialNarration, generateRoundNarration, generateAfterMathNarration, annotateNarration } from './combatNarration';
 import { CombatState } from '../../types/combatState';
+import { executePassiveAbilities } from './traitExecutor';
 
 /**
  * Populates the combat logs with formatted event information
@@ -63,7 +65,11 @@ export async function populateCombatLogs(event: CombatEvent, state: CombatState)
           const structuredRoundLogs = LLMLogFormatters.formatEventsForSingleRound(roundLog.events);
           const roundNarration = await generateRoundNarration(state, structuredRoundLogs);
           roundLog.llmContextLog.push(structuredRoundLogs);
-          if (roundNarration) roundLog.llmNarrations.push(roundNarration);
+          if (roundNarration) {
+            // Annotate the round narration and store directly in llmNarrations
+            const annotatedNarration = await annotateNarration(roundNarration, state, currentRoundIndex);
+            roundLog.llmNarrations.push(annotatedNarration);
+          }
           break;
           
         case PhaseChangeSubtype.END:
@@ -82,11 +88,20 @@ export async function populateCombatLogs(event: CombatEvent, state: CombatState)
 }
 /**
  * Logs an event and emits it to both the combat event bus and UI event bus
+ * Also checks for and triggers any passive abilities that should activate in response
+ * 
  * @param event The game event to emit
  * @param state The current game state
  */ 
 export async function logAndEmitCombatEvent(event: CombatEvent, state: CombatState): Promise<void> {
   // Populate logs and wait for narrations to be generated
   await populateCombatLogs(event, state);
+  
+  // Check for passive abilities that should trigger from this event
+  // Skip if this is already a passive ability event to prevent infinite loops
+  if (event.type !== 'ABILITY' || !event.ability?.passive) {
+    await executePassiveAbilities(event, state);
+  }
+  
   // for now, dont add to an event queue - no need to
 }

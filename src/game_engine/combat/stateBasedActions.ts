@@ -38,18 +38,18 @@ export async function processBetweenActions(state: CombatState): Promise<CombatS
     for (const char of characters) {
         if (char.vitality.current <= 0) {
             const winner = characters.find(c => c !== char);
-            const loser = char;
             if (winner) {
-                await applyEndCombat(state, winner, loser, CombatEndReason.DEATH);
+                await applyEndCombat(state, winner, CombatEndReason.DEATH);
+                return state; // Return early if combat has ended
             }
             break;
         }
         // Check for insemination victory condition
         if (getStatus(char.statuses, StatusName.INSEMINATED)) {
             const winner = characters.find(c => c !== char);
-            const loser = char;
             if (winner) {
-                await applyEndCombat(state, winner, loser, CombatEndReason.BREEDING);
+                await applyEndCombat(state, winner, CombatEndReason.BREEDING);
+                return state; // Return early if combat has ended
             }
             break;
         }

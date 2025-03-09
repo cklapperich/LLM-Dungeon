@@ -21,6 +21,22 @@ import promptsData from '@assets/descriptions/prompts.json';
 
 export class LLMLogFormatters {
   /**
+   * Filters combat logs to remove skillchecks and other unnecessary information for annotation
+   * @param events The events to filter
+   * @returns Formatted string with filtered events
+   */
+  static filterLogsForAnnotation(events: GameEvent[]): string {
+    // Filter out skillcheck events and other unnecessary events
+    const filteredEvents = events.filter(event => 
+      event.type !== 'SKILL_CHECK'
+      // Add other event types to filter out as needed
+    );
+    
+    // Format the filtered events
+    return this.formatEventsForSingleRound(filteredEvents);
+  }
+
+  /**
    * Formats a section with a header, only including the header if content exists
    * @param title The section title
    * @param content The section content
@@ -157,20 +173,30 @@ export class LLMLogFormatters {
       // Format combat end header
       formattedOutput.push(`### COMBAT ENDS`);
       
-      // Get the loser and winner
-      const loser = event.loser;
+      // Get the winner
       const winner = event.winner;
       
-      if (loser && winner) {
-          // Check if the loser is a monster by looking at its type property
-          if (loser.type === 'monster') {
-              // If the loser is a monster, describe retreat instead of death
-              formattedOutput.push(`* ${loser.name} has been defeated and retreats from the battle.`);
-              formattedOutput.push(`* ${winner.name} stands victorious as ${loser.name} flees.`);
+      if (winner && event.characters && event.characters.length > 1) {
+          // Determine the loser (the character that is not the winner)
+          const loser = event.characters.find(character => character !== winner);
+          
+          if (loser) {
+              // Check if the loser is a monster by looking at its type property
+              if (loser.type === 'monster') {
+                  // If the loser is a monster, describe retreat instead of death
+                  formattedOutput.push(`* ${loser.name} has been defeated and retreats from the battle.`);
+                  formattedOutput.push(`* ${winner.name} stands victorious as ${loser.name} flees.`);
+              } else {
+                  // If the hero is defeated, still use death terminology
+                  formattedOutput.push(`* ${loser.name} has been defeated by ${winner.name}.`);
+              }
           } else {
-              // If the hero is defeated, still use death terminology
-              formattedOutput.push(`* ${loser.name} has been defeated by ${winner.name}.`);
+              // If we couldn't determine a loser, just mention the winner
+              formattedOutput.push(`* ${winner.name} is victorious.`);
           }
+      } else if (winner) {
+          // If we have a winner but no characters array, just mention the winner
+          formattedOutput.push(`* ${winner.name} is victorious.`);
       }
       
       // Join the array of strings into a single string with newlines
@@ -188,6 +214,7 @@ export class LLMLogFormatters {
       let currentActor = null;
       let inInitiativePhase = false;
       let combatHasEnded = false;
+      let eventCounter = 1; // Counter for numbering events
       
       events.forEach(event => {
         // Skip combat start and end events - these are handled separately

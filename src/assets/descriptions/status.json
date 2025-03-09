@@ -1,4 +1,11 @@
 {
+  "ambushed": {
+    "1": [
+      "caught completely off-guard",
+      "surprised by a sudden attack",
+      "disoriented and vulnerable"
+    ]
+  },
   "grappled": {
     "1": [
       "caught in a firm hold",
@@ -44,5 +51,39 @@
     "2": ["flushed and arouseed. feeling a bit wet between the legs"],
     "3": ["feels very hot, flushed, aroused and sweating. Slick thighs. Is breathing heavily. Wet and horny."],
     "4": ["gushing soaking dripping wet. Slick thighs. Cant think about anything other than getting fucked. Feels like a bitch in heat"]
+  },
+  "exhaustion": {
+    "1": [
+      "showing signs of fatigue",
+      "breathing heavily from exertion",
+      "movements slowing from tiredness"
+    ],
+    "2": [
+      "visibly exhausted and struggling",
+      "muscles trembling with fatigue",
+      "barely able to keep going"
+    ],
+    "3": [
+      "completely drained of energy",
+      "on the verge of collapse from exhaustion",
+      "barely conscious from extreme fatigue"
+    ]
+  },
+  "inseminated": {
+    "1": [
+      "filled with monster seed",
+      "dripping with the monster's essence",
+      "claimed and marked internally"
+    ],
+    "2": [
+      "thoroughly inseminated and leaking",
+      "overflowing with monster seed",
+      "completely filled and marked"
+    ],
+    "3": [
+      "utterly saturated with monster seed",
+      "completely claimed and overflowing",
+      "marked so thoroughly it may never wash away"
+    ]
   }
 }

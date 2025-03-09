@@ -25,11 +25,11 @@ export interface PromptsData {
         INITIAL_COMBAT: string;
         CONTINUE_COMBAT: string;
         COMBAT_AFTERMATH: string;
+        ANNOTATE_COMBAT: string;
     };
+    game_context: string;
     prompts: {
-        narrate: {
-            system: string;
-            task: string;
-        };
+        narrate: string;
+        jailbreak: string;
     };
 }

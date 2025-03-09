@@ -11,6 +11,103 @@ const BINDABLE_PARTS = [
 
 // Collection of all built-in status effects
 export const StatusEffects: Record<string, BuiltInStatus> = {
+    [StatusName.SKILL_BOOST]: {
+        name: StatusName.SKILL_BOOST,
+        defaultParams: {
+            skill: Skills.DODGE_GRACE,
+            value: 0,
+            duration: 1
+        },
+        getModifiers: (status: Status): ModifierResult => {
+            const skillModifiers: Record<string, number> = {};
+            skillModifiers[status.params.skill || Skills.DODGE_GRACE] = status.params.value || 0;
+            return {
+                skill_modifiers: skillModifiers,
+                attribute_modifiers: {}
+            };
+        },
+        createInstance: (params?: Record<string, any>): Status => ({
+            id: crypto.randomUUID(),
+            name: StatusName.SKILL_BOOST,
+            source: StatusSource.SELF,
+            duration: params?.duration ?? 1,
+            stacks: 1,
+            max_stacks: 1,
+            is_negative: false,
+            params: { ...params }
+        })
+    },
+    [StatusName.STAT_BOOST]: {
+        name: StatusName.STAT_BOOST,
+        defaultParams: {
+            attributes: {},
+            duration: 1
+        },
+        getModifiers: (status: Status): ModifierResult => {
+            const attributeModifiers: Record<string, number> = {};
+            if (status.params.attributes) {
+                Object.entries(status.params.attributes).forEach(([attr, value]) => {
+                    attributeModifiers[attr.toLowerCase()] = value as number;
+                });
+            }
+            return {
+                skill_modifiers: {},
+                attribute_modifiers: attributeModifiers
+            };
+        },
+        createInstance: (params?: Record<string, any>): Status => ({
+            id: crypto.randomUUID(),
+            name: StatusName.STAT_BOOST,
+            source: StatusSource.SELF,
+            duration: params?.duration ?? 1,
+            stacks: 1,
+            max_stacks: 1,
+            is_negative: false,
+            params: { ...params }
+        })
+    },
+    [StatusName.AMBUSHED]: {
+        name: StatusName.AMBUSHED,
+        defaultParams: {
+            duration: 1
+        },
+        getModifiers: (status: Status, gameState: any): ModifierResult => {
+            const target = gameState?.characters?.find(c => c.statuses.some(s => s.id === status.id));
+            if (!target) {
+                return {
+                    skill_modifiers: {
+                        [Skills.INITIATIVE]: -20
+                    },
+                    attribute_modifiers: {}
+                };
+            }
+            
+            // Calculate grace modifier to reduce to 10 (if higher)
+            const currentGrace = target.attributes.Grace;
+            const graceModifier = currentGrace > 10 ? 10 - currentGrace : 0;
+            
+            return {
+                skill_modifiers: {
+                    [Skills.INITIATIVE]: -20
+                },
+                attribute_modifiers: {
+                    grace: graceModifier
+                }
+            };
+        },
+        createInstance: (params?: Record<string, any>): Status => {
+            return {
+                id: crypto.randomUUID(),
+                name: StatusName.AMBUSHED,
+                source: StatusSource.SYSTEM,
+                duration: params?.duration ?? 1,
+                stacks: 1,
+                max_stacks: 1,
+                is_negative: true,
+                params: { ...params }
+            };
+        }
+    },
     [StatusName.GRAPPLED]: {
         name: StatusName.GRAPPLED,
         defaultParams: {

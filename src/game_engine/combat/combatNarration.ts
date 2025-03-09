@@ -1,5 +1,5 @@
 import { CombatState } from '../../types/combatState';
-import { callLLM, formatSystemPrompt } from '../llm';
+import { callLLM, formatSystemPrompt, LLMErrorType } from '../llm';
 import { LLMLogFormatters } from '../llmLogFormatters';
 import { SpiceLevel, Length, SpiceLevels, Lengths } from '../../types/prompts';
 
@@ -91,6 +91,36 @@ function getModelForNarration(spiceLevel: SpiceLevel, length: Length, settings: 
     return settings.llm;
 }
 
+/**
+ * Creates a detailed error message for narration generation
+ * @param narrationType The type of narration being generated
+ * @param error The error that occurred
+ * @param state The combat state
+ * @param additionalInfo Additional information about the error
+ * @returns A formatted error message
+ */
+function createNarrationErrorMessage(
+    narrationType: 'initial' | 'round' | 'aftermath',
+    error: Error,
+    state: CombatState,
+    additionalInfo: Record<string, any> = {}
+): string {
+    // Extract useful information from the state without including the entire state object
+    const stateInfo = {
+        round: state.round,
+        charactersPresent: state.characters.map(c => c.name),
+        spiceLevel: additionalInfo.spiceLevel,
+        length: additionalInfo.length,
+        modelUsed: additionalInfo.model
+    };
+    
+    // Check if this is an LLM error with a specific type
+    const errorTypeMatch = error.message.match(/\[(.*?)\]/);
+    const errorType = errorTypeMatch ? errorTypeMatch[1] : 'NARRATION_ERROR';
+    
+    return `Failed to generate ${narrationType} narration [${errorType}]: ${error.message} | State: ${JSON.stringify(stateInfo)}`;
+}
+
 export async function generateInitialNarration(
     state: CombatState,
     structuredLogs: string
@@ -110,25 +140,60 @@ export async function generateInitialNarration(
         // Get the appropriate model for this narration
         const model = getModelForNarration(spiceLevel, length, state.settings);
         
-        const systemPrompt = formatSystemPrompt(
-            PROMPTS.narrate.system,
+        // Track narration context for error reporting
+        const narrationContext = {
             spiceLevel,
             length,
-            formattedLogs,  // Use the new structured logs
-            [], // No previous narrations for initial
-            TASKS.INITIAL_COMBAT,
-            room?.description,
-            characterInfo
-        );
+            model,
+            isInitial: true,
+            hasEvents: (currentRoundLog.events || []).length > 0,
+            roomProvided: !!room?.description
+        };
         
-        // Log the prompt
-        if (state.combatLog.length > 0) {
-            state.combatLog[state.combatLog.length-1].prompts.push(systemPrompt);
-        }
+        try {
+            const systemPrompt = formatSystemPrompt(
+                PROMPTS.narrate,
+                spiceLevel,
+                length,
+                formattedLogs,  // Use the new structured logs
+                [], // No previous narrations for initial
+                TASKS.INITIAL_COMBAT,
+                room?.description,
+                characterInfo
+            );
+            
+            // Log the prompt
+            if (state.combatLog.length > 0) {
+                state.combatLog[state.combatLog.length-1].prompts.push(systemPrompt);
+            }
 
-        return await callLLM('narrate', [systemPrompt], model, get_api_key(state.settings));
+            return await callLLM('narrate', [systemPrompt], model, get_api_key(state.settings));
+        } catch (error) {
+            // Handle specific formatting errors
+            if (error.message.includes('formatSystemPrompt')) {
+                console.error(createNarrationErrorMessage(
+                    'initial',
+                    new Error(`Prompt formatting failed: ${error.message}`),
+                    state,
+                    narrationContext
+                ));
+            } else {
+                // Re-throw for the outer catch block to handle
+                throw error;
+            }
+        }
     } catch (error) {
-        console.error('Failed to generate initial combat narration:', error);
+        // Get narration settings again for error context
+        const { spiceLevel, length } = getNarrationSettings(state, true, 0);
+        const model = getModelForNarration(spiceLevel, length, state.settings);
+        
+        console.error(createNarrationErrorMessage(
+            'initial',
+            error,
+            state,
+            { spiceLevel, length, model }
+        ));
+        
         const characters = state.characters;
         return `A battle begins between ${characters[0].name} and ${characters[1].name}!`;
     }
@@ -139,8 +204,19 @@ export async function generateRoundNarration(
     structuredLogs?: string
 ): Promise<string> {
     try {
+        // Validate state has the required data
+        if (!state.combatLog || state.round < 0 || state.round >= state.combatLog.length) {
+            throw new Error(`Invalid combat state: round ${state.round} not found in combat log (length: ${state.combatLog?.length || 0})`);
+        }
+        
         const characters = state.characters;
         const currentRoundLog = state.combatLog[state.round];
+        
+        // Check if we have a valid current round log
+        if (!currentRoundLog) {
+            throw new Error(`Missing combat log for round ${state.round}`);
+        }
+        
         const previousNarrations = state.combatLog
             .slice(0, state.round)
             .flatMap(log => log.llmNarrations);
@@ -156,26 +232,147 @@ export async function generateRoundNarration(
         // Get the appropriate model for this narration
         const model = getModelForNarration(spiceLevel, length, state.settings);
         
-        const systemPrompt = formatSystemPrompt(
-            PROMPTS.narrate.system,
+        // Track narration context for error reporting
+        const narrationContext = {
             spiceLevel,
             length,
-            formattedLogs,  // Use the new structured logs
-            previousNarrations,
-            TASKS.CONTINUE_COMBAT,
-            null, // No room description needed for round narration
-            characterInfo
+            model,
+            round: state.round,
+            eventsCount: (currentRoundLog.events || []).length,
+            previousNarrationsCount: previousNarrations.length,
+            isExplicit: spiceLevel === SpiceLevels.EXPLICIT
+        };
+        
+        try {
+            const systemPrompt = formatSystemPrompt(
+                PROMPTS.narrate,
+                spiceLevel,
+                length,
+                formattedLogs,
+                previousNarrations,
+                TASKS.CONTINUE_COMBAT,
+                null, // No room description needed for round narration
+                characterInfo
+            );
+            
+            // Log the prompt
+            if (state.combatLog.length > 0) {
+                state.combatLog[state.combatLog.length-1].prompts.push(systemPrompt);
+            }
+            
+            // Special handling for explicit narrations
+            if (spiceLevel === SpiceLevels.EXPLICIT) {
+                try {
+                    return await callLLM('narrate', [systemPrompt], model, get_api_key(state.settings));
+                } catch (explicitError) {
+                    // Log the explicit narration error
+                    console.error(createNarrationErrorMessage(
+                        'round',
+                        new Error(`Explicit narration failed: ${explicitError.message}`),
+                        state,
+                        narrationContext
+                    ));
+                    
+                    // Fall back to suggestive narration
+                    const fallbackSystemPrompt = formatSystemPrompt(
+                        PROMPTS.narrate,
+                        SpiceLevels.SUGGESTIVE, // Fallback to suggestive
+                        length,
+                        formattedLogs,
+                        previousNarrations,
+                        TASKS.CONTINUE_COMBAT,
+                        null,
+                        characterInfo
+                    );
+                    
+                    // Use the regular model for fallback
+                    return await callLLM('narrate', [fallbackSystemPrompt], state.settings.llm, get_api_key(state.settings));
+                }
+            }
+            
+            return await callLLM('narrate', [systemPrompt], model, get_api_key(state.settings));
+        } catch (error) {
+            // Handle specific formatting errors
+            if (error.message.includes('formatSystemPrompt')) {
+                console.error(createNarrationErrorMessage(
+                    'round',
+                    new Error(`Prompt formatting failed: ${error.message}`),
+                    state,
+                    narrationContext
+                ));
+            }
+            
+            // Re-throw for the outer catch block to handle
+            throw error;
+        }
+    } catch (error) {
+        // Get narration settings again for error context
+        const { spiceLevel, length } = getNarrationSettings(state, false, state.round - 1);
+        const model = getModelForNarration(spiceLevel, length, state.settings);
+        
+        console.error(createNarrationErrorMessage(
+            'round',
+            error,
+            state,
+            { spiceLevel, length, model, round: state.round }
+        ));
+        
+        return `Round ${state.round} combat actions completed.`;
+    }
+}
+
+/**
+ * Annotates a narration by adding references to combat events
+ * @param narration The narration to annotate
+ * @param state The current combat state
+ * @param roundIndex The index of the round to use for annotation
+ * @returns The annotated narration
+ */
+export async function annotateNarration(
+    narration: string,
+    state: CombatState,
+    roundIndex: number
+): Promise<string> {
+    try {
+        // Get the round log for the specified round
+        const roundLog = state.combatLog[roundIndex];
+        if (!roundLog || !roundLog.events || roundLog.events.length === 0) {
+            console.error(`No events found for round ${roundIndex}`);
+            return narration;
+        }
+        
+        // Filter the logs for annotation
+        const filteredLogs = LLMLogFormatters.filterLogsForAnnotation(roundLog.events);
+        
+        // Determine which model to use for annotation
+        const model = state.settings.annotation_llm || state.settings.llm;
+        
+        // Create a system prompt for annotation
+        const systemPrompt = formatSystemPrompt(
+            PROMPTS.narrate,
+            SpiceLevels.NONE, // Annotation doesn't need spice level
+            Lengths.SHORT,    // Length doesn't matter for annotation
+            filteredLogs,     // The filtered logs for reference
+            [],               // No previous narrations needed
+            TASKS.ANNOTATE_COMBAT, // Use the annotation task
+            null,             // No room description needed
+            null              // No character info needed
         );
+        
+        // Add the narration to annotate as a user message
+        const userMessage = narration;
         
         // Log the prompt
         if (state.combatLog.length > 0) {
             state.combatLog[state.combatLog.length-1].prompts.push(systemPrompt);
         }
         
-        return await callLLM('narrate', [systemPrompt], model, get_api_key(state.settings));
+        // Call the LLM to annotate the narration
+        return await callLLM('narrate', [systemPrompt, userMessage], model, get_api_key(state.settings));
     } catch (error) {
-        console.error('Failed to generate round narration:', error);
-        return `Round ${state.round} combat actions completed.`;
+        console.error(`Failed to annotate narration: ${error.message}`);
+        // Return the original narration if annotation fails
+        return narration;
     }
 }
 
@@ -184,8 +381,19 @@ export async function generateAfterMathNarration(
     structuredLogs?: string
 ): Promise<string> {
     try {
+        // Validate state has the required data
+        if (!state.combatLog || state.round <= 0 || state.round > state.combatLog.length) {
+            throw new Error(`Invalid combat state for aftermath: round ${state.round} not valid for combat log (length: ${state.combatLog?.length || 0})`);
+        }
+        
         const characters = state.characters;
         const currentRoundLog = state.combatLog[state.round - 1];
+        
+        // Check if we have a valid final round log
+        if (!currentRoundLog) {
+            throw new Error(`Missing combat log for final round ${state.round - 1}`);
+        }
+        
         const previousNarrations = state.combatLog
             .flatMap(log => log.llmNarrations);
         
@@ -200,25 +408,102 @@ export async function generateAfterMathNarration(
         // Get the appropriate model for this narration
         const model = getModelForNarration(spiceLevel, length, state.settings);
         
-        const systemPrompt = formatSystemPrompt(
-            PROMPTS.narrate.system,
+        // Track narration context for error reporting
+        const narrationContext = {
             spiceLevel,
             length,
-            formattedLogs,  // Use the new structured logs
-            previousNarrations,
-            TASKS.COMBAT_AFTERMATH, 
-            null, // Room description
-            characterInfo
-        );
+            model,
+            finalRound: state.round - 1,
+            eventsCount: (currentRoundLog.events || []).length,
+            previousNarrationsCount: previousNarrations.length,
+            isExplicit: spiceLevel === SpiceLevels.EXPLICIT,
+            winner: state.winner ? state.winner.name : 'none'
+        };
         
-        // Log the prompt
-        if (state.combatLog.length > 0) {
-            state.combatLog[state.combatLog.length-1].prompts.push(systemPrompt);
+        try {
+            const systemPrompt = formatSystemPrompt(
+                PROMPTS.narrate,
+                spiceLevel,
+                length,
+                formattedLogs,
+                previousNarrations,
+                TASKS.COMBAT_AFTERMATH, 
+                null, // Room description
+                characterInfo
+            );
+            
+            // Log the prompt
+            if (state.combatLog.length > 0) {
+                state.combatLog[state.combatLog.length-1].prompts.push(systemPrompt);
+            }
+            
+            // Special handling for explicit narrations
+            if (spiceLevel === SpiceLevels.EXPLICIT) {
+                try {
+                    return await callLLM('narrate', [systemPrompt], model, get_api_key(state.settings));
+                } catch (explicitError) {
+                    // Log the explicit narration error
+                    console.error(createNarrationErrorMessage(
+                        'aftermath',
+                        new Error(`Explicit aftermath narration failed: ${explicitError.message}`),
+                        state,
+                        narrationContext
+                    ));
+                    
+                    // Fall back to suggestive narration
+                    const fallbackSystemPrompt = formatSystemPrompt(
+                        PROMPTS.narrate,
+                        SpiceLevels.SUGGESTIVE, // Fallback to suggestive
+                        length,
+                        formattedLogs,
+                        previousNarrations,
+                        TASKS.COMBAT_AFTERMATH,
+                        null,
+                        characterInfo
+                    );
+                    
+                    // Use the regular model for fallback
+                    return await callLLM('narrate', [fallbackSystemPrompt], state.settings.llm, get_api_key(state.settings));
+                }
+            }
+            
+            return await callLLM('narrate', [systemPrompt], model, get_api_key(state.settings));
+        } catch (error) {
+            // Handle specific formatting errors
+            if (error.message.includes('formatSystemPrompt')) {
+                console.error(createNarrationErrorMessage(
+                    'aftermath',
+                    new Error(`Prompt formatting failed: ${error.message}`),
+                    state,
+                    narrationContext
+                ));
+            }
+            
+            // Re-throw for the outer catch block to handle
+            throw error;
         }
-        
-        return await callLLM('narrate', [systemPrompt], model, get_api_key(state.settings));
     } catch (error) {
-        console.error('Failed to generate aftermath narration:', error);
+        // Get narration settings again for error context
+        const { spiceLevel, length } = getNarrationSettings(state, false, state.round - 1);
+        const model = getModelForNarration(spiceLevel, length, state.settings);
+        
+        console.error(createNarrationErrorMessage(
+            'aftermath',
+            error,
+            state,
+            { 
+                spiceLevel, 
+                length, 
+                model, 
+                finalRound: state.round - 1,
+                winner: state.winner ? state.winner.name : 'none'
+            }
+        ));
+        
+        // Provide a more informative fallback message
+        if (state.winner) {
+            return `The combat has ended. ${state.winner.name} is victorious!`;
+        }
         return `The combat has ended.`;
     }
 }

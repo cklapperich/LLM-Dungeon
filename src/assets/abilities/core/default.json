@@ -1,0 +1,212 @@
+[
+  {
+    "id": "core.slam",
+    "name": "Slam",
+    "description": "A forceful body slam attack",
+    "rarity": "common",
+    "skill": "Heavy Weapons",
+    "defenseOptions": ["Dodge", "Block"],
+    "requirements": {
+      "parts": {}
+    },
+    "effects": [
+      {
+        "type": "WOUND",
+        "params": { "value": 1 },
+        "target": "other"
+      }
+    ]
+  },
+  {
+    "id": "core.grab",
+    "name": "Grab",
+    "description": "A basic grab attempt",
+    "rarity": "common",
+    "skill": "Strong Grapple",
+    "defenseOptions": ["Break Free", "Slip Free"],
+    "requirements": {
+      "parts": {}
+    },
+    "effects": [
+      {
+        "type": "GRAPPLE",
+        "params": { "type": "grab" },
+        "target": "other"
+      },
+      {
+        "type": "STATUS",
+        "params": {
+          "type": "ability_cooldown",
+          "abilityName": "Grab",
+          "duration": 2
+        },
+        "target": "self",
+        "applyOnSkillCheckFailure": true
+      }
+    ]
+  },
+  {
+    "id": "core.penetrate",
+    "name": "Penetrate",
+    "description": "The monster penetrates an orifice with a tongue, phallus, or other appendage.",
+    "rarity": "common",
+    "skill": "Strong Grapple",
+    "defenseOptions": ["Break Free", "Slip Free"],
+    "modifier": 2,
+    "requirements": {
+      "parts": {},
+      "statuses": [{
+        "name": "grappled",
+        "stacks": 1,
+        "target": "other"
+      }],
+      "clothing": {
+        "maxLevel": 0
+      }
+    },
+    "effects": [
+      {
+        "type": "PENETRATE",
+        "params": {
+          "inseminate_if_x_stacks": 2
+        },
+        "target": "other"
+      }
+    ]
+  },
+  {
+    "id": "core.shred",
+    "name": "Shred",
+    "description": "Tear away at clothing with acid or claw",
+    "rarity": "common",
+    "skill": "Grace",
+    "defenseOptions": ["Dodge"],
+    "requirements": {
+      "parts": {}
+    },
+    "effects": [
+      {
+        "type": "MODIFY_CLOTHING",
+        "params": { "amount": -1 },
+        "target": "other"
+      },
+      {
+        "type": "STATUS",
+        "params": {
+          "type": "ability_cooldown",
+          "abilityName": "Shred",
+          "duration": 2
+        },
+        "target": "self",
+        "applyOnSkillCheckFailure": true
+      }
+    ]
+  },
+  {
+    "id": "core.dodge_stance",
+    "name": "Dodge Stance",
+    "description": "The werewolf drops into a low, predatory stance, its muscles coiled and ready to evade any attack with supernatural reflexes",
+    "rarity": "common",
+    "skill": "Dodge",
+    "defenseOptions": [],
+    "priority": true,
+    "requirements": {
+      "parts": {}
+    },
+    "effects": [
+      {
+        "type": "STATUS",
+        "params": {
+          "type": "skill_boost",
+          "skill": "Dodge",
+          "value": 6,
+          "duration": 1
+        },
+        "target": "self"
+      },
+      {
+        "type": "STATUS",
+        "params": {
+          "type": "ability_cooldown",
+          "abilityName": "Dodge Stance",
+          "duration": 3
+        },
+        "target": "self"
+      }
+    ]
+  },
+  {
+    "id": "core.clamp",
+    "name": "Clamp",
+    "description": "The werewolf lunges forward with terrifying speed, sinking its razor-sharp fangs deep into flesh and holding on with powerful jaws",
+    "rarity": "common",
+    "skill": "Light Weapons",
+    "defenseOptions": ["Dodge", "Block"],
+    "modifier": 4,
+    "requirements": {
+      "parts": {
+        "mouth": 1
+      }
+    },
+    "effects": [
+      {
+        "type": "WOUND",
+        "params": { "value": 1 },
+        "target": "other"
+      },
+      {
+        "type": "GRAPPLE",
+        "params": { "type": "grab" },
+        "target": "other"
+      },
+      {
+        "type": "STATUS",
+        "params": {
+          "type": "ability_cooldown",
+          "abilityName": "Clamp",
+          "duration": 2
+        },
+        "target": "self",
+        "applyOnSkillCheckFailure": true
+      }
+    ]
+  },
+  {
+    "id": "core.howl",
+    "name": "Howl",
+    "description": "The werewolf releases a bone-chilling howl that echoes through the darkness, channeling primal fury to enhance its already formidable abilities",
+    "rarity": "rare",
+    "skill": "Will",
+    "defenseOptions": [],
+    "requirements": {
+      "parts": {
+        "mouth": 1
+      }
+    },
+    "effects": [
+      {
+        "type": "STATUS",
+        "params": {
+          "type": "stat_boost",
+          "attributes": {
+            "Might": 2,
+            "Grace": 2,
+            "Wit": 2,
+            "Will": 2
+          },
+          "duration": 2
+        },
+        "target": "self"
+      },
+      {
+        "type": "STATUS",
+        "params": {
+          "type": "ability_cooldown",
+          "abilityName": "Howl",
+          "duration": 3
+        },
+        "target": "self"
+      }
+    ]
+  }
+]

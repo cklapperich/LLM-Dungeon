@@ -1,0 +1,106 @@
+{
+    "name": "Temple Serpent",
+    "type": "monster",
+    "artworkUrl": "monsters/serpent.png",
+    "attributes":{
+        "Might": 10,
+        "Grace": 12,
+        "Wit": 8,
+        "Will": 10
+    },
+    "skills": {
+        "Stealth": 3,
+        "Grapple": 4,
+        "Perception": 3
+    },
+    "vitality": {
+        "max": 4,
+        "current": 4
+    },
+    "conviction": {
+        "max": 3,
+        "current": 3
+    },
+    "description": "A large serpent with hypnotic eyes and a muscular body. It lurks in the temple's dark corners, using its powerful coils to restrain prey before delivering its arousal-inducing venom. Its scales shimmer with an otherworldly iridescence that seems to enhance its hypnotic abilities.",
+    "size": 2,
+    "armor": {
+        "max": 2,
+        "current": 2
+    },
+    "limbs": {
+        "mouth": 1,
+        "tentacle": 1,
+        "venom_injector": 1
+    },
+    "statuses": [],
+    "flags": {},
+    "traits": [
+        "core.slam",
+        "tentacles.bind_limb",
+        "tentacles.squeeze",
+        "venomous_fangs.venom_bite",
+        {
+            "name": "Hypnotic Gaze",
+            "description": "The serpent's eyes shimmer with an otherworldly light, attempting to entrance its prey",
+            "rarity": "rare",
+            "skill": "Will",
+            "defenseOptions": ["Will"],
+            "modifier": 2,
+            "priority": false,
+            "effects": [
+                {
+                    "type": "STATUS",
+                    "params": {
+                        "type": "stunned",
+                        "duration": 1
+                    },
+                    "target": "other"
+                },
+                {
+                    "type": "STATUS",
+                    "params": {
+                        "type": "ability_cooldown",
+                        "abilityName": "Hypnotic Gaze",
+                        "duration": 3
+                    },
+                    "target": "self",
+                    "applyOnSkillCheckFailure": true
+                }
+            ]
+        },
+        {
+            "name": "Coil",
+            "description": "The serpent wraps its powerful body around the target, constricting with increasing pressure",
+            "rarity": "common",
+            "skill": "Grapple",
+            "defenseOptions": ["Break Free"],
+            "requirements": {
+                "statuses": [{
+                    "name": "grappled",
+                    "stacks": 1,
+                    "target": "other"
+                }]
+            },
+            "effects": [
+                {
+                    "type": "STATUS",
+                    "params": {
+                        "type": "grappled",
+                        "stacks": 1
+                    },
+                    "target": "other"
+                },
+                {
+                    "type": "STATUS",
+                    "params": {
+                        "type": "weakened",
+                        "attribute": "Might",
+                        "value": -1,
+                        "duration": 2
+                    },
+                    "target": "other"
+                }
+            ]
+        }
+    ]
+}
